@@ -9,9 +9,10 @@ MeshingKit is based on [Meshing](https://apps.apple.com/in/app/ai-mesh-gradient-
 ## Features
 
 - Create mesh gradients with customizable control points and colors
-- 52 predefined gradient templates for quick and stunning designs
+- 63 predefined gradient templates for quick and stunning designs
   - 30 templates with 2x2 grid size
   - 22 templates with 3x3 grid size
+  - 11 templates with 4x4 grid size
 - Easily extendable for custom gradient creations
 - Support for iOS 18.0+, macOS 15.0+, tvOS 18.0+, watchOS 11.0+, and visionOS 2.0+
 - SwiftUI compatible
@@ -46,7 +47,7 @@ struct ContentView: View {
 
 ## Available Gradient Templates
 
-MeshingKit provides two sets of predefined gradient templates:
+MeshingKit provides three sets of predefined gradient templates:
 
 ### GradientTemplateSize2 (2x2 grid)
 
@@ -109,6 +110,22 @@ MeshingKit offers 22 gradient templates with a 3x3 grid size:
 - mintBreeze
 - twilightSerenade
 - saharaDunes
+
+### GradientTemplateSize4 (4x4 grid)
+
+MeshingKit offers 11 gradient templates with a 4x4 grid size:
+
+- auroraBorealis
+- sunsetHorizon
+- mysticForest
+- cosmicNebula
+- coralReef
+- etherealTwilight
+- volcanicOasis
+- arcticFrost
+- jungleMist
+- desertMirage
+- neonMetropolis
 
 ## Custom Gradients
 
