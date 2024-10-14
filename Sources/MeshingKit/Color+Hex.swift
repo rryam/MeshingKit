@@ -1,3 +1,10 @@
+//
+//  Color+Hex.swift
+//  MeshingKit
+//
+//  Created by Rudrank Riyam on 10/14/24.
+//
+
 import SwiftUI
 
 extension Color {
