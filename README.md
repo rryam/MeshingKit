@@ -29,8 +29,6 @@ https://github.com/rryam/MeshingKit.git
 
 ## Usage
 
-### Basic Usage
-
 To use a predefined gradient template:
 
 ```swift
@@ -50,8 +48,6 @@ struct ContentView: View {
 MeshingKit provides three sets of predefined gradient templates:
 
 ### GradientTemplateSize2 (2x2 grid)
-
-MeshingKit offers 30 gradient templates with a 2x2 grid size:
 
 - mysticTwilight
 - tropicalParadise
@@ -86,8 +82,6 @@ MeshingKit offers 30 gradient templates with a 2x2 grid size:
 
 ### GradientTemplateSize3 (3x3 grid)
 
-MeshingKit offers 22 gradient templates with a 3x3 grid size:
-
 - intelligence
 - auroraBorealis
 - sunsetGlow
@@ -113,8 +107,6 @@ MeshingKit offers 22 gradient templates with a 3x3 grid size:
 
 ### GradientTemplateSize4 (4x4 grid)
 
-MeshingKit offers 11 gradient templates with a 4x4 grid size:
-
 - auroraBorealis
 - sunsetHorizon
 - mysticForest
@@ -129,7 +121,7 @@ MeshingKit offers 11 gradient templates with a 4x4 grid size:
 
 ## Custom Gradients
 
-You can create custom gradients by defining your own `GradientTemplate`:
+Ccreate custom gradients by defining your own `GradientTemplate`:
 
 ```swift
 let customTemplate = GradientTemplate(
@@ -158,7 +150,7 @@ let customGradient = MeshGradient(
 
 ## Hex Color Initialization
 
-MeshingKit includes an extension on `Color` that allows you to initialize colors using hexadecimal strings:
+There is an extension on `Color` that allows to initialise colors using hexadecimal strings:
 
 ```swift
 let color = Color(hex: "#FF5733")
