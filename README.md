@@ -1,6 +1,6 @@
 # MeshingKit
 
-MeshingKit is a Swift package that provides a powerful way to create mesh gradients in SwiftUI. It offers predefined gradient templates to directly render beautiful, gorgeous gradients!
+MeshingKit provides an easy way to create mesh gradients in SwiftUI with predefined gradient templates to directly render beautiful, gorgeous gradients!
 
 ## Meshing
 
@@ -8,20 +8,18 @@ MeshingKit is based on [Meshing](https://apps.apple.com/in/app/ai-mesh-gradient-
 
 ## Features
 
-- Create mesh gradients with customizable control points and colors
-- 63 predefined gradient templates for quick and stunning designs
+- 63 predefined gradient templates:
   - 30 templates with 2x2 grid size
   - 22 templates with 3x3 grid size
   - 11 templates with 4x4 grid size
-- Easily extendable for custom gradient creations
+- Easily extendable for custom gradients
 - Support for iOS 18.0+, macOS 15.0+, tvOS 18.0+, watchOS 11.0+, and visionOS 2.0+
-- SwiftUI compatible
 
 ## Installation
 
 ### Swift Package Manager
 
-You can add MeshingKit to your project using Swift Package Manager. In Xcode, go to File > Swift Packages > Add Package Dependency and enter the following URL:
+Add MeshingKit to your project using Swift Package Manager. In Xcode, go to File > Swift Packages > Add Package Dependency and enter the following URL:
 
 ```
 https://github.com/rryam/MeshingKit.git
