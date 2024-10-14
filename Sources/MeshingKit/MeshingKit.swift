@@ -7,7 +7,7 @@
 
 import SwiftUI
 /// A structure that provides utility functions for creating mesh gradients.
-public struct MeshingKit {
+public struct MeshingKit: Sendable {
 
   /// Creates a `MeshGradient` from a given `GradientTemplateSize3`.
   ///
