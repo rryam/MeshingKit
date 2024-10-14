@@ -16,7 +16,7 @@ public struct MeshingKit: Sendable {
   ///
   /// - Parameter template: A `GradientTemplateSize3` containing the gradient's specifications.
   /// - Returns: A `MeshGradient` instance created from the provided template.
-  public static func gradientSize3(template: GradientTemplateSize3) -> MeshGradient {
+  @MainActor public static func gradientSize3(template: GradientTemplateSize3) -> MeshGradient {
     MeshGradient(width: template.size, height: template.size, points: template.points, colors: template.colors)
   }
 
@@ -27,7 +27,7 @@ public struct MeshingKit: Sendable {
   ///
   /// - Parameter template: A `GradientTemplateSize2` containing the gradient's specifications.
   /// - Returns: A `MeshGradient` instance created from the provided template.
-  public static func gradientSize2(template: GradientTemplateSize2) -> MeshGradient {
+  @MainActor public static func gradientSize2(template: GradientTemplateSize2) -> MeshGradient {
     MeshGradient(width: template.size, height: template.size, points: template.points, colors: template.colors)
   }
 
@@ -38,7 +38,7 @@ public struct MeshingKit: Sendable {
   ///
   /// - Parameter template: A `GradientTemplateSize4` containing the gradient's specifications.
   /// - Returns: A `MeshGradient` instance created from the provided template.
-  public static func gradientSize4(template: GradientTemplateSize4) -> MeshGradient {
+  @MainActor public static func gradientSize4(template: GradientTemplateSize4) -> MeshGradient {
     MeshGradient(width: template.size, height: template.size, points: template.points, colors: template.colors)
   }
 }
