@@ -1,5 +1,7 @@
 # MeshingKit
 
+![Gradient](Sources/MeshingKit/Resources/gradient.jpg)
+
 MeshingKit provides an easy way to create mesh gradients in SwiftUI with predefined gradient templates to directly render beautiful, gorgeous gradients!
 
 ## Meshing
