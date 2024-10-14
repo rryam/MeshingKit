@@ -20,4 +20,15 @@ public struct MeshingKit {
     public static func gradientSize3(template: GradientTemplateSize3) -> MeshGradient {
         MeshGradient(width: template.size, height: template.size, points: template.points, colors: template.colors)
     }
+    
+    /// Creates a `MeshGradient` from a given `GradientTemplateSize2`.
+    ///
+    /// This function takes a `GradientTemplateSize2` and converts it into a `MeshGradient`,
+    /// using the template's size, points, and colors.
+    ///
+    /// - Parameter template: A `GradientTemplateSize2` containing the gradient's specifications.
+    /// - Returns: A `MeshGradient` instance created from the provided template.
+    public static func gradientSize2(template: GradientTemplateSize2) -> MeshGradient {
+        MeshGradient(width: template.size, height: template.size, points: template.points, colors: template.colors)
+    }
 }
