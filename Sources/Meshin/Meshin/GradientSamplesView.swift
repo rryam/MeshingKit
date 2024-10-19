@@ -67,13 +67,13 @@ struct FullScreenGradientView: View {
   var body: some View {
     ZStack {
       gradientView
-
       VStack {
         Spacer()
+
         Toggle("Animate", isOn: $showAnimation)
           .padding()
-          .background(Color.white.opacity(0.7))
-          .cornerRadius(8)
+          .background(.ultraThinMaterial, in: .rect)
+
         Button("Close") {
           presentationMode.wrappedValue.dismiss()
         }
@@ -91,7 +91,7 @@ struct FullScreenGradientView: View {
         AnimatedMeshGradientView(
           gridSize: 2,
           showAnimation: $showAnimation,
-          positions: size2Template.positions,
+          positions: size2Template.points,
           colors: size2Template.colors,
           background: size2Template.background
         )
@@ -99,7 +99,7 @@ struct FullScreenGradientView: View {
         AnimatedMeshGradientView(
           gridSize: 3,
           showAnimation: $showAnimation,
-          positions: size3Template.positions,
+          positions: size3Template.points,
           colors: size3Template.colors,
           background: size3Template.background
         )
@@ -107,7 +107,7 @@ struct FullScreenGradientView: View {
         AnimatedMeshGradientView(
           gridSize: 4,
           showAnimation: $showAnimation,
-          positions: size4Template.positions,
+          positions: size4Template.points,
           colors: size4Template.colors,
           background: size4Template.background
         )

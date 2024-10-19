@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0ACF11DF2CC3CA11008D8E5C /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 0ACF11DE2CC3CA11008D8E5C /* Inject */; };
-		0ACF11E22CC3CA30008D8E5C /* MeshingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0ACF11E12CC3CA30008D8E5C /* MeshingKit */; };
+		0A2DF7D82CC3D03400920005 /* MeshingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0A2DF7D72CC3D03400920005 /* MeshingKit */; };
+		0A2DF7DB2CC3D07D00920005 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 0A2DF7DA2CC3D07D00920005 /* Inject */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,8 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0ACF11DF2CC3CA11008D8E5C /* Inject in Frameworks */,
-				0ACF11E22CC3CA30008D8E5C /* MeshingKit in Frameworks */,
+				0A2DF7D82CC3D03400920005 /* MeshingKit in Frameworks */,
+				0A2DF7DB2CC3D07D00920005 /* Inject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,8 +72,8 @@
 			);
 			name = Meshin;
 			packageProductDependencies = (
-				0ACF11DE2CC3CA11008D8E5C /* Inject */,
-				0ACF11E12CC3CA30008D8E5C /* MeshingKit */,
+				0A2DF7D72CC3D03400920005 /* MeshingKit */,
+				0A2DF7DA2CC3D07D00920005 /* Inject */,
 			);
 			productName = Meshin;
 			productReference = 0ACF11BF2CC3C99F008D8E5C /* Meshin.app */;
@@ -104,8 +104,8 @@
 			mainGroup = 0ACF11B62CC3C99F008D8E5C;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				0ACF11DD2CC3CA11008D8E5C /* XCRemoteSwiftPackageReference "Inject" */,
-				0ACF11E02CC3CA30008D8E5C /* XCRemoteSwiftPackageReference "MeshingKit" */,
+				0A2DF7D62CC3D03400920005 /* XCRemoteSwiftPackageReference "MeshingKit" */,
+				0A2DF7D92CC3D07D00920005 /* XCRemoteSwiftPackageReference "Inject" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0ACF11C02CC3C99F008D8E5C /* Products */;
@@ -354,15 +354,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		0ACF11DD2CC3CA11008D8E5C /* XCRemoteSwiftPackageReference "Inject" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzysztofzablocki/Inject";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.2;
-			};
-		};
-		0ACF11E02CC3CA30008D8E5C /* XCRemoteSwiftPackageReference "MeshingKit" */ = {
+		0A2DF7D62CC3D03400920005 /* XCRemoteSwiftPackageReference "MeshingKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rryam/MeshingKit";
 			requirement = {
@@ -370,18 +362,26 @@
 				kind = branch;
 			};
 		};
+		0A2DF7D92CC3D07D00920005 /* XCRemoteSwiftPackageReference "Inject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzysztofzablocki/Inject";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0ACF11DE2CC3CA11008D8E5C /* Inject */ = {
+		0A2DF7D72CC3D03400920005 /* MeshingKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0ACF11DD2CC3CA11008D8E5C /* XCRemoteSwiftPackageReference "Inject" */;
-			productName = Inject;
-		};
-		0ACF11E12CC3CA30008D8E5C /* MeshingKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0ACF11E02CC3CA30008D8E5C /* XCRemoteSwiftPackageReference "MeshingKit" */;
+			package = 0A2DF7D62CC3D03400920005 /* XCRemoteSwiftPackageReference "MeshingKit" */;
 			productName = MeshingKit;
+		};
+		0A2DF7DA2CC3D07D00920005 /* Inject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A2DF7D92CC3D07D00920005 /* XCRemoteSwiftPackageReference "Inject" */;
+			productName = Inject;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
