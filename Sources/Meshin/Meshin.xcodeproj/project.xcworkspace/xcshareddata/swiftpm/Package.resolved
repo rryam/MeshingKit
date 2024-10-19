@@ -1,0 +1,24 @@
+{
+  "originHash" : "a3b6befc9c60b97e2d9e9df58d9f700739f562662b7b6cf700c9dde7a7b18e3f",
+  "pins" : [
+    {
+      "identity" : "inject",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzysztofzablocki/Inject",
+      "state" : {
+        "revision" : "728c56639ecb3df441d51d5bc6747329afabcfc9",
+        "version" : "1.5.2"
+      }
+    },
+    {
+      "identity" : "meshingkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rryam/MeshingKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "bbcac98d173daa9a21beb6d19e9ab25f2acb0cfa"
+      }
+    }
+  ],
+  "version" : 3
+}
