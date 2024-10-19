@@ -45,6 +45,69 @@ struct ContentView: View {
 }
 ```
 
+## Animated Gradient Views
+
+To create an animated gradient view:
+
+```swift
+import SwiftUI
+import MeshingKit
+
+struct AnimatedGradientView: View {
+    @State private var showAnimation = true
+
+    var body: some View {
+        MeshingKit.animatedGradientSize3(template: .cosmicAurora, showAnimation: $showAnimation)
+            .frame(width: 300, height: 300)
+            .padding()
+
+        // Toggle animation
+        Toggle("Animate Gradient", isOn: $showAnimation)
+            .padding()
+    }
+}
+```
+
+## Noise Effect with Gradients
+
+You can add a noise effect to your gradients using the ParameterizedNoiseView:
+
+```swift
+import SwiftUI
+import MeshingKit
+
+struct NoiseEffectGradientView: View {
+    @State private var intensity: Float = 0.5
+    @State private var frequency: Float = 0.2
+    @State private var opacity: Float = 0.9
+
+    var body: some View {
+        ParameterizedNoiseView(intensity: $intensity, frequency: $frequency, opacity: $opacity) {
+            MeshingKit.gradientSize3(template: .cosmicAurora)
+        }
+        .frame(width: 300, height: 300)
+
+        // Controls for adjusting the noise effect
+        VStack {
+            Slider(value: $intensity, in: 0...1) {
+                Text("Intensity")
+            }
+            .padding()
+
+            Slider(value: $frequency, in: 0...1) {
+                Text("Frequency")
+            }
+            .padding()
+
+            Slider(value: $opacity, in: 0...1) {
+                Text("Opacity")
+            }
+            .padding()
+        }
+    }
+}
+```
+
 ## Available Gradient Templates
 
 MeshingKit provides three sets of predefined gradient templates:

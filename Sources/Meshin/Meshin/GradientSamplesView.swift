@@ -67,6 +67,7 @@ struct FullScreenGradientView: View {
   var body: some View {
     ZStack {
       gradientView
+
       VStack {
         Spacer()
 
@@ -83,34 +84,15 @@ struct FullScreenGradientView: View {
     }
     .edgesIgnoringSafeArea(.all)
   }
-
   @ViewBuilder
   var gradientView: some View {
     switch template {
       case .size2(let size2Template):
-        AnimatedMeshGradientView(
-          gridSize: 2,
-          showAnimation: $showAnimation,
-          positions: size2Template.points,
-          colors: size2Template.colors,
-          background: size2Template.background
-        )
+        MeshingKit.gradientSize2(template: size2Template)
       case .size3(let size3Template):
-        AnimatedMeshGradientView(
-          gridSize: 3,
-          showAnimation: $showAnimation,
-          positions: size3Template.points,
-          colors: size3Template.colors,
-          background: size3Template.background
-        )
+        MeshingKit.animatedGradientSize3(template: size3Template, showAnimation: $showAnimation)
       case .size4(let size4Template):
-        AnimatedMeshGradientView(
-          gridSize: 4,
-          showAnimation: $showAnimation,
-          positions: size4Template.points,
-          colors: size4Template.colors,
-          background: size4Template.background
-        )
+        MeshingKit.animatedGradientSize4(template: size4Template, showAnimation: $showAnimation)
     }
   }
 }
