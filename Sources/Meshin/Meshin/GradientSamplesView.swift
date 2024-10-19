@@ -2,104 +2,116 @@ import SwiftUI
 import MeshingKit
 import Inject
 
-/// A view that displays various gradient samples using MeshingKit.
-///
-/// This view showcases different gradient sizes and an animated gradient,
-/// demonstrating the capabilities of the MeshingKit framework.
+/// A view that displays a list of gradient templates and allows full-screen viewing.
 struct GradientSamplesView: View {
   @ObserveInjection var inject
-  @State private var showAnimation = true
+  @State private var selectedTemplate: GradientTemplate?
 
   var body: some View {
-    ScrollView {
-      VStack(spacing: 20) {
-        Text("MeshingKit Samples")
-          .font(.largeTitle)
-          .padding()
+    NavigationStack {
+      List {
+        Section(header: Text("Size 2 Templates")) {
+          ForEach(GradientTemplateSize2.allCases, id: \.self) { template in
+            Button(template.name) {
+              selectedTemplate = .size2(template)
+            }
+          }
+        }
 
-        GradientSize2View()
+        Section(header: Text("Size 3 Templates")) {
+          ForEach(GradientTemplateSize3.allCases, id: \.self) { template in
+            Button(template.name) {
+              selectedTemplate = .size3(template)
+            }
+          }
+        }
 
-        GradientSize3View()
-
-        GradientSize4View()
-
-        AnimatedGradientView(showAnimation: $showAnimation)
+        Section(header: Text("Size 4 Templates")) {
+          ForEach(GradientTemplateSize4.allCases, id: \.self) { template in
+            Button(template.name) {
+              selectedTemplate = .size4(template)
+            }
+          }
+        }
       }
-      .padding()
+      .navigationTitle("Gradient Templates")
+    }
+    .sheet(item: $selectedTemplate) { template in
+      FullScreenGradientView(template: template)
     }
     .enableInjection()
   }
 }
 
-/// A view that displays a size 2 gradient sample.
-struct GradientSize2View: View {
-  @ObserveInjection var inject
+/// An enumeration representing the different types of gradient templates.
+enum GradientTemplate: Identifiable {
+  case size2(GradientTemplateSize2)
+  case size3(GradientTemplateSize3)
+  case size4(GradientTemplateSize4)
 
-  var body: some View {
-    VStack {
-      Text("Gradient Size 2")
-        .font(.headline)
-
-      MeshingKit.gradientSize2(template: .mysticTwilight)
-        .frame(width: 200, height: 200)
-        .cornerRadius(20)
+  var id: String {
+    switch self {
+      case .size2(let template): return "size2_\(template.rawValue)"
+      case .size3(let template): return "size3_\(template.rawValue)"
+      case .size4(let template): return "size4_\(template.rawValue)"
     }
-    .enableInjection()
   }
 }
 
-/// A view that displays a size 3 gradient sample.
-struct GradientSize3View: View {
-  @ObserveInjection var inject
+/// A view that displays a full-screen version of a selected gradient template.
+struct FullScreenGradientView: View {
+  let template: GradientTemplate
+  @Environment(\.presentationMode) var presentationMode
+  @State private var showAnimation: Bool = false
 
   var body: some View {
-    VStack {
-      Text("Gradient Size 3")
-        .font(.headline)
+    ZStack {
+      gradientView
 
-      MeshingKit.gradientSize3(template: .cosmicAurora)
-        .frame(width: 200, height: 200)
-        .cornerRadius(20)
+      VStack {
+        Spacer()
+        Toggle("Animate", isOn: $showAnimation)
+          .padding()
+          .background(Color.white.opacity(0.7))
+          .cornerRadius(8)
+        Button("Close") {
+          presentationMode.wrappedValue.dismiss()
+        }
+        .padding(.bottom)
+        .buttonStyle(.borderedProminent)
+      }
     }
-    .enableInjection()
+    .edgesIgnoringSafeArea(.all)
   }
-}
 
-/// A view that displays a size 4 gradient sample.
-struct GradientSize4View: View {
-  @ObserveInjection var inject
-
-  var body: some View {
-    VStack {
-      Text("Gradient Size 4")
-        .font(.headline)
-
-      MeshingKit.gradientSize4(template: .auroraBorealis)
-        .frame(width: 200, height: 200)
-        .cornerRadius(20)
+  @ViewBuilder
+  var gradientView: some View {
+    switch template {
+      case .size2(let size2Template):
+        AnimatedMeshGradientView(
+          gridSize: 2,
+          showAnimation: $showAnimation,
+          positions: size2Template.positions,
+          colors: size2Template.colors,
+          background: size2Template.background
+        )
+      case .size3(let size3Template):
+        AnimatedMeshGradientView(
+          gridSize: 3,
+          showAnimation: $showAnimation,
+          positions: size3Template.positions,
+          colors: size3Template.colors,
+          background: size3Template.background
+        )
+      case .size4(let size4Template):
+        AnimatedMeshGradientView(
+          gridSize: 4,
+          showAnimation: $showAnimation,
+          positions: size4Template.positions,
+          colors: size4Template.colors,
+          background: size4Template.background
+        )
     }
-    .enableInjection()
-  }
-}
-
-/// A view that displays an animated gradient sample.
-struct AnimatedGradientView: View {
-  @ObserveInjection var inject
-  @Binding var showAnimation: Bool
-
-  var body: some View {
-    VStack {
-      Text("Animated Gradient")
-        .font(.headline)
-
-      MeshingKit.animatedGradientSize3(template: .intelligence, showAnimation: $showAnimation)
-        .frame(width: 200, height: 200)
-        .cornerRadius(20)
-
-      Toggle("Show Animation", isOn: $showAnimation)
-        .padding()
-    }
-    .enableInjection()
   }
 }
 

@@ -8,14 +8,28 @@
 import SwiftUI
 
 /// A view that displays an animated mesh gradient.
-struct AnimatedMeshGradientView: View {
+public struct AnimatedMeshGradientView: View {
   var gridSize: Int
   @Binding var showAnimation: Bool
   var positions: [SIMD2<Float>]
   var colors: [Color]
   var background: Color
 
-  var body: some View {
+  public init(
+    gridSize: Int,
+    showAnimation: Binding<Bool>,
+    positions: [SIMD2<Float>],
+    colors: [Color],
+    background: Color
+  ) {
+    self.gridSize = gridSize
+    self._showAnimation = showAnimation
+    self.positions = positions
+    self.colors = colors
+    self.background = background
+  }
+
+  public var body: some View {
     TimelineView(.animation(minimumInterval: 1/120, paused: !showAnimation)) { phase in
       MeshGradient(
         width: gridSize,
