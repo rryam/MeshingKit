@@ -46,7 +46,7 @@ public struct GradientTemplate: Sendable {
   ///   - background: The base color of the gradient.
   ///
   /// - Note: The number of elements in `points` should match the number of elements in `colors`.
-  init(name: String, size: Int, points: [SIMD2<Float>], colors: [Color], background: Color) {
+  public init(name: String, size: Int, points: [SIMD2<Float>], colors: [Color], background: Color) {
     self.name = name
     self.size = size
     self.points = points
