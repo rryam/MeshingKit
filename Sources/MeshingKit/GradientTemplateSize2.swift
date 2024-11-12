@@ -39,6 +39,11 @@ public enum GradientTemplateSize2: String, CaseIterable {
   case mermaidLagoon
   case chocolateTruffle
   case neonNights
+  case fieryEmbers
+  case morningDew
+  case starryNight
+  case auroraBorealis
+  case sunsetBlaze
   
   /// The name of the gradient template.
   public var name: String {
@@ -213,6 +218,31 @@ public enum GradientTemplateSize2: String, CaseIterable {
           Color(hex: "#FF00FF"), Color(hex: "#00FFFF"),
           Color(hex: "#FF1493"), Color(hex: "#00FF00")
         ]
+      case .fieryEmbers:
+        return [
+          Color(hex: "#FF6347"), Color(hex: "#FF4500"),
+          Color(hex: "#FF7F50"), Color(hex: "#FFA500")
+        ]
+      case .morningDew:
+        return [
+          Color(hex: "#98FB98"), Color(hex: "#00FA9A"),
+          Color(hex: "#7FFF00"), Color(hex: "#32CD32")
+        ]
+      case .starryNight:
+        return [
+          Color(hex: "#191970"), Color(hex: "#483D8B"),
+          Color(hex: "#6A5ACD"), Color(hex: "#9370DB")
+        ]
+      case .auroraBorealis:
+        return [
+          Color(hex: "#00FF00"), Color(hex: "#00FFFF"),
+          Color(hex: "#FF00FF"), Color(hex: "#4B0082")
+        ]
+      case .sunsetBlaze:
+        return [
+          Color(hex: "#FF4500"), Color(hex: "#FF6347"),
+          Color(hex: "#FF7F50"), Color(hex: "#FFA07A")
+        ]
     }
   }
   
@@ -279,6 +309,16 @@ public enum GradientTemplateSize2: String, CaseIterable {
         return Color(hex: "#3C2A21")
       case .neonNights:
         return Color(hex: "#000000")
+      case .fieryEmbers:
+        return Color(hex: "#FF6347")
+      case .morningDew:
+        return Color(hex: "#98FB98")
+      case .starryNight:
+        return Color(hex: "#191970")
+      case .auroraBorealis:
+        return Color(hex: "#000033")
+      case .sunsetBlaze:
+        return Color(hex: "#FF4500")
     }
   }
 }
