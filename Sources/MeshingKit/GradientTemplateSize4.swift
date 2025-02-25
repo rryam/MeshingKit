@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// An enumeration of predefined gradient templates with a 4x4 grid size.
-public enum GradientTemplateSize4: String, CaseIterable {
+public enum GradientTemplateSize4: String, CaseIterable, GradientTemplate {
     case auroraBorealis
     case sunsetHorizon
     case mysticForest

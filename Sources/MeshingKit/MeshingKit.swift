@@ -25,9 +25,7 @@ public struct MeshingKit: Sendable {
     @MainActor public static func gradientSize3(template: GradientTemplateSize3)
         -> MeshGradient
     {
-        MeshGradient(
-            width: template.size, height: template.size,
-            points: template.points, colors: template.colors)
+        gradient(template: template)
     }
 
     /// Creates a `MeshGradient` from a given `GradientTemplateSize2`.
@@ -45,9 +43,7 @@ public struct MeshingKit: Sendable {
     @MainActor public static func gradientSize2(template: GradientTemplateSize2)
         -> MeshGradient
     {
-        MeshGradient(
-            width: template.size, height: template.size,
-            points: template.points, colors: template.colors)
+        gradient(template: template)
     }
 
     /// Creates a `MeshGradient` from a given `GradientTemplateSize4`.
@@ -65,9 +61,7 @@ public struct MeshingKit: Sendable {
     @MainActor public static func gradientSize4(template: GradientTemplateSize4)
         -> MeshGradient
     {
-        MeshGradient(
-            width: template.size, height: template.size,
-            points: template.points, colors: template.colors)
+        gradient(template: template)
     }
 
     /// Creates a `MeshGradient` from a given `GradientTemplate`.
@@ -117,13 +111,7 @@ public struct MeshingKit: Sendable {
     @MainActor public static func animatedGradientSize3(
         template: GradientTemplateSize3, showAnimation: Binding<Bool>
     ) -> some View {
-        AnimatedMeshGradientView(
-            gridSize: template.size,
-            showAnimation: showAnimation,
-            positions: template.points,
-            colors: template.colors,
-            background: template.background
-        )
+        animatedGradient(template: template, showAnimation: showAnimation)
     }
 
     /// Creates an animated `MeshGradient` view from a given `GradientTemplateSize4`.
@@ -152,13 +140,7 @@ public struct MeshingKit: Sendable {
     @MainActor public static func animatedGradientSize4(
         template: GradientTemplateSize4, showAnimation: Binding<Bool>
     ) -> some View {
-        AnimatedMeshGradientView(
-            gridSize: template.size,
-            showAnimation: showAnimation,
-            positions: template.points,
-            colors: template.colors,
-            background: template.background
-        )
+        animatedGradient(template: template, showAnimation: showAnimation)
     }
 
     /// Creates an animated `MeshGradient` view from a given `GradientTemplate`.
