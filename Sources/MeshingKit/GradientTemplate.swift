@@ -74,7 +74,10 @@ public struct CustomGradientTemplate: GradientTemplate {
     ///
     /// - Note: The number of elements in `points` should match the number of elements in `colors`.
     public init(
-        name: String, size: Int, points: [SIMD2<Float>], colors: [Color],
+        name: String,
+        size: Int,
+        points: [SIMD2<Float>],
+        colors: [Color],
         background: Color
     ) {
         self.name = name

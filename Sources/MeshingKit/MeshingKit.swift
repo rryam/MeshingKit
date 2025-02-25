@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+struct NewMeshGradientView: View {
+    var body: some View {
+        MeshingKit.gradient(template: .size3(.intelligence))
+    }
+}
+
 /// A structure that provides utility functions for creating mesh gradients.
 public struct MeshingKit: Sendable {
 
@@ -17,7 +23,7 @@ public struct MeshingKit: Sendable {
     ///
     /// - Parameter template: A `GradientTemplateSize3` containing the gradient's specifications.
     /// - Returns: A `MeshGradient` instance created from the provided template.
-    /// 
+    ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradientSize3(template: .auroraBorealis)
@@ -35,7 +41,7 @@ public struct MeshingKit: Sendable {
     ///
     /// - Parameter template: A `GradientTemplateSize2` containing the gradient's specifications.
     /// - Returns: A `MeshGradient` instance created from the provided template.
-    /// 
+    ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradientSize2(template: .mysticTwilight)
@@ -53,7 +59,7 @@ public struct MeshingKit: Sendable {
     ///
     /// - Parameter template: A `GradientTemplateSize4` containing the gradient's specifications.
     /// - Returns: A `MeshGradient` instance created from the provided template.
-    /// 
+    ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradientSize4(template: .cosmicNebula)
@@ -71,12 +77,12 @@ public struct MeshingKit: Sendable {
     ///
     /// - Parameter template: A `GradientTemplate` containing the gradient's specifications.
     /// - Returns: A `MeshGradient` instance created from the provided template.
-    /// 
+    ///
     /// Example:
     /// ```swift
     /// // Using with enum templates
     /// let gradient = MeshingKit.gradient(template: GradientTemplateSize3.auroraBorealis)
-    /// 
+    ///
     /// // Using with custom template
     /// let customTemplate = CustomGradientTemplate(name: "Custom", size: 4, points: [...], colors: [...], background: .black)
     /// let gradient = MeshingKit.gradient(template: customTemplate)
@@ -89,83 +95,44 @@ public struct MeshingKit: Sendable {
             points: template.points, colors: template.colors)
     }
 
-    /// Creates an animated `MeshGradient` view from a given `GradientTemplateSize3`.
+    /// Creates a `MeshGradient` from a predefined template.
     ///
-    /// This function takes a `GradientTemplateSize3` and creates an animated `MeshGradient` view,
-    /// using the template's size, points, colors, and background.
+    /// - Parameter template: The predefined template to use.
+    /// - Returns: A `MeshGradient` instance created from the provided template.
     ///
-    /// - Parameters:
-    ///   - template: A `GradientTemplateSize3` containing the gradient's specifications.
-    ///   - showAnimation: A binding to control the animation's play/pause state.
-    /// - Returns: A view containing the animated `MeshGradient`.
-    /// 
     /// Example:
     /// ```swift
-    /// struct ContentView: View {
-    ///     @State private var showAnimation = true
-    ///     
-    ///     var body: some View {
-    ///         MeshingKit.animatedGradientSize3(
-    ///             template: .sunsetGlow, 
-    ///             showAnimation: $showAnimation
-    ///         )
-    ///     }
-    /// }
+    /// let gradient = MeshingKit.gradient(template: .size3(.auroraBorealis))
     /// ```
-    @MainActor public static func animatedGradientSize3(
-        template: GradientTemplateSize3, showAnimation: Binding<Bool>
-    ) -> some View {
-        animatedGradient(template: template, showAnimation: showAnimation)
+    @MainActor public static func gradient(template: PredefinedTemplate)
+        -> MeshGradient
+    {
+        switch template {
+        case .size2(let template):
+            return gradient(template: template)
+        case .size3(let template):
+            return gradient(template: template)
+        case .size4(let template):
+            return gradient(template: template)
+        }
     }
 
-    /// Creates an animated `MeshGradient` view from a given `GradientTemplateSize4`.
-    ///
-    /// This function takes a `GradientTemplateSize4` and creates an animated `MeshGradient` view,
-    /// using the template's size, points, colors, and background.
+    /// Creates an animated `MeshGradient` view from any gradient template.
     ///
     /// - Parameters:
-    ///   - template: A `GradientTemplateSize4` containing the gradient's specifications.
-    ///   - showAnimation: A binding to control the animation's play/pause state.
-    /// - Returns: A view containing the animated `MeshGradient`.
-    /// 
-    /// Example:
-    /// ```swift
-    /// struct ContentView: View {
-    ///     @State private var showAnimation = true
-    ///     
-    ///     var body: some View {
-    ///         MeshingKit.animatedGradientSize4(
-    ///             template: .neonMetropolis, 
-    ///             showAnimation: $showAnimation
-    ///         )
-    ///     }
-    /// }
-    /// ```
-    @MainActor public static func animatedGradientSize4(
-        template: GradientTemplateSize4, showAnimation: Binding<Bool>
-    ) -> some View {
-        animatedGradient(template: template, showAnimation: showAnimation)
-    }
-
-    /// Creates an animated `MeshGradient` view from a given `GradientTemplate`.
-    ///
-    /// This function takes any `GradientTemplate` and creates an animated `MeshGradient` view,
-    /// using the template's size, points, colors, and background.
-    ///
-    /// - Parameters:
-    ///   - template: A `GradientTemplate` containing the gradient's specifications.
+    ///   - template: A gradient template to use.
     ///   - showAnimation: A binding to control the animation's play/pause state.
     ///   - animationSpeed: Controls the speed of the animation (default: 1.0).
     /// - Returns: A view containing the animated `MeshGradient`.
-    /// 
+    ///
     /// Example:
     /// ```swift
     /// struct ContentView: View {
     ///     @State private var showAnimation = true
-    ///     
+    ///
     ///     var body: some View {
     ///         MeshingKit.animatedGradient(
-    ///             template: GradientTemplateSize3.intelligence, 
+    ///             .size3.intelligence,
     ///             showAnimation: $showAnimation,
     ///             animationSpeed: 1.5
     ///         )
@@ -173,7 +140,7 @@ public struct MeshingKit: Sendable {
     /// }
     /// ```
     @MainActor public static func animatedGradient(
-        template: GradientTemplate,
+        _ template: any GradientTemplate,
         showAnimation: Binding<Bool>,
         animationSpeed: Double = 1.0
     ) -> some View {
@@ -184,5 +151,48 @@ public struct MeshingKit: Sendable {
             colors: template.colors,
             background: template.background
         )
+    }
+
+    /// Creates an animated `MeshGradient` view from a predefined template.
+    ///
+    /// - Parameters:
+    ///   - template: A predefined template to use.
+    ///   - showAnimation: A binding to control the animation's play/pause state.
+    ///   - animationSpeed: Controls the speed of the animation (default: 1.0).
+    /// - Returns: A view containing the animated `MeshGradient`.
+    ///
+    /// Example:
+    /// ```swift
+    /// struct ContentView: View {
+    ///     @State private var showAnimation = true
+    ///
+    ///     var body: some View {
+    ///         MeshingKit.animatedGradient(
+    ///             .size3(.intelligence),
+    ///             showAnimation: $showAnimation,
+    ///             animationSpeed: 1.5
+    ///         )
+    ///     }
+    /// }
+    /// ```
+    @MainActor public static func animatedGradient(
+        _ template: PredefinedTemplate,
+        showAnimation: Binding<Bool>,
+        animationSpeed: Double = 1.0
+    ) -> some View {
+        switch template {
+        case .size2(let template):
+            return animatedGradient(
+                template, showAnimation: showAnimation,
+                animationSpeed: animationSpeed)
+        case .size3(let template):
+            return animatedGradient(
+                template, showAnimation: showAnimation,
+                animationSpeed: animationSpeed)
+        case .size4(let template):
+            return animatedGradient(
+                template, showAnimation: showAnimation,
+                animationSpeed: animationSpeed)
+        }
     }
 }
