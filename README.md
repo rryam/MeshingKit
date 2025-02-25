@@ -12,12 +12,20 @@ MeshingKit is based on [Meshing](https://apps.apple.com/in/app/ai-mesh-gradient-
 
 ## Features
 
+- Create beautiful mesh gradients with customizable control points and colors
+- Animate gradients with smooth, configurable transitions
 - 63 predefined gradient templates:
   - 30 templates with 2x2 grid size
   - 22 templates with 3x3 grid size
   - 11 templates with 4x4 grid size
 - Easily extendable for custom gradients
-- Support for iOS 18.0+, macOS 15.0+, tvOS 18.0+, watchOS 11.0+, and visionOS 2.0+
+- Works across all Apple platforms (iOS, macOS, tvOS, watchOS, visionOS)
+
+## Requirements
+
+- iOS 18.0+, macOS 15.0+, tvOS 18.0+, watchOS 11.0+, visionOS 2.0+
+- Swift 6.0+
+- Xcode 16.0+
 
 ## Installation
 
