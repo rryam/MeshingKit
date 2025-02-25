@@ -74,7 +74,11 @@ public struct MeshingKit: Sendable {
     /// 
     /// Example:
     /// ```swift
-    /// let customTemplate = CustomTemplate() // implementing GradientTemplate protocol
+    /// // Using with enum templates
+    /// let gradient = MeshingKit.gradient(template: GradientTemplateSize3.auroraBorealis)
+    /// 
+    /// // Using with custom template
+    /// let customTemplate = CustomGradientTemplate(name: "Custom", size: 4, points: [...], colors: [...], background: .black)
     /// let gradient = MeshingKit.gradient(template: customTemplate)
     /// ```
     @MainActor public static func gradient(template: GradientTemplate)
