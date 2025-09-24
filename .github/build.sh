@@ -72,6 +72,10 @@ sed -i '' 's/type: \.static/type: .dynamic/g' Package.swift
 build_framework "iphonesimulator" "generic/platform=iOS Simulator" "$PACKAGE_NAME"
 build_framework "iphoneos" "generic/platform=iOS" "$PACKAGE_NAME"
 
+# Optional: Test on latest iOS 26.0 if available
+# build_framework "iphonesimulator26.0" "generic/platform=iOS Simulator" "$PACKAGE_NAME"
+# build_framework "iphoneos26.0" "generic/platform=iOS" "$PACKAGE_NAME"
+
 echo "Builds completed successfully."
 
 XCFRAMEWORK_PATH="$PROJECT_BUILD_DIR/$PACKAGE_NAME.xcframework"
