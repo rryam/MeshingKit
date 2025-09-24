@@ -14,6 +14,8 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '26'  # Using Xcode 26 for latest features
+      - name: Download Metal Toolchain
+        run: xcodebuild -downloadComponent MetalToolchain
       - name: Build XCFramework
         run: sh ./.github/build.sh $PACKAGE_NAME
       - name: Upload artifact to Emerge
