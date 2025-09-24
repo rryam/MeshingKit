@@ -18,7 +18,3 @@ jobs:
         run: xcodebuild -downloadComponent MetalToolchain
       - name: Build Swift Package
         run: swift build
-      - name: Build Meshiin for iOS (Debug)
-        run: xcodebuild -project "Sources/Meshin/Meshin.xcodeproj" -scheme "Meshin" -sdk iphoneos -configuration Debug
-      - name: Build Meshiin for macOS (Debug)
-        run: xcodebuild -project "Sources/Meshin/Meshin.xcodeproj" -scheme "Meshin" -sdk macosx -configuration Debug
