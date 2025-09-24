@@ -5,7 +5,7 @@ on:
 jobs:
   build:
     name: Build XCFramework
-    runs-on: macos-latest
+    runs-on: macos-26  # Using macOS 26 beta for Xcode 26 testing
     env:
       PACKAGE_NAME: MeshingKit
     steps:
@@ -13,7 +13,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '26'  # Using Xcode 26 for latest features
       - name: Build XCFramework
         run: sh ./.github/build.sh $PACKAGE_NAME
       - name: Upload artifact to Emerge
