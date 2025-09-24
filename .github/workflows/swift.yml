@@ -4,10 +4,8 @@ on:
     branches: [main]
 jobs:
   build:
-    name: Build XCFramework
+    name: Build Package
     runs-on: macos-26  # Using macOS 26 beta for Xcode 26 testing
-    env:
-      PACKAGE_NAME: MeshingKit
     steps:
       - uses: actions/checkout@v4
       - name: Setup Xcode
@@ -16,11 +14,9 @@ jobs:
           xcode-version: '26'  # Using Xcode 26 for latest features
       - name: Download Metal Toolchain
         run: xcodebuild -downloadComponent MetalToolchain
-      - name: Build XCFramework
-        run: sh ./.github/build.sh $PACKAGE_NAME
-      - name: Upload artifact to Emerge
-        uses: EmergeTools/emerge-upload-action@v1.1.0
-        with:
-          build_type: release
-          artifact_path: ./build/${{ env.PACKAGE_NAME }}.xcframework.zip
-          emerge_api_key: ${{ secrets.EMERGE_API_KEY }}
+      - name: Build Swift Package
+        run: swift build
+      - name: Build Meshiin for iOS
+        run: xcodebuild -project "Sources/Meshin/Meshin.xcodeproj" -scheme "Meshin" -sdk iphoneos -configuration Release
+      - name: Build Meshiin for macOS
+        run: xcodebuild -project "Sources/Meshin/Meshin.xcodeproj" -scheme "Meshin" -sdk macosx -configuration Release

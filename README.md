@@ -2,7 +2,11 @@
 
 ![Gradient](Sources/Resources/gradient.jpg)
 
-<a href="https://www.emergetools.com/app/example/ios/meshingkit.MeshingKit/release?utm_campaign=badge-data"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.emergetools.com%2Fapi%2Fv2%2Fpublic_new_build%3FexampleId%3Dmeshingkit.MeshingKit%26platform%3Dios%26badgeOption%3Dversion_and_max_install_size%26buildType%3Drelease&query=$.badgeMetadata&label=MeshingKit&logo=apple" /></a>
+![Swift](https://img.shields.io/badge/Swift-6.2-orange.svg)
+![Build Status](https://github.com/rryam/MeshingKit/workflows/Build/badge.svg)
+![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)
 
 MeshingKit provides an easy way to create mesh gradients in SwiftUI with predefined gradient templates to directly render beautiful, gorgeous gradients!
 
