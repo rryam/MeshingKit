@@ -35,12 +35,8 @@ jobs:
 
       - name: Generate Documentation
         run: |
-          swift package --allow-writing-to-directory docs \
-            generate-documentation --target MeshingKit \
-            --disable-indexing \
-            --transform-for-static-hosting \
-            --hosting-base-path MeshingKit \
-            --output-path docs
+          xcodebuild docbuild -scheme MeshingKit -destination 'generic/platform=iOS' -derivedDataPath DerivedData
+          $(xcrun --find docc) process-archive transform-for-static-hosting DerivedData/Build/Products/Debug-iphoneos/MeshingKit.doccarchive --output-path docs --hosting-base-path MeshingKit
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
