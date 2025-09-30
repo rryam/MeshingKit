@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-struct NewMeshGradientView: View {
-    var body: some View {
-        MeshingKit.gradient(template: .size3(.intelligence))
-    }
-}
-
 /// A structure that provides utility functions for creating mesh gradients.
 public struct MeshingKit: Sendable {
 
