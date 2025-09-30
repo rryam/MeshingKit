@@ -77,7 +77,7 @@ struct AnimatedGradientView: View {
     @State private var showAnimation = true
 
     var body: some View {
-        MeshingKit.animatedGradientSize3(template: .cosmicAurora, showAnimation: $showAnimation)
+        MeshingKit.animatedGradient(.cosmicAurora, showAnimation: $showAnimation)
             .frame(width: 300, height: 300)
             .padding()
 
