@@ -88,11 +88,11 @@ struct FullScreenGradientView: View {
   var gradientView: some View {
     switch template {
       case .size2(let size2Template):
-        MeshingKit.gradientSize2(template: size2Template)
+        MeshingKit.animatedGradient(size2Template, showAnimation: $showAnimation)
       case .size3(let size3Template):
-        MeshingKit.animatedGradientSize3(template: size3Template, showAnimation: $showAnimation)
+        MeshingKit.animatedGradient(size3Template, showAnimation: $showAnimation)
       case .size4(let size4Template):
-        MeshingKit.animatedGradientSize4(template: size4Template, showAnimation: $showAnimation)
+        MeshingKit.animatedGradient(size4Template, showAnimation: $showAnimation)
     }
   }
 }

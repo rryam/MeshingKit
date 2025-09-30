@@ -1,5 +1,5 @@
 {
-  "originHash" : "a7e1058f960e76d7439d316f8d2baee5b4fec89d6b8fa43279215bc4f594d263",
+  "originHash" : "a3b6befc9c60b97e2d9e9df58d9f700739f562662b7b6cf700c9dde7a7b18e3f",
   "pins" : [
     {
       "identity" : "inject",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/rryam/MeshingKit",
       "state" : {
         "branch" : "main",
-        "revision" : "3436d7d5652803103519897c5914e5a37007575a"
+        "revision" : "ec1a91a87fec085ef7706bfeaf6af9b006c758c6"
       }
     }
   ],
