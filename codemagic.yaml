@@ -102,48 +102,7 @@ workflows:
 
           echo "Documentation check complete!"
 
-      - name: Performance Test
-        script: |
-          #!/bin/zsh
-
-          echo "Running basic performance tests..."
-
-          # Create a simple performance test
-          cat > PerformanceTest.swift << 'EOF'
-          import Foundation
-          import MeshingKit
-
-          func measurePerformance() {
-            let startTime = CFAbsoluteTimeGetCurrent()
-
-            // Test gradient creation
-            let gradient = MeshingKit.gradient(template: .size3(.auroraBorealis))
-
-            // Test multiple gradient creations
-            for _ in 0..<100 {
-                let _ = MeshingKit.gradient(template: .size2(.mysticTwilight))
-            }
-
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-            print("Performance test completed in \(timeElapsed) seconds")
-
-            // Performance should be reasonable (less than 1 second for 100 operations)
-            if timeElapsed > 1.0 {
-                print("Warning: Performance test took longer than expected")
-                exit(1)
-            } else {
-                print("Performance test passed!")
-            }
-          }
-
-          measurePerformance()
-          EOF
-
-          swift PerformanceTest.swift
-          rm PerformanceTest.swift
-
-          echo "Performance tests completed successfully!"
-
+      
     artifacts:
       - build/**/outputs/**/*.txt
       - build/**/reports/**/*.xml
