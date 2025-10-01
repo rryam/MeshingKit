@@ -1,0 +1,178 @@
+definitions:
+  triggering:
+    push: &events
+      events:
+        - push
+        - pull_request
+      notify:
+        success: true
+        failure: true
+
+workflows:
+  meshingkit:
+    name: MeshingKit Workflow
+    environment:
+      xcode: 26.0
+      vars:
+        XCODE_SCHEME: "MeshingKit"
+        APP_ID: "MeshingKit"
+    when:
+      changeset:
+        includes:
+          - 'Sources'
+          - 'Tests'
+          - 'Package.swift'
+          - '*.swift'
+    triggering:
+      <<: *events
+    scripts:
+      - name: Build Swift Package
+        script: |
+          #!/bin/zsh
+
+          echo "Building MeshingKit for all platforms..."
+
+          # Build for different platforms
+          declare -a PLATFORMS=(
+            "iOS Simulator"
+            "macOS"
+            "watchOS Simulator"
+            "tvOS Simulator"
+            "visionOS Simulator"
+          )
+
+          for PLATFORM in "${PLATFORMS[@]}"
+            do
+              echo "Building for $PLATFORM..."
+              case $PLATFORM in
+                "iOS Simulator")
+                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios18.0-simulator"
+                  ;;
+                "macOS")
+                  swift build --target MeshingKit
+                  ;;
+                "watchOS Simulator")
+                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk watchsimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-watchos11.0-simulator"
+                  ;;
+                "tvOS Simulator")
+                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk appletvsimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-tvos18.0-simulator"
+                  ;;
+                "visionOS Simulator")
+                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk xrsimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-xros2.0-simulator"
+                  ;;
+              esac
+          done
+
+      - name: Test Swift Package
+        script: |
+          #!/bin/zsh
+
+          echo "Testing MeshingKit..."
+
+          # Run tests with verbose output
+          swift test --verbose
+
+          # Generate code coverage report
+          swift test --enable-code-coverage
+
+      - name: Build with Xcode (Multi-Platform)
+        script: |
+          #!/bin/zss
+
+          declare -a DESTINATIONS=(
+            "platform=iOS Simulator,name=iPhone 15"
+            "platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)"
+            "platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
+            "platform=macOS"
+            "platform=visionOS Simulator,name=Apple Vision Pro"
+          )
+
+          for DESTINATION in "${DESTINATIONS[@]}"
+            do
+              echo "Building for destination: $DESTINATION"
+              xcodebuild clean build \
+                -scheme "$XCODE_SCHEME" \
+                -destination "$DESTINATION" \
+                -skipPackagePluginValidation \
+                -quiet
+          done
+
+      - name: Validate Package
+        script: |
+          #!/bin/zsh
+
+          echo "Validating Swift package..."
+
+          # Validate package manifest
+          swift package validate
+
+          # Resolve dependencies
+          swift package resolve
+
+          # Check for outdated dependencies
+          swift package update --what-is-new || true
+
+          echo "Package validation complete!"
+
+      - name: Documentation Check
+        script: |
+          #!/bin/zss
+
+          echo "Checking documentation..."
+
+          # Generate documentation if docc plugin is available
+          if swift package plugin --list | grep -q "Swift-DocC"; then
+            echo "Swift-DocC plugin found, generating documentation..."
+            swift package generate-documentation
+          else
+            echo "Swift-DocC plugin not found, skipping documentation generation"
+          fi
+
+          echo "Documentation check complete!"
+
+      - name: Performance Test
+        script: |
+          #!/bin/zsh
+
+          echo "Running basic performance tests..."
+
+          # Create a simple performance test
+          cat > PerformanceTest.swift << 'EOF'
+          import Foundation
+          import MeshingKit
+
+          func measurePerformance() {
+            let startTime = CFAbsoluteTimeGetCurrent()
+
+            // Test gradient creation
+            let gradient = MeshingKit.gradient(template: .size3(.auroraBorealis))
+
+            // Test multiple gradient creations
+            for _ in 0..<100 {
+                let _ = MeshingKit.gradient(template: .size2(.mysticTwilight))
+            }
+
+            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            print("Performance test completed in \(timeElapsed) seconds")
+
+            // Performance should be reasonable (less than 1 second for 100 operations)
+            if timeElapsed > 1.0 {
+                print("Warning: Performance test took longer than expected")
+                exit(1)
+            } else {
+                print("Performance test passed!")
+            }
+          }
+
+          measurePerformance()
+          EOF
+
+          swift PerformanceTest.swift
+          rm PerformanceTest.swift
+
+          echo "Performance tests completed successfully!"
+
+    artifacts:
+      - build/**/outputs/**/*.txt
+      - build/**/reports/**/*.xml
+      - build/reports/**/*.xml
