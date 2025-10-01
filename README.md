@@ -26,10 +26,10 @@ MeshingKit is based on [Meshing](https://apps.apple.com/in/app/ai-mesh-gradient-
 
 - Create beautiful mesh gradients with customizable control points and colors
 - Animate gradients with smooth, configurable transitions
-- 237 predefined gradient templates:
-  - 44 templates with 2x2 grid size
-  - 88 templates with 3x3 grid size
-  - 105 templates with 4x4 grid size
+- 68 predefined gradient templates:
+  - 11 templates with 2x2 grid size
+  - 35 templates with 3x3 grid size
+  - 22 templates with 4x4 grid size
 - Easily extendable for custom gradients
 - Works across all Apple platforms (iOS, macOS, tvOS, watchOS, visionOS)
 
@@ -193,7 +193,7 @@ struct NoiseEffectGradientView: View {
 
 ## Available Gradient Templates
 
-MeshingKit provides 237 predefined gradient templates organized by grid size:
+MeshingKit provides 68 predefined gradient templates organized by grid size:
 
 ### Exploring Templates Programmatically
 
@@ -206,30 +206,30 @@ for template in GradientTemplateSize3.allCases {
 }
 
 // Get total count of templates for each size
-let size2Count = GradientTemplateSize2.allCases.count // 44 templates
-let size3Count = GradientTemplateSize3.allCases.count // 88 templates
-let size4Count = GradientTemplateSize4.allCases.count // 105 templates
+let size2Count = GradientTemplateSize2.allCases.count // 11 templates
+let size3Count = GradientTemplateSize3.allCases.count // 35 templates
+let size4Count = GradientTemplateSize4.allCases.count // 22 templates
 ```
 
 ### Popular Template Examples
 
-**2x2 Grid Templates (44 total):**
+**2x2 Grid Templates (11 total):**
 - mysticTwilight, tropicalParadise, cherryBlossom, arcticFrost
 - goldenSunrise, emeraldForest, desertMirage, midnightGalaxy
-- autumnHarvest, oceanBreeze, lavenderDreams, citrusBurst
-- ...and 32 more templates
+- autumnHarvest
 
-**3x3 Grid Templates (88 total):**
+**3x3 Grid Templates (35 total):**
 - intelligence, auroraBorealis, sunsetGlow, oceanDepths
 - neonNight, autumnLeaves, cosmicAurora, lavaFlow
 - etherealMist, tropicalParadise, midnightGalaxy, desertMirage
-- ...and 76 more templates
+- frostedCrystal, enchantedForest, rubyFusion, goldenSunrise
+- cosmicNebula, arcticAurora, volcanicEmber, mintBreeze
+- twilightSerenade, saharaDunes
 
-**4x4 Grid Templates (105 total):**
+**4x4 Grid Templates (22 total):**
 - auroraBorealis, sunsetHorizon, mysticForest, cosmicNebula
 - coralReef, etherealTwilight, volcanicOasis, arcticFrost
 - jungleMist, desertMirage, neonMetropolis
-- ...and 96 more templates
 
 ### Finding Templates by Name
 
