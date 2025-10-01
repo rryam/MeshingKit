@@ -44,23 +44,26 @@ workflows:
           # Generate code coverage report
           swift test --enable-code-coverage
 
+      - name: Download Metal Toolchain
+        script: |
+          #!/bin/zsh
+          xcodebuild -downloadComponent MetalToolchain
+
       - name: Build with Xcode (Multi-Platform)
         script: |
           #!/bin/zsh
 
           declare -a DESTINATIONS=(
-            "platform=iOS Simulator,name=iPhone 15"
-            "platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)"
-            "platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
+            "platform=iOS Simulator,name=iPhone 17 Pro"
             "platform=macOS"
-            "platform=visionOS Simulator,name=Apple Vision Pro"
           )
 
           for DESTINATION in "${DESTINATIONS[@]}"
             do
               echo "Building for destination: $DESTINATION"
               xcodebuild clean build \
-                -scheme "$XCODE_SCHEME" \
+                -project Sources/Meshin/Meshin.xcodeproj \
+                -scheme Meshin \
                 -destination "$DESTINATION" \
                 -skipPackagePluginValidation \
                 -quiet

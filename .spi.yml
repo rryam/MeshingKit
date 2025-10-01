@@ -4,3 +4,20 @@ metadata:
 builder:
   configs:
     - documentation_targets: ["MeshingKit"]
+    - custom_build_commands: |
+        #!/bin/zsh
+
+        declare -a DESTINATIONS=(
+          "platform=iOS Simulator,name=iPhone 17 Pro"
+          "platform=macOS"
+        )
+
+        for DESTINATION in "${DESTINATIONS[@]}"
+          do
+            echo "Building for destination: $DESTINATION"
+            xcodebuild clean build \
+              -scheme MeshingKit \
+              -destination "$DESTINATION" \
+              -skipPackagePluginValidation \
+              -quiet
+        done
