@@ -65,6 +65,7 @@ workflows:
                 -project Sources/Meshin/Meshin.xcodeproj \
                 -scheme Meshin \
                 -destination "$DESTINATION" \
+                -configuration Debug \
                 -skipPackagePluginValidation \
                 -quiet
           done
