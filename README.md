@@ -26,17 +26,17 @@ MeshingKit is based on [Meshing](https://apps.apple.com/in/app/ai-mesh-gradient-
 
 - Create beautiful mesh gradients with customizable control points and colors
 - Animate gradients with smooth, configurable transitions
-- 63 predefined gradient templates:
-  - 30 templates with 2x2 grid size
-  - 22 templates with 3x3 grid size
-  - 11 templates with 4x4 grid size
+- 237 predefined gradient templates:
+  - 44 templates with 2x2 grid size
+  - 88 templates with 3x3 grid size
+  - 105 templates with 4x4 grid size
 - Easily extendable for custom gradients
 - Works across all Apple platforms (iOS, macOS, tvOS, watchOS, visionOS)
 
 ## Requirements
 
 - iOS 18.0+, macOS 15.0+, tvOS 18.0+, watchOS 11.0+, visionOS 2.0+
-- Swift 6.0+
+- Swift 6.2+
 - Xcode 16.0+
 
 ## Installation
@@ -59,10 +59,25 @@ import MeshingKit
 
 struct ContentView: View {
     var body: some View {
+        // Using PredefinedTemplate enum (recommended)
+        MeshingKit.gradient(template: .size3(.cosmicAurora))
+            .frame(width: 300, height: 300)
+
+        // Or using specific size methods
         MeshingKit.gradientSize3(template: .cosmicAurora)
             .frame(width: 300, height: 300)
     }
 }
+```
+
+### Using PredefinedTemplate Enum
+
+The `PredefinedTemplate` enum provides a unified way to access all gradient templates:
+
+```swift
+let gradient = MeshingKit.gradient(template: .size2(.mysticTwilight))
+let gradient3 = MeshingKit.gradient(template: .size3(.auroraBorealis))
+let gradient4 = MeshingKit.gradient(template: .size4(.cosmicNebula))
 ```
 
 ## Animated Gradient Views
@@ -77,9 +92,13 @@ struct AnimatedGradientView: View {
     @State private var showAnimation = true
 
     var body: some View {
-        MeshingKit.animatedGradient(.cosmicAurora, showAnimation: $showAnimation)
-            .frame(width: 300, height: 300)
-            .padding()
+        MeshingKit.animatedGradient(
+            .size3(.cosmicAurora),
+            showAnimation: $showAnimation,
+            animationSpeed: 1.5
+        )
+        .frame(width: 300, height: 300)
+        .padding()
 
         // Toggle animation
         Toggle("Animate Gradient", isOn: $showAnimation)
@@ -87,6 +106,50 @@ struct AnimatedGradientView: View {
     }
 }
 ```
+
+## Custom Animation Patterns
+
+MeshingKit provides advanced animation control through `AnimationPattern` and `PointAnimation` structures:
+
+```swift
+import SwiftUI
+import MeshingKit
+
+struct CustomAnimationView: View {
+    @State private var showAnimation = true
+
+    var body: some View {
+        // Use default animation pattern
+        MeshingKit.animatedGradient(
+            .size3(.cosmicAurora),
+            showAnimation: $showAnimation,
+            animationSpeed: 1.0
+        )
+        .frame(width: 300, height: 300)
+    }
+}
+```
+
+### Creating Custom Animation Patterns
+
+You can create custom animations by defining specific point movements:
+
+```swift
+// Create custom point animations
+let pointAnimations = [
+    PointAnimation(pointIndex: 1, axis: .x, amplitude: 0.3, frequency: 1.2),
+    PointAnimation(pointIndex: 4, axis: .both, amplitude: 0.2, frequency: 0.8),
+    PointAnimation(pointIndex: 7, axis: .y, amplitude: -0.4, frequency: 1.5)
+]
+
+let customPattern = AnimationPattern(animations: pointAnimations)
+```
+
+**Animation Parameters:**
+- `pointIndex`: Index of the point to animate in the gradient's position array
+- `axis`: Which axis to animate (`.x`, `.y`, or `.both`)
+- `amplitude`: How far the point moves from its original position
+- `frequency`: Speed multiplier for the animation (default: 1.0)
 
 ## Noise Effect with Gradients
 
@@ -130,83 +193,57 @@ struct NoiseEffectGradientView: View {
 
 ## Available Gradient Templates
 
-MeshingKit provides three sets of predefined gradient templates:
+MeshingKit provides 237 predefined gradient templates organized by grid size:
 
-### GradientTemplateSize2 (2x2 grid)
+### Exploring Templates Programmatically
 
-- mysticTwilight
-- tropicalParadise
-- cherryBlossom
-- arcticFrost
-- goldenSunrise
-- emeraldForest
-- desertMirage
-- midnightGalaxy
-- autumnHarvest
-- oceanBreeze
-- lavenderDreams
-- citrusBurst
-- northernLights
-- strawberryLemonade
-- deepSea
-- cottonCandy
-- volcanicAsh
-- springMeadow
-- cosmicDust
-- peacockFeathers
-- crimsonSunset
-- enchantedForest
-- blueberryMuffin
-- saharaDunes
-- grapeSoda
-- frostyWinter
-- dragonFire
-- mermaidLagoon
-- chocolateTruffle
-- neonNights
+You can explore all available templates using the `CaseIterable` conformance:
 
-### GradientTemplateSize3 (3x3 grid)
+```swift
+// List all 3x3 templates
+for template in GradientTemplateSize3.allCases {
+    print(template.name)
+}
 
-- intelligence
-- auroraBorealis
-- sunsetGlow
-- oceanDepths
-- neonNight
-- autumnLeaves
-- cosmicAurora
-- lavaFlow
-- etherealMist
-- tropicalParadise
-- midnightGalaxy
-- desertMirage
-- frostedCrystal
-- enchantedForest
-- rubyFusion
-- goldenSunrise
-- cosmicNebula
-- arcticAurora
-- volcanicEmber
-- mintBreeze
-- twilightSerenade
-- saharaDunes
+// Get total count of templates for each size
+let size2Count = GradientTemplateSize2.allCases.count // 44 templates
+let size3Count = GradientTemplateSize3.allCases.count // 88 templates
+let size4Count = GradientTemplateSize4.allCases.count // 105 templates
+```
 
-### GradientTemplateSize4 (4x4 grid)
+### Popular Template Examples
 
-- auroraBorealis
-- sunsetHorizon
-- mysticForest
-- cosmicNebula
-- coralReef
-- etherealTwilight
-- volcanicOasis
-- arcticFrost
-- jungleMist
-- desertMirage
-- neonMetropolis
+**2x2 Grid Templates (44 total):**
+- mysticTwilight, tropicalParadise, cherryBlossom, arcticFrost
+- goldenSunrise, emeraldForest, desertMirage, midnightGalaxy
+- autumnHarvest, oceanBreeze, lavenderDreams, citrusBurst
+- ...and 32 more templates
+
+**3x3 Grid Templates (88 total):**
+- intelligence, auroraBorealis, sunsetGlow, oceanDepths
+- neonNight, autumnLeaves, cosmicAurora, lavaFlow
+- etherealMist, tropicalParadise, midnightGalaxy, desertMirage
+- ...and 76 more templates
+
+**4x4 Grid Templates (105 total):**
+- auroraBorealis, sunsetHorizon, mysticForest, cosmicNebula
+- coralReef, etherealTwilight, volcanicOasis, arcticFrost
+- jungleMist, desertMirage, neonMetropolis
+- ...and 96 more templates
+
+### Finding Templates by Name
+
+Since templates follow `camelCase` naming, you can easily find them:
+
+```swift
+// Create a gradient from any template name
+let template = GradientTemplateSize3.auroraBorealis
+let gradient = MeshingKit.gradient(template: template)
+```
 
 ## Custom Gradients
 
-Ccreate custom gradients by defining your own `GradientTemplate`:
+Create custom gradients by defining your own `GradientTemplate`:
 
 ```swift
 let customTemplate = GradientTemplate(
@@ -231,6 +268,63 @@ let customGradient = MeshGradient(
     points: customTemplate.points,
     colors: customTemplate.colors
 )
+```
+
+## Advanced Animation Examples
+
+### Speed Control and Pausing
+
+```swift
+struct AdvancedAnimationView: View {
+    @State private var showAnimation = true
+    @State private var animationSpeed: Double = 1.0
+
+    var body: some View {
+        VStack {
+            MeshingKit.animatedGradient(
+                .size4(.cosmicNebula),
+                showAnimation: $showAnimation,
+                animationSpeed: animationSpeed
+            )
+            .frame(width: 400, height: 400)
+
+            // Animation controls
+            VStack {
+                Toggle("Enable Animation", isOn: $showAnimation)
+
+                Slider(value: $animationSpeed, in: 0.1...3.0) {
+                    Text("Animation Speed: \(animationSpeed, specifier: "%.1f")x")
+                }
+            }
+            .padding()
+        }
+    }
+}
+```
+
+### Combining Animation with Noise Effects
+
+```swift
+struct AnimatedNoiseGradientView: View {
+    @State private var showAnimation = true
+    @State private var intensity: Float = 0.3
+    @State private var frequency: Float = 0.2
+
+    var body: some View {
+        ParameterizedNoiseView(
+            intensity: $intensity,
+            frequency: $frequency,
+            opacity: .constant(0.8)
+        ) {
+            MeshingKit.animatedGradient(
+                .size3(.auroraBorealis),
+                showAnimation: $showAnimation,
+                animationSpeed: 1.2
+            )
+        }
+        .frame(width: 300, height: 300)
+    }
+}
 ```
 
 ## Hex Color Initialization
