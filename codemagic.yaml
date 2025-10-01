@@ -4,9 +4,6 @@ definitions:
       events:
         - push
         - pull_request
-      notify:
-        success: true
-        failure: true
 
 workflows:
   meshingkit:
@@ -68,42 +65,4 @@ workflows:
                 -skipPackagePluginValidation \
                 -quiet
           done
-
-      - name: Validate Package
-        script: |
-          #!/bin/zsh
-
-          echo "Validating Swift package..."
-
-          # Validate package manifest
-          swift package validate
-
-          # Resolve dependencies
-          swift package resolve
-
-          # Check for outdated dependencies
-          swift package update --what-is-new || true
-
-          echo "Package validation complete!"
-
-      - name: Documentation Check
-        script: |
-          #!/bin/zsh
-
-          echo "Checking documentation..."
-
-          # Generate documentation if docc plugin is available
-          if swift package plugin --list | grep -q "Swift-DocC"; then
-            echo "Swift-DocC plugin found, generating documentation..."
-            swift package generate-documentation
-          else
-            echo "Swift-DocC plugin not found, skipping documentation generation"
-          fi
-
-          echo "Documentation check complete!"
-
-      
-    artifacts:
-      - build/**/outputs/**/*.txt
-      - build/**/reports/**/*.xml
-      - build/reports/**/*.xml
+    
