@@ -67,6 +67,8 @@ workflows:
                 -destination "$DESTINATION" \
                 -configuration Debug \
                 -skipPackagePluginValidation \
+                CODE_SIGN_IDENTITY="" \
+                CODE_SIGNING_REQUIRED=NO \
                 -quiet
           done
     
