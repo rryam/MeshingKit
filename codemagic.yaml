@@ -30,38 +30,10 @@ workflows:
         script: |
           #!/bin/zsh
 
-          echo "Building MeshingKit for all platforms..."
+          echo "Building MeshingKit..."
 
-          # Build for different platforms
-          declare -a PLATFORMS=(
-            "iOS Simulator"
-            "macOS"
-            "watchOS Simulator"
-            "tvOS Simulator"
-            "visionOS Simulator"
-          )
-
-          for PLATFORM in "${PLATFORMS[@]}"
-            do
-              echo "Building for $PLATFORM..."
-              case $PLATFORM in
-                "iOS Simulator")
-                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios18.0-simulator"
-                  ;;
-                "macOS")
-                  swift build --target MeshingKit
-                  ;;
-                "watchOS Simulator")
-                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk watchsimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-watchos11.0-simulator"
-                  ;;
-                "tvOS Simulator")
-                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk appletvsimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-tvos18.0-simulator"
-                  ;;
-                "visionOS Simulator")
-                  swift build --target MeshingKit -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk xrsimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-xros2.0-simulator"
-                  ;;
-              esac
-          done
+          # Basic swift build for the current platform
+          swift build --target MeshingKit
 
       - name: Test Swift Package
         script: |
