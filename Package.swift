@@ -25,6 +25,10 @@ let package = Package(
       resources: [
         .process("ParameterizedNoise.metal")
       ]
+    ),
+    .testTarget(
+      name: "MeshingKitTests",
+      dependencies: ["MeshingKit"]
     )
   ]
 )
