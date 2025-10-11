@@ -9,22 +9,22 @@ struct MeshingKitTests {
     @MainActor
     func gradientCreation() {
         let template = GradientTemplateSize3.auroraBorealis
-        
+
         // Verify the template has the correct size
         #expect(template.size == 3)
-        
+
         // Verify the template has the expected number of points (3x3 = 9 points)
         #expect(template.points.count == 9)
-        
+
         // Verify the template has the expected number of colors (3x3 = 9 colors)
         #expect(template.colors.count == 9)
-        
+
         // Verify points are normalized (between 0.0 and 1.0)
         for point in template.points {
             #expect(point.x >= 0.0 && point.x <= 1.0)
             #expect(point.y >= 0.0 && point.y <= 1.0)
         }
-        
+
         // Verify the gradient can be created without errors
         let gradient = MeshingKit.gradient(template: template)
         #expect(type(of: gradient) == MeshGradient.self)
