@@ -52,7 +52,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.450), .init(x: 0.653, y: 0.670),
                 .init(x: 1.000, y: 0.200),
                 .init(x: 0.000, y: 1.000), .init(x: 0.550, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .auroraBorealis:
             return [
@@ -61,7 +61,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.450), .init(x: 0.900, y: 0.700),
                 .init(x: 1.000, y: 0.200),
                 .init(x: 0.000, y: 1.000), .init(x: 0.550, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .sunsetGlow:
             return [
@@ -70,7 +70,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.537), .init(x: 0.182, y: 0.794),
                 .init(x: 1.000, y: 0.148),
                 .init(x: 0.000, y: 1.000), .init(x: 0.900, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .oceanDepths:
             return [
@@ -79,7 +79,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.213), .init(x: 0.670, y: 0.930),
                 .init(x: 1.000, y: 0.091),
                 .init(x: 0.000, y: 1.000), .init(x: 0.490, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .neonNight:
             return [
@@ -88,7 +88,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.596), .init(x: 0.807, y: 0.295),
                 .init(x: 1.000, y: 0.200),
                 .init(x: 0.000, y: 1.000), .init(x: 0.800, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .autumnLeaves:
             return [
@@ -97,7 +97,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.700), .init(x: 0.172, y: 0.154),
                 .init(x: 1.000, y: 0.300),
                 .init(x: 0.000, y: 1.000), .init(x: 0.700, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .cosmicAurora:
             return [
@@ -106,7 +106,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.326), .init(x: 0.263, y: 0.882),
                 .init(x: 1.003, y: 0.142),
                 .init(x: 0.000, y: 1.000), .init(x: 0.600, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .lavaFlow:
             return [
@@ -115,7 +115,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.177), .init(x: 0.703, y: 0.809),
                 .init(x: 1.000, y: 0.503),
                 .init(x: 0.000, y: 1.000), .init(x: 0.502, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .etherealMist:
             return [
@@ -124,7 +124,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.150), .init(x: 0.920, y: 0.080),
                 .init(x: 1.000, y: 0.850),
                 .init(x: 0.000, y: 1.000), .init(x: 0.150, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .tropicalParadise:
             return [
@@ -133,7 +133,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.600), .init(x: 0.250, y: 0.750),
                 .init(x: 1.000, y: 0.400),
                 .init(x: 0.000, y: 1.000), .init(x: 0.950, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .midnightGalaxy:
             return [
@@ -142,7 +142,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.900), .init(x: 0.800, y: 0.200),
                 .init(x: 1.000, y: 0.100),
                 .init(x: 0.000, y: 1.000), .init(x: 0.900, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .desertMirage:
             return [
@@ -151,7 +151,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.700), .init(x: 0.600, y: 0.400),
                 .init(x: 1.000, y: 0.300),
                 .init(x: 0.000, y: 1.000), .init(x: 0.700, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .frostedCrystal:
             return [
@@ -160,7 +160,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.600), .init(x: 0.200, y: 0.200),
                 .init(x: 1.000, y: 0.400),
                 .init(x: 0.000, y: 1.000), .init(x: 0.600, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .enchantedForest:
             return [
@@ -169,7 +169,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.700), .init(x: 0.500, y: 0.300),
                 .init(x: 1.000, y: 0.300),
                 .init(x: 0.000, y: 1.000), .init(x: 0.700, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .rubyFusion:
             return [
@@ -178,7 +178,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.800), .init(x: 0.400, y: 0.600),
                 .init(x: 1.000, y: 0.200),
                 .init(x: 0.000, y: 1.000), .init(x: 0.800, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .goldenSunrise:
             return [
@@ -187,7 +187,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.400), .init(x: 0.700, y: 0.300),
                 .init(x: 1.000, y: 0.600),
                 .init(x: 0.000, y: 1.000), .init(x: 0.400, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .cosmicNebula:
             return [
@@ -196,7 +196,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.500), .init(x: 0.750, y: 0.250),
                 .init(x: 1.000, y: 0.500),
                 .init(x: 0.000, y: 1.000), .init(x: 0.500, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .arcticAurora:
             return [
@@ -205,7 +205,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.700), .init(x: 0.600, y: 0.400),
                 .init(x: 1.000, y: 0.300),
                 .init(x: 0.000, y: 1.000), .init(x: 0.700, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .volcanicEmber:
             return [
@@ -214,7 +214,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.800), .init(x: 0.500, y: 0.500),
                 .init(x: 1.000, y: 0.200),
                 .init(x: 0.000, y: 1.000), .init(x: 0.800, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .mintBreeze:
             return [
@@ -223,7 +223,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.600), .init(x: 0.720, y: 0.860),
                 .init(x: 1.000, y: 0.130),
                 .init(x: 0.000, y: 1.000), .init(x: 0.600, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .twilightSerenade:
             return [
@@ -232,7 +232,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.230), .init(x: 0.220, y: 0.770),
                 .init(x: 1.000, y: 0.210),
                 .init(x: 0.000, y: 1.000), .init(x: 0.700, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         case .saharaDunes:
             return [
@@ -241,7 +241,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.600), .init(x: 0.700, y: 0.300),
                 .init(x: 1.000, y: 0.400),
                 .init(x: 0.000, y: 1.000), .init(x: 0.600, y: 1.000),
-                .init(x: 1.000, y: 1.000),
+                .init(x: 1.000, y: 1.000)
             ]
         }
     }
@@ -256,7 +256,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#9B79F1"), Color(hex: "#ED50EB"),
                 Color(hex: "#F65490"),
                 Color(hex: "#F74A6B"), Color(hex: "#F47F3E"),
-                Color(hex: "#ED8D02"),
+                Color(hex: "#ED8D02")
             ]
         case .auroraBorealis:
             return [
@@ -265,7 +265,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#00ff80"), Color(hex: "#66ffb3"),
                 Color(hex: "#99ffcc"),
                 Color(hex: "#004d40"), Color(hex: "#008577"),
-                Color(hex: "#00a693"),
+                Color(hex: "#00a693")
             ]
         case .sunsetGlow:
             return [
@@ -274,7 +274,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#CC4D80"), Color(hex: "#99194D"),
                 Color(hex: "#660D33"),
                 Color(hex: "#4D0D26"), Color(hex: "#330D1A"),
-                Color(hex: "#1A0D0D"),
+                Color(hex: "#1A0D0D")
             ]
         case .oceanDepths:
             return [
@@ -283,7 +283,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#264D8C"), Color(hex: "#1A4073"),
                 Color(hex: "#0D3366"),
                 Color(hex: "#336699"), Color(hex: "#264D8C"),
-                Color(hex: "#1A4D80"),
+                Color(hex: "#1A4D80")
             ]
         case .neonNight:
             return [
@@ -292,7 +292,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#FF8000"), Color(hex: "#8000FF"),
                 Color(hex: "#00FFFF"),
                 Color(hex: "#FF00FF"), Color(hex: "#FFFF00"),
-                Color(hex: "#80FF80"),
+                Color(hex: "#80FF80")
             ]
         case .autumnLeaves:
             return [
@@ -301,7 +301,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#993319"), Color(hex: "#801910"),
                 Color(hex: "#661A00"),
                 Color(hex: "#4D0D00"), Color(hex: "#33190D"),
-                Color(hex: "#1A0D00"),
+                Color(hex: "#1A0D00")
             ]
         case .cosmicAurora:
             return [
@@ -310,7 +310,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#4DCC99"), Color(hex: "#66E6B3"),
                 Color(hex: "#80FFCC"),
                 Color(hex: "#1A334D"), Color(hex: "#335266"),
-                Color(hex: "#4D7080"),
+                Color(hex: "#4D7080")
             ]
         case .lavaFlow:
             return [
@@ -319,7 +319,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#B34D00"), Color(hex: "#996600"),
                 Color(hex: "#808000"),
                 Color(hex: "#660000"), Color(hex: "#4D0000"),
-                Color(hex: "#330000"),
+                Color(hex: "#330000")
             ]
         case .etherealMist:
             return [
@@ -328,7 +328,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#CCE0FF"), Color(hex: "#B3D1FF"),
                 Color(hex: "#99C2FF"),
                 Color(hex: "#80B3FF"), Color(hex: "#66A3FF"),
-                Color(hex: "#4D94FF"),
+                Color(hex: "#4D94FF")
             ]
         case .tropicalParadise:
             return [
@@ -337,7 +337,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#99CC33"), Color(hex: "#CCCC00"),
                 Color(hex: "#FFCC00"),
                 Color(hex: "#FF9900"), Color(hex: "#FF6600"),
-                Color(hex: "#FF3300"),
+                Color(hex: "#FF3300")
             ]
         case .midnightGalaxy:
             return [
@@ -346,7 +346,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#990066"), Color(hex: "#CC0066"),
                 Color(hex: "#FF0066"),
                 Color(hex: "#FF3399"), Color(hex: "#FF66CC"),
-                Color(hex: "#FF99CC"),
+                Color(hex: "#FF99CC")
             ]
         case .desertMirage:
             return [
@@ -355,7 +355,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#FFB833"), Color(hex: "#FFAD1A"),
                 Color(hex: "#FFA500"),
                 Color(hex: "#E69900"), Color(hex: "#CC8800"),
-                Color(hex: "#B37700"),
+                Color(hex: "#B37700")
             ]
         case .frostedCrystal:
             return [
@@ -364,7 +364,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#9ACDFF"), Color(hex: "#7CBEFF"),
                 Color(hex: "#5EAFFF"),
                 Color(hex: "#40A0FF"), Color(hex: "#2291FF"),
-                Color(hex: "#0482FF"),
+                Color(hex: "#0482FF")
             ]
         case .enchantedForest:
             return [
@@ -373,7 +373,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#288228"), Color(hex: "#329B32"),
                 Color(hex: "#3CB43C"),
                 Color(hex: "#46CD46"), Color(hex: "#50E650"),
-                Color(hex: "#5AFF5A"),
+                Color(hex: "#5AFF5A")
             ]
         case .rubyFusion:
             return [
@@ -382,7 +382,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#FF0000"), Color(hex: "#FF3333"),
                 Color(hex: "#FF6666"),
                 Color(hex: "#FF9999"), Color(hex: "#FFCCCC"),
-                Color(hex: "#FFFFFF"),
+                Color(hex: "#FFFFFF")
             ]
         case .goldenSunrise:
             return [
@@ -391,7 +391,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#FFD58A"), Color(hex: "#FFE4B8"),
                 Color(hex: "#FFF4E6"),
                 Color(hex: "#FFFAF0"), Color(hex: "#FFFDF7"),
-                Color(hex: "#FFFFFF"),
+                Color(hex: "#FFFFFF")
             ]
         case .cosmicNebula:
             return [
@@ -400,7 +400,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#9900FF"), Color(hex: "#CC00FF"),
                 Color(hex: "#FF00FF"),
                 Color(hex: "#FF33CC"), Color(hex: "#FF6699"),
-                Color(hex: "#FF99CC"),
+                Color(hex: "#FF99CC")
             ]
         case .arcticAurora:
             return [
@@ -409,7 +409,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#00A3FF"), Color(hex: "#33B8FF"),
                 Color(hex: "#66CCFF"),
                 Color(hex: "#99E0FF"), Color(hex: "#CCF2FF"),
-                Color(hex: "#FFFFFF"),
+                Color(hex: "#FFFFFF")
             ]
         case .volcanicEmber:
             return [
@@ -418,7 +418,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#FF3300"), Color(hex: "#FF6600"),
                 Color(hex: "#FF9900"),
                 Color(hex: "#FFCC00"), Color(hex: "#FFFF00"),
-                Color(hex: "#FFFFCC"),
+                Color(hex: "#FFFFCC")
             ]
         case .mintBreeze:
             return [
@@ -427,7 +427,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#33FF99"), Color(hex: "#00FF80"),
                 Color(hex: "#00CC66"),
                 Color(hex: "#009949"), Color(hex: "#006633"),
-                Color(hex: "#00331A"),
+                Color(hex: "#00331A")
             ]
         case .twilightSerenade:
             return [
@@ -436,7 +436,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#8000FF"), Color(hex: "#9933FF"),
                 Color(hex: "#B266FF"),
                 Color(hex: "#CC99FF"), Color(hex: "#E6CCFF"),
-                Color(hex: "#FFFFFF"),
+                Color(hex: "#FFFFFF")
             ]
         case .saharaDunes:
             return [
@@ -445,7 +445,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 Color(hex: "#BF4C1A"), Color(hex: "#B32900"),
                 Color(hex: "#992200"),
                 Color(hex: "#801A00"), Color(hex: "#661400"),
-                Color(hex: "#4D0F00"),
+                Color(hex: "#4D0F00")
             ]
         }
     }

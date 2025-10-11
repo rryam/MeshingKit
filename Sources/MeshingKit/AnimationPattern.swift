@@ -62,8 +62,7 @@ public struct AnimationPattern: Sendable {
     }
 
     /// Creates a default animation pattern for a mesh gradient of the specified size.
-    public static func defaultPattern(forGridSize size: Int) -> AnimationPattern
-    {
+    public static func defaultPattern(forGridSize size: Int) -> AnimationPattern {
         switch size {
         case 3:
             return AnimationPattern(animations: [
@@ -77,7 +76,7 @@ public struct AnimationPattern: Sendable {
                 PointAnimation(
                     pointIndex: 5, axis: .y, amplitude: -0.2, frequency: 0.9),
                 PointAnimation(
-                    pointIndex: 7, axis: .x, amplitude: -0.4, frequency: 1.2),
+                    pointIndex: 7, axis: .x, amplitude: -0.4, frequency: 1.2)
             ])
         case 4:
             return AnimationPattern(animations: [
@@ -107,7 +106,7 @@ public struct AnimationPattern: Sendable {
                     pointIndex: 9, axis: .both, amplitude: 0.15, frequency: 1.2),
                 PointAnimation(
                     pointIndex: 10, axis: .both, amplitude: -0.15,
-                    frequency: 1.4),
+                    frequency: 1.4)
             ])
         default:
             return AnimationPattern(animations: [])

@@ -1,0 +1,51 @@
+# SwiftLint Configuration File
+
+# Disabled rules
+disabled_rules:
+  - trailing_whitespace
+  - duplicate_imports
+  - non_optional_string_data_conversion
+  - todo
+  - void_return
+
+# Enabled rules with custom configuration
+line_length:
+  warning: 120
+  error: 150
+
+file_length:
+  warning: 400
+  error: 600
+
+type_body_length:
+  warning: 300
+  error: 400
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 40
+    error: 60
+  allowed_symbols: ["_"]
+
+# Custom rules for trailing commas
+trailing_comma:
+  mandatory_comma: false
+
+# Opening brace spacing
+opening_brace:
+  ignore_multiline_function_signatures: true
+
+# Switch case alignment
+switch_case_alignment:
+  indented_cases: false
+
+# Excluded files and directories
+excluded:
+  - .build/
+  - .swiftpm/
+  - DerivedSources/
+  - "*Test*.swift"
+  - "*.generated.swift"

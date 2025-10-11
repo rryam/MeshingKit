@@ -23,6 +23,21 @@ workflows:
     triggering:
       <<: *events
     scripts:
+      - name: Lint Swift Code
+        script: |
+          #!/bin/zsh
+
+          echo "Running SwiftLint..."
+
+          # Install swiftlint if not available
+          if ! command -v swiftlint &> /dev/null; then
+            echo "Installing SwiftLint..."
+            brew install swiftlint
+          fi
+
+          # Run swiftlint with strict mode
+          swiftlint --strict
+
       - name: Build Swift Package
         script: |
           #!/bin/zsh
