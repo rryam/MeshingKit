@@ -17,7 +17,7 @@ let package = Package(
     .library(
       name: "MeshingKit",
       type: .static,
-      targets: ["MeshingKit"]),
+      targets: ["MeshingKit"])
   ],
   targets: [
     .target(

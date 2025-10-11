@@ -25,7 +25,8 @@ public struct ParameterizedNoiseView: View {
 
     /// The frequency of the noise pattern.
     ///
-    /// Higher values create a finer, more detailed noise pattern, while lower values create a broader, more spread-out pattern.
+    /// Higher values create a finer, more detailed noise pattern, while lower values create a
+    /// broader, more spread-out pattern.
     @Binding var frequency: Float
 
     /// The opacity of the noise effect.

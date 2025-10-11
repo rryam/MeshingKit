@@ -1,18 +1,37 @@
-import XCTest
+import Testing
 @testable import MeshingKit
 import SwiftUI
 
-final class MeshingKitTests: XCTestCase {
+@Suite("MeshingKit Tests")
+struct MeshingKitTests {
 
+    @Test("Gradient creation from template")
     @MainActor
-    func testMeshingKitCreation() {
-        // Test that we can create a basic gradient
-        let gradient = MeshingKit.gradient(template: GradientTemplateSize3.auroraBorealis)
-        XCTAssertNotNil(gradient)
+    func gradientCreation() {
+        let template = GradientTemplateSize3.auroraBorealis
+
+        // Verify the template has the correct size
+        #expect(template.size == 3)
+
+        // Verify the template has the expected number of points (3x3 = 9 points)
+        #expect(template.points.count == 9)
+
+        // Verify the template has the expected number of colors (3x3 = 9 colors)
+        #expect(template.colors.count == 9)
+
+        // Verify points are normalized (between 0.0 and 1.0)
+        for point in template.points {
+            #expect(point.x >= 0.0 && point.x <= 1.0)
+            #expect(point.y >= 0.0 && point.y <= 1.0)
+        }
+
+        // Verify the gradient can be created without errors
+        let gradient = MeshingKit.gradient(template: template)
+        #expect(type(of: gradient) == MeshGradient.self)
     }
 
-    func testTemplateCounts() {
-        // Verify template counts
+    @Test("Template counts validation")
+    func templateCounts() {
         let size2Count = GradientTemplateSize2.allCases.count
         let size3Count = GradientTemplateSize3.allCases.count
         let size4Count = GradientTemplateSize4.allCases.count
@@ -21,22 +40,20 @@ final class MeshingKitTests: XCTestCase {
         print("Size 3x3 templates: \(size3Count)")
         print("Size 4x4 templates: \(size4Count)")
 
-        XCTAssertGreaterThan(size2Count, 0)
-        XCTAssertGreaterThan(size3Count, 0)
-        XCTAssertGreaterThan(size4Count, 0)
+        #expect(size2Count > 0)
+        #expect(size3Count > 0)
+        #expect(size4Count > 0)
     }
 
-    func testColorHexExtension() {
-        // Test hex color extension
-        let redColor = Color(hex: "#FF0000")
-        let blueColor = Color(hex: "#0000FF")
-
-        // These should not crash
-        _ = redColor
-        _ = blueColor
-
-        XCTAssertNoThrow(Color(hex: "#FF0000"))
-        XCTAssertNoThrow(Color(hex: "#00FF00"))
-        XCTAssertNoThrow(Color(hex: "#0000FF"))
+    @Test("Hex color extension", arguments: [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF",
+        "#FFFFFF",
+        "#000000"
+    ])
+    func colorHexExtension(hexValue: String) {
+        let color = Color(hex: hexValue)
+        #expect(type(of: color) == Color.self)
     }
 }
