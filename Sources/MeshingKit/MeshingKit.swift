@@ -78,7 +78,8 @@ public struct MeshingKit: Sendable {
     /// let gradient = MeshingKit.gradient(template: GradientTemplateSize3.auroraBorealis)
     ///
     /// // Using with custom template
-    /// let customTemplate = CustomGradientTemplate(name: "Custom", size: 4, points: [...], colors: [...], background: .black)
+    /// let customTemplate = CustomGradientTemplate(name: "Custom", size: 4,
+    ///                                              points: [...], colors: [...], background: .black)
     /// let gradient = MeshingKit.gradient(template: customTemplate)
     /// ```
     @MainActor public static func gradient(template: GradientTemplate)

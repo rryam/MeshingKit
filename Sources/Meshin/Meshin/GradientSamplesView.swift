@@ -51,9 +51,9 @@ enum GradientTemplate: Identifiable {
 
   var id: String {
     switch self {
-      case .size2(let template): return "size2_\(template.rawValue)"
-      case .size3(let template): return "size3_\(template.rawValue)"
-      case .size4(let template): return "size4_\(template.rawValue)"
+    case .size2(let template): return "size2_\(template.rawValue)"
+    case .size3(let template): return "size3_\(template.rawValue)"
+    case .size4(let template): return "size4_\(template.rawValue)"
     }
   }
 }
@@ -87,12 +87,12 @@ struct FullScreenGradientView: View {
   @ViewBuilder
   var gradientView: some View {
     switch template {
-      case .size2(let size2Template):
-        MeshingKit.animatedGradient(size2Template, showAnimation: $showAnimation)
-      case .size3(let size3Template):
-        MeshingKit.animatedGradient(size3Template, showAnimation: $showAnimation)
-      case .size4(let size4Template):
-        MeshingKit.animatedGradient(size4Template, showAnimation: $showAnimation)
+    case .size2(let size2Template):
+      MeshingKit.animatedGradient(size2Template, showAnimation: $showAnimation)
+    case .size3(let size3Template):
+      MeshingKit.animatedGradient(size3Template, showAnimation: $showAnimation)
+    case .size4(let size4Template):
+      MeshingKit.animatedGradient(size4Template, showAnimation: $showAnimation)
     }
   }
 }

@@ -7,6 +7,7 @@ disabled_rules:
   - non_optional_string_data_conversion
   - todo
   - void_return
+  - identifier_name
 
 # Enabled rules with custom configuration
 line_length:
@@ -20,15 +21,6 @@ file_length:
 type_body_length:
   warning: 300
   error: 400
-
-identifier_name:
-  min_length:
-    warning: 2
-    error: 1
-  max_length:
-    warning: 40
-    error: 60
-  allowed_symbols: ["_"]
 
 # Custom rules for trailing commas
 trailing_comma:
@@ -49,3 +41,5 @@ excluded:
   - DerivedSources/
   - "*Test*.swift"
   - "*.generated.swift"
+  # Exclude template files from length checks (they contain many predefined templates)
+  - Sources/MeshingKit/GradientTemplateSize*.swift
