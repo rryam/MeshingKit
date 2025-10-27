@@ -45,8 +45,10 @@ MeshingKit is based on [Meshing](https://apps.apple.com/in/app/ai-mesh-gradient-
 
 Add MeshingKit to your project using Swift Package Manager. In Xcode, go to File > Swift Packages > Add Package Dependency and enter the following URL:
 
-```
-https://github.com/rryam/MeshingKit.git
+```swift
+dependencies: [
+    .package(url: "https://github.com/rryam/MeshingKit.git", from: "2.1.0")
+]
 ```
 
 ## Usage
