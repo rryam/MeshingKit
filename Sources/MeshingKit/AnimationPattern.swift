@@ -2,8 +2,7 @@
 //  AnimationPattern.swift
 //  MeshingKit
 //
-//  Created by Alex on \(Date().formatted(date: .numeric, time: .omitted))
-//
+//  Created by Rudrank Riyam on 10/29/25.
 
 import SwiftUI
 
@@ -26,8 +25,17 @@ public struct PointAnimation: Sendable {
         case x, y, both
     }
 
+    /// Creates a new point animation with the specified parameters.
+    ///
+    /// - Parameters:
+    ///   - pointIndex: The index of the point in the gradient's position array.
+    ///   - axis: The axis to animate (x, y, or both).
+    ///   - amplitude: The amplitude of the animation (how far the point moves).
+    ///   - frequency: The frequency multiplier (controls animation speed).
     public init(
-        pointIndex: Int, axis: Axis, amplitude: CGFloat,
+        pointIndex: Int,
+        axis: Axis,
+        amplitude: CGFloat,
         frequency: CGFloat = 1.0
     ) {
         self.pointIndex = pointIndex
@@ -54,9 +62,14 @@ public struct PointAnimation: Sendable {
 
 /// A collection of point animations that can be applied to a mesh gradient.
 public struct AnimationPattern: Sendable {
+
     /// The individual point animations in this pattern.
     public let animations: [PointAnimation]
 
+    /// Creates a new animation pattern with the specified point animations.
+    ///
+    /// - Parameters:
+    ///   - animations: An array of `PointAnimation` objects defining the individual point animations.
     public init(animations: [PointAnimation]) {
         self.animations = animations
     }

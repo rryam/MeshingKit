@@ -2,7 +2,7 @@
 //  GradientTemplateSize2.swift
 //  MeshingKit
 //
-//  Created by Assistant on 10/14/24.
+//  Created by Rudrank Riyam on 10/14/24.
 //
 
 import SwiftUI
