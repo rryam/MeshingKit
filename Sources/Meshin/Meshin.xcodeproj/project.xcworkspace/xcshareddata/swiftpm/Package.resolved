@@ -1,5 +1,5 @@
 {
-  "originHash" : "a3b6befc9c60b97e2d9e9df58d9f700739f562662b7b6cf700c9dde7a7b18e3f",
+  "originHash" : "af70fb9296517684576143a169e8d49dfcc3bc7d890d287ebb63bb9f31863317",
   "pins" : [
     {
       "identity" : "inject",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "728c56639ecb3df441d51d5bc6747329afabcfc9",
         "version" : "1.5.2"
-      }
-    },
-    {
-      "identity" : "meshingkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rryam/MeshingKit",
-      "state" : {
-        "branch" : "main",
-        "revision" : "ec1a91a87fec085ef7706bfeaf6af9b006c758c6"
       }
     }
   ],

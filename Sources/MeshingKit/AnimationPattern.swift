@@ -45,17 +45,18 @@ public struct PointAnimation: Sendable {
     }
 
     /// Applies the animation to a point based on the current phase.
-    func apply(to point: inout CGPoint, at phase: Double) {
-        let value = CGFloat(cos(phase * Double(frequency)))
+    func apply(to point: inout SIMD2<Float>, at phase: Double) {
+        let value = Float(cos(phase * Double(frequency)))
+        let amplitudeFloat = Float(amplitude)
 
         switch axis {
         case .x:
-            point.x += amplitude * value
+            point.x += amplitudeFloat * value
         case .y:
-            point.y += amplitude * value
+            point.y += amplitudeFloat * value
         case .both:
-            point.x += amplitude * value
-            point.y += amplitude * CGFloat(sin(phase * Double(frequency)))
+            point.x += amplitudeFloat * value
+            point.y += amplitudeFloat * Float(sin(phase * Double(frequency)))
         }
     }
 }
@@ -127,7 +128,7 @@ public struct AnimationPattern: Sendable {
     }
 
     /// Applies all animations in the pattern to the points.
-    func apply(to points: [CGPoint], at phase: Double) -> [CGPoint] {
+    func apply(to points: [SIMD2<Float>], at phase: Double) -> [SIMD2<Float>] {
         var result = points
 
         for animation in animations {

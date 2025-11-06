@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+/// A type alias for an array of 2D points used in mesh gradients.
+///
+/// Each point is represented as a `SIMD2<Float>` where:
+/// - The x-component represents the horizontal position (0.0 to 1.0).
+/// - The y-component represents the vertical position (0.0 to 1.0).
+public typealias MeshPoints = [SIMD2<Float>]
+
 /// A structure that provides utility functions for creating mesh gradients.
 public struct MeshingKit: Sendable {
 

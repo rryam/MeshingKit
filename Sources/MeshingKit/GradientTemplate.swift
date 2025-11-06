@@ -73,6 +73,8 @@ public struct CustomGradientTemplate: GradientTemplate {
     ///   - background: The base color of the gradient.
     ///
     /// - Note: The number of elements in `points` should match the number of elements in `colors`.
+    /// - Precondition: `size > 0`, `points.count == size * size`, `colors.count == size * size`,
+    ///   and all points have coordinates in the range [0.0, 1.0].
     public init(
         name: String,
         size: Int,
@@ -80,6 +82,21 @@ public struct CustomGradientTemplate: GradientTemplate {
         colors: [Color],
         background: Color
     ) {
+        let expectedCount = size * size
+        precondition(size > 0, "Gradient size must be greater than 0")
+        precondition(points.count == expectedCount, 
+                    "Expected \(expectedCount) points for size \(size), got \(points.count)")
+        precondition(colors.count == expectedCount,
+                    "Expected \(expectedCount) colors for size \(size), got \(colors.count)")
+        
+        // Validate point ranges
+        for (index, point) in points.enumerated() {
+            precondition(point.x >= 0.0 && point.x <= 1.0,
+                        "Point at index \(index) has x coordinate \(point.x) outside valid range [0.0, 1.0]")
+            precondition(point.y >= 0.0 && point.y <= 1.0,
+                        "Point at index \(index) has y coordinate \(point.y) outside valid range [0.0, 1.0]")
+        }
+        
         self.name = name
         self.size = size
         self.points = points

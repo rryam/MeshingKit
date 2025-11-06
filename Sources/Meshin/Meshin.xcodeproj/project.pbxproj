@@ -353,15 +353,14 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		0A2DF7D62CC3D03400920005 /* XCRemoteSwiftPackageReference "MeshingKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rryam/MeshingKit";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		0A2DF7D62CC3D03400920005 /* XCLocalSwiftPackageReference "MeshingKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../..";
 		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
 		0A2DF7D92CC3D07D00920005 /* XCRemoteSwiftPackageReference "Inject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/krzysztofzablocki/Inject";
@@ -375,7 +374,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		0A2DF7D72CC3D03400920005 /* MeshingKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0A2DF7D62CC3D03400920005 /* XCRemoteSwiftPackageReference "MeshingKit" */;
+			package = 0A2DF7D62CC3D03400920005 /* XCLocalSwiftPackageReference "MeshingKit" */;
 			productName = MeshingKit;
 		};
 		0A2DF7DA2CC3D07D00920005 /* Inject */ = {
