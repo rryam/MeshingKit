@@ -12,7 +12,11 @@ public enum PredefinedTemplate: Identifiable {
     case size2(GradientTemplateSize2)
     case size3(GradientTemplateSize3)
     case size4(GradientTemplateSize4)
-    
+
+    /// A unique identifier for the template.
+    ///
+    /// The identifier is constructed from the template size and the template's raw value,
+    /// ensuring uniqueness across all predefined templates.
     public var id: String {
         switch self {
         case .size2(let template): return "size2_\(template.rawValue)"

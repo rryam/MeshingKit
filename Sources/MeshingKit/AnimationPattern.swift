@@ -20,7 +20,11 @@ public struct PointAnimation: Sendable {
     /// The frequency multiplier (controls animation speed).
     public let frequency: CGFloat
 
-    /// Possible axes for animation.
+    /// Defines the axis or axes along which a point can be animated.
+    ///
+    /// - `x`: Animate only along the horizontal axis.
+    /// - `y`: Animate only along the vertical axis.
+    /// - `both`: Animate along both axes simultaneously.
     public enum Axis: Sendable {
         case x, y, both
     }
@@ -76,6 +80,15 @@ public struct AnimationPattern: Sendable {
     }
 
     /// Creates a default animation pattern for a mesh gradient of the specified size.
+    ///
+    /// This method provides pre-configured animation patterns optimized for common grid sizes.
+    /// For grid sizes 3 and 4, it returns a pattern with carefully tuned animations for
+    /// various control points. For other sizes, it returns an empty pattern.
+    ///
+    /// - Parameter size: The grid size of the mesh gradient (e.g., 3 for a 3x3 grid).
+    /// - Returns: An `AnimationPattern` with default animations for the specified grid size.
+    ///
+    /// - Note: Currently, default patterns are only available for grid sizes 3 and 4.
     public static func defaultPattern(forGridSize size: Int) -> AnimationPattern {
         switch size {
         case 3:

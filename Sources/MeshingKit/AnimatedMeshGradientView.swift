@@ -11,7 +11,7 @@ import SwiftUI
 private enum AnimationConstants {
     /// Animation frame rate (frames per second).
     static let frameRate: Double = 120
-    
+
     // Grid size 3 animation constants
     enum GridSize3 {
         static let centerX: Float = 0.5
@@ -25,7 +25,7 @@ private enum AnimationConstants {
         static let frequency4: Double = 0.7
         static let frequency5: Double = 1.2
     }
-    
+
     // Grid size 4 animation constants
     enum GridSize4 {
         static let phaseDivider: Double = 2.0
@@ -49,13 +49,41 @@ private enum AnimationConstants {
 
 /// A view that displays an animated mesh gradient.
 public struct AnimatedMeshGradientView: View {
+    /// The size of the gradient grid (e.g., 3 for a 3x3 grid).
     var gridSize: Int
+
+    /// A binding that controls whether the animation is currently playing.
     @Binding var showAnimation: Bool
+
+    /// An array of 2D points that define the control points of the gradient.
+    ///
+    /// Each point is represented as a `SIMD2<Float>` where coordinates range from 0.0 to 1.0.
     var positions: [SIMD2<Float>]
+
+    /// An array of colors associated with the control points.
+    ///
+    /// The colors in this array correspond to the points in the `positions` array.
     var colors: [Color]
+
+    /// The background color of the gradient.
+    ///
+    /// This color is used as the base color for areas not directly affected by the control points.
     var background: Color
+
+    /// The speed multiplier for the animation.
+    ///
+    /// A value of 1.0 represents normal speed, 2.0 is twice as fast, and 0.5 is half speed.
     var animationSpeed: Double
 
+    /// Creates a new animated mesh gradient view with the specified parameters.
+    ///
+    /// - Parameters:
+    ///   - gridSize: The size of the gradient grid (e.g., 3 for a 3x3 grid).
+    ///   - showAnimation: A binding that controls whether the animation is currently playing.
+    ///   - positions: An array of 2D points that define the control points of the gradient.
+    ///   - colors: An array of colors associated with the control points.
+    ///   - background: The background color of the gradient.
+    ///   - animationSpeed: The speed multiplier for the animation (default: 1.0).
     public init(
         gridSize: Int,
         showAnimation: Binding<Bool>,
@@ -72,6 +100,7 @@ public struct AnimatedMeshGradientView: View {
         self.animationSpeed = animationSpeed
     }
 
+    /// The body of the view, displaying an animated mesh gradient.
     public var body: some View {
         TimelineView(
             .animation(minimumInterval: 1 / AnimationConstants.frameRate, paused: !showAnimation)
@@ -92,42 +121,113 @@ public struct AnimatedMeshGradientView: View {
         let adjustedTimeInterval =
             date.timeIntervalSinceReferenceDate * animationSpeed
 
-        if gridSize == 3 {
-            let phase = adjustedTimeInterval
-            var animatedPositions = positions
-
-            animatedPositions[1].x = AnimationConstants.GridSize3.centerX + AnimationConstants.GridSize3.amplitude1 * Float(cos(phase * AnimationConstants.GridSize3.frequency1))
-            animatedPositions[3].y = AnimationConstants.GridSize3.centerY + AnimationConstants.GridSize3.amplitude2 * Float(cos(phase * AnimationConstants.GridSize3.frequency2))
-            animatedPositions[4].y = AnimationConstants.GridSize3.centerY - AnimationConstants.GridSize3.amplitude1 * Float(cos(phase * AnimationConstants.GridSize3.frequency3))
-            animatedPositions[4].x = AnimationConstants.GridSize3.centerX + AnimationConstants.GridSize3.amplitude3 * Float(cos(phase * AnimationConstants.GridSize3.frequency4))
-            animatedPositions[5].y = AnimationConstants.GridSize3.centerY - AnimationConstants.GridSize3.amplitude3 * Float(cos(phase * AnimationConstants.GridSize3.frequency3))
-            animatedPositions[7].x = AnimationConstants.GridSize3.centerX - AnimationConstants.GridSize3.amplitude1 * Float(cos(phase * AnimationConstants.GridSize3.frequency5))
-
-            return animatedPositions
-        } else if gridSize == 4 {
-            let phase = adjustedTimeInterval / AnimationConstants.GridSize4.phaseDivider
-            var animatedPositions = positions
-
-            animatedPositions[1].x = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency1))  // Top edge
-            animatedPositions[2].x = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency2))  // Top edge
-            animatedPositions[4].y = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency3))  // Left edge
-            animatedPositions[7].y = AnimationConstants.GridSize4.position3 - AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency4))  // Left edge
-            animatedPositions[11].y = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency5))  // Bottom edge
-            animatedPositions[13].x = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency6))  // Right edge
-            animatedPositions[14].x = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.edgeAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency7))  // Right edge
-
-            animatedPositions[5].x = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency2))
-            animatedPositions[5].y = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency3))
-            animatedPositions[6].x = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency9))
-            animatedPositions[6].y = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency10))
-            animatedPositions[9].x = AnimationConstants.GridSize4.position1 + AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency5))
-            animatedPositions[9].y = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency6))
-            animatedPositions[10].x = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency7))
-            animatedPositions[10].y = AnimationConstants.GridSize4.position2 - AnimationConstants.GridSize4.innerAmplitude * Float(cos(phase * AnimationConstants.GridSize4.frequency8))
-
-            return animatedPositions
-        } else {
+        switch gridSize {
+        case 3:
+            return animatedPositionsForGridSize3(
+                phase: adjustedTimeInterval, positions: positions)
+        case 4:
+            return animatedPositionsForGridSize4(
+                phase: adjustedTimeInterval, positions: positions)
+        default:
             return positions
         }
+    }
+
+    private func animatedPositionsForGridSize3(
+        phase: Double, positions: [SIMD2<Float>]
+    ) -> [SIMD2<Float>] {
+        var animatedPositions = positions
+
+        animatedPositions[1].x = AnimationConstants.GridSize3.centerX
+            + AnimationConstants.GridSize3.amplitude1
+            * Float(cos(phase * AnimationConstants.GridSize3.frequency1))
+        animatedPositions[3].y = AnimationConstants.GridSize3.centerY
+            + AnimationConstants.GridSize3.amplitude2
+            * Float(cos(phase * AnimationConstants.GridSize3.frequency2))
+        animatedPositions[4].y = AnimationConstants.GridSize3.centerY
+            - AnimationConstants.GridSize3.amplitude1
+            * Float(cos(phase * AnimationConstants.GridSize3.frequency3))
+        animatedPositions[4].x = AnimationConstants.GridSize3.centerX
+            + AnimationConstants.GridSize3.amplitude3
+            * Float(cos(phase * AnimationConstants.GridSize3.frequency4))
+        animatedPositions[5].y = AnimationConstants.GridSize3.centerY
+            - AnimationConstants.GridSize3.amplitude3
+            * Float(cos(phase * AnimationConstants.GridSize3.frequency3))
+        animatedPositions[7].x = AnimationConstants.GridSize3.centerX
+            - AnimationConstants.GridSize3.amplitude1
+            * Float(cos(phase * AnimationConstants.GridSize3.frequency5))
+
+        return animatedPositions
+    }
+
+    private func animatedPositionsForGridSize4(
+        phase: Double, positions: [SIMD2<Float>]
+    ) -> [SIMD2<Float>] {
+        let adjustedPhase = phase / AnimationConstants.GridSize4.phaseDivider
+        var animatedPositions = positions
+
+        animateGridSize4Edges(&animatedPositions, phase: adjustedPhase)
+        animateGridSize4InnerPoints(&animatedPositions, phase: adjustedPhase)
+
+        return animatedPositions
+    }
+
+    private func animateGridSize4Edges(
+        _ positions: inout [SIMD2<Float>], phase: Double
+    ) {
+        // Top edge
+        positions[1].x = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency1))
+        positions[2].x = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency2))
+        // Left edge
+        positions[4].y = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency3))
+        positions[7].y = AnimationConstants.GridSize4.position3
+            - AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency4))
+        // Bottom edge
+        positions[11].y = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency5))
+        // Right edge
+        positions[13].x = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency6))
+        positions[14].x = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.edgeAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency7))
+    }
+
+    private func animateGridSize4InnerPoints(
+        _ positions: inout [SIMD2<Float>], phase: Double
+    ) {
+        positions[5].x = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency2))
+        positions[5].y = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency3))
+        positions[6].x = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency9))
+        positions[6].y = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency10))
+        positions[9].x = AnimationConstants.GridSize4.position1
+            + AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency5))
+        positions[9].y = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency6))
+        positions[10].x = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency7))
+        positions[10].y = AnimationConstants.GridSize4.position2
+            - AnimationConstants.GridSize4.innerAmplitude
+            * Float(cos(phase * AnimationConstants.GridSize4.frequency8))
     }
 }
