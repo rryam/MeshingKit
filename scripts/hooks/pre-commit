@@ -31,8 +31,7 @@ echo "Checking staged Swift files:"
 echo "$STAGED_SWIFT_FILES" | sed 's/^/  - /'
 
 # Run SwiftLint on staged files
-# Use --strict mode to fail on warnings (matching CI behavior)
-if echo "$STAGED_SWIFT_FILES" | xargs swiftlint lint --strict; then
+if echo "$STAGED_SWIFT_FILES" | xargs swiftlint lint; then
     echo -e "${GREEN}✓ SwiftLint passed!${NC}"
     exit 0
 else

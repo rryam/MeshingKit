@@ -84,11 +84,11 @@ public struct CustomGradientTemplate: GradientTemplate {
     ) {
         let expectedCount = size * size
         precondition(size > 0, "Gradient size must be greater than 0")
-        precondition(points.count == expectedCount, 
+        precondition(points.count == expectedCount,
                     "Expected \(expectedCount) points for size \(size), got \(points.count)")
         precondition(colors.count == expectedCount,
                     "Expected \(expectedCount) colors for size \(size), got \(colors.count)")
-        
+
         // Validate point ranges
         for (index, point) in points.enumerated() {
             precondition(point.x >= 0.0 && point.x <= 1.0,
@@ -96,7 +96,7 @@ public struct CustomGradientTemplate: GradientTemplate {
             precondition(point.y >= 0.0 && point.y <= 1.0,
                         "Point at index \(index) has y coordinate \(point.y) outside valid range [0.0, 1.0]")
         }
-        
+
         self.name = name
         self.size = size
         self.points = points
