@@ -109,6 +109,8 @@ struct AnimatedGradientView: View {
 }
 ```
 
+> **Note:** Animation is only available for 3x3 and 4x4 grid templates. 2x2 templates cannot be animated because all four points are corner points that must remain fixed at the edges of the gradient.
+
 ## Custom Animation Patterns
 
 MeshingKit provides advanced animation control through `AnimationPattern` and `PointAnimation` structures:
