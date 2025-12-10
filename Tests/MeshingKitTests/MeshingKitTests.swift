@@ -210,8 +210,8 @@ struct MeshingKitTests {
 
         // At least one point should have moved
         var hasMovement = false
-        for i in 0..<original.count {
-            if original[i].x != animated[i].x || original[i].y != animated[i].y {
+        for index in 0..<original.count {
+            if original[index].x != animated[index].x || original[index].y != animated[index].y {
                 hasMovement = true
                 break
             }
