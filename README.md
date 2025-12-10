@@ -217,12 +217,12 @@ let size4Count = GradientTemplateSize4.allCases.count // 11 templates
 
 ### Popular Template Examples
 
-**2x2 Grid Templates (11 total):**
+**2x2 Grid Templates (35 total):**
 - mysticTwilight, tropicalParadise, cherryBlossom, arcticFrost
 - goldenSunrise, emeraldForest, desertMirage, midnightGalaxy
 - autumnHarvest
 
-**3x3 Grid Templates (35 total):**
+**3x3 Grid Templates (22 total):**
 - intelligence, auroraBorealis, sunsetGlow, oceanDepths
 - neonNight, autumnLeaves, cosmicAurora, lavaFlow
 - etherealMist, tropicalParadise, midnightGalaxy, desertMirage
@@ -230,7 +230,7 @@ let size4Count = GradientTemplateSize4.allCases.count // 11 templates
 - cosmicNebula, arcticAurora, volcanicEmber, mintBreeze
 - twilightSerenade, saharaDunes
 
-**4x4 Grid Templates (22 total):**
+**4x4 Grid Templates (11 total):**
 - auroraBorealis, sunsetHorizon, mysticForest, cosmicNebula
 - coralReef, etherealTwilight, volcanicOasis, arcticFrost
 - jungleMist, desertMirage, neonMetropolis
