@@ -70,12 +70,15 @@ struct MeshingKitTests {
         #expect(type(of: color) == Color.self)
     }
 
-    @Test("All Size2 templates have valid structure")
-    func allSize2TemplatesValid() {
-        for template in GradientTemplateSize2.allCases {
-            #expect(template.size == 2)
-            #expect(template.points.count == 4)
-            #expect(template.colors.count == 4)
+    private func validateTemplates<T: GradientTemplate>(
+        _ templates: [T],
+        expectedSize: Int
+    ) {
+        let expectedCount = expectedSize * expectedSize
+        for template in templates {
+            #expect(template.size == expectedSize)
+            #expect(template.points.count == expectedCount)
+            #expect(template.colors.count == expectedCount)
             #expect(!template.name.isEmpty)
 
             for point in template.points {
@@ -85,34 +88,11 @@ struct MeshingKitTests {
         }
     }
 
-    @Test("All Size3 templates have valid structure")
-    func allSize3TemplatesValid() {
-        for template in GradientTemplateSize3.allCases {
-            #expect(template.size == 3)
-            #expect(template.points.count == 9)
-            #expect(template.colors.count == 9)
-            #expect(!template.name.isEmpty)
-
-            for point in template.points {
-                #expect(point.x >= 0.0 && point.x <= 1.0, "Point x=\(point.x) out of range in \(template.name)")
-                #expect(point.y >= 0.0 && point.y <= 1.0, "Point y=\(point.y) out of range in \(template.name)")
-            }
-        }
-    }
-
-    @Test("All Size4 templates have valid structure")
-    func allSize4TemplatesValid() {
-        for template in GradientTemplateSize4.allCases {
-            #expect(template.size == 4)
-            #expect(template.points.count == 16)
-            #expect(template.colors.count == 16)
-            #expect(!template.name.isEmpty)
-
-            for point in template.points {
-                #expect(point.x >= 0.0 && point.x <= 1.0, "Point x=\(point.x) out of range in \(template.name)")
-                #expect(point.y >= 0.0 && point.y <= 1.0, "Point y=\(point.y) out of range in \(template.name)")
-            }
-        }
+    @Test("All templates have valid structure")
+    func allTemplatesValid() {
+        validateTemplates(GradientTemplateSize2.allCases, expectedSize: 2)
+        validateTemplates(GradientTemplateSize3.allCases, expectedSize: 3)
+        validateTemplates(GradientTemplateSize4.allCases, expectedSize: 4)
     }
 
     @Test("PredefinedTemplate allCases contains all templates")
