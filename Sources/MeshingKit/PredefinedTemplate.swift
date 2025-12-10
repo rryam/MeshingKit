@@ -18,9 +18,9 @@ public enum PredefinedTemplate: Identifiable, CaseIterable {
     /// This property provides access to all 68 templates (35 size2 + 22 size3 + 11 size4)
     /// in a single collection for easy iteration.
     public static var allCases: [PredefinedTemplate] {
-        GradientTemplateSize2.allCases.map { .size2($0) }
-            + GradientTemplateSize3.allCases.map { .size3($0) }
-            + GradientTemplateSize4.allCases.map { .size4($0) }
+        GradientTemplateSize2.allCases.map(PredefinedTemplate.size2)
+            + GradientTemplateSize3.allCases.map(PredefinedTemplate.size3)
+            + GradientTemplateSize4.allCases.map(PredefinedTemplate.size4)
     }
 
     /// A unique identifier for the template.
