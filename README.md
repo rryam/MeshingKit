@@ -109,6 +109,8 @@ struct AnimatedGradientView: View {
 }
 ```
 
+> **Note:** Animation is only available for 3x3 and 4x4 grid templates. 2x2 templates cannot be animated because all four points are corner points that must remain fixed at the edges of the gradient.
+
 ## Custom Animation Patterns
 
 MeshingKit provides advanced animation control through `AnimationPattern` and `PointAnimation` structures:
@@ -208,19 +210,19 @@ for template in GradientTemplateSize3.allCases {
 }
 
 // Get total count of templates for each size
-let size2Count = GradientTemplateSize2.allCases.count // 11 templates
-let size3Count = GradientTemplateSize3.allCases.count // 35 templates
-let size4Count = GradientTemplateSize4.allCases.count // 22 templates
+let size2Count = GradientTemplateSize2.allCases.count
+let size3Count = GradientTemplateSize3.allCases.count
+let size4Count = GradientTemplateSize4.allCases.count
 ```
 
 ### Popular Template Examples
 
-**2x2 Grid Templates (11 total):**
+**2x2 Grid Templates (35 total):**
 - mysticTwilight, tropicalParadise, cherryBlossom, arcticFrost
 - goldenSunrise, emeraldForest, desertMirage, midnightGalaxy
 - autumnHarvest
 
-**3x3 Grid Templates (35 total):**
+**3x3 Grid Templates (22 total):**
 - intelligence, auroraBorealis, sunsetGlow, oceanDepths
 - neonNight, autumnLeaves, cosmicAurora, lavaFlow
 - etherealMist, tropicalParadise, midnightGalaxy, desertMirage
@@ -228,7 +230,7 @@ let size4Count = GradientTemplateSize4.allCases.count // 22 templates
 - cosmicNebula, arcticAurora, volcanicEmber, mintBreeze
 - twilightSerenade, saharaDunes
 
-**4x4 Grid Templates (22 total):**
+**4x4 Grid Templates (11 total):**
 - auroraBorealis, sunsetHorizon, mysticForest, cosmicNebula
 - coralReef, etherealTwilight, volcanicOasis, arcticFrost
 - jungleMist, desertMirage, neonMetropolis

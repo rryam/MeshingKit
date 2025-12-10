@@ -8,10 +8,19 @@
 import Foundation
 
 /// A type representing predefined gradient templates of different sizes.
-public enum PredefinedTemplate: Identifiable {
+public enum PredefinedTemplate: Identifiable, CaseIterable {
     case size2(GradientTemplateSize2)
     case size3(GradientTemplateSize3)
     case size4(GradientTemplateSize4)
+
+    /// All predefined templates across all sizes.
+    ///
+    /// This property provides access to all templates in a single collection for easy iteration.
+    public static var allCases: [PredefinedTemplate] {
+        GradientTemplateSize2.allCases.map(PredefinedTemplate.size2)
+            + GradientTemplateSize3.allCases.map(PredefinedTemplate.size3)
+            + GradientTemplateSize4.allCases.map(PredefinedTemplate.size4)
+    }
 
     /// A unique identifier for the template.
     ///

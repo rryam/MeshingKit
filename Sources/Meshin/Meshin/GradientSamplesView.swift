@@ -46,7 +46,7 @@ struct GradientSamplesView: View {
 /// A view that displays a full-screen version of a selected gradient template.
 struct FullScreenGradientView: View {
   let template: PredefinedTemplate
-  @Environment(\.presentationMode) var presentationMode
+  @Environment(\.dismiss) private var dismiss
   @State private var showAnimation: Bool = false
 
   var body: some View {
@@ -61,7 +61,7 @@ struct FullScreenGradientView: View {
           .background(.ultraThinMaterial, in: .rect)
 
         Button("Close") {
-          presentationMode.wrappedValue.dismiss()
+          dismiss()
         }
         .padding(.bottom)
         .buttonStyle(.borderedProminent)
