@@ -104,7 +104,7 @@ public enum GradientTemplateSize3: String, CaseIterable, GradientTemplate {
                 .init(x: 0.000, y: 0.000), .init(x: 0.161, y: 0.000),
                 .init(x: 1.000, y: 0.000),
                 .init(x: 0.000, y: 0.326), .init(x: 0.263, y: 0.882),
-                .init(x: 1.003, y: 0.142),
+                .init(x: 1.000, y: 0.142),
                 .init(x: 0.000, y: 1.000), .init(x: 0.600, y: 1.000),
                 .init(x: 1.000, y: 1.000)
             ]

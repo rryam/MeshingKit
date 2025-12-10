@@ -17,5 +17,5 @@ half4 parameterizedNoise(float2 position, half4 color, float intensity, float fr
   float g = color.g * mix(1.0, value, intensity);
   float b = color.b * mix(1.0, value, intensity);
 
-  return half4(r, g, b, opacity);
+  return half4(r, g, b, color.a * opacity);
 }
