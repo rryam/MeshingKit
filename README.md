@@ -210,9 +210,9 @@ for template in GradientTemplateSize3.allCases {
 }
 
 // Get total count of templates for each size
-let size2Count = GradientTemplateSize2.allCases.count // 35 templates
-let size3Count = GradientTemplateSize3.allCases.count // 22 templates
-let size4Count = GradientTemplateSize4.allCases.count // 11 templates
+let size2Count = GradientTemplateSize2.allCases.count
+let size3Count = GradientTemplateSize3.allCases.count
+let size4Count = GradientTemplateSize4.allCases.count
 ```
 
 ### Popular Template Examples

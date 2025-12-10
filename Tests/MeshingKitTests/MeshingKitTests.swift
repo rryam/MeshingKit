@@ -107,23 +107,18 @@ struct MeshingKitTests {
         let uniqueIds = Set(ids)
         #expect(ids.count == uniqueIds.count, "Duplicate template IDs found")
 
-        // Verify we have templates from each size
-        let size2Templates = allTemplates.filter {
-            if case .size2 = $0 { return true }
-            return false
-        }
-        let size3Templates = allTemplates.filter {
-            if case .size3 = $0 { return true }
-            return false
-        }
-        let size4Templates = allTemplates.filter {
-            if case .size4 = $0 { return true }
-            return false
+        // Verify we have the correct count of templates from each size
+        let counts = allTemplates.reduce(into: (size2: 0, size3: 0, size4: 0)) { counts, template in
+            switch template {
+            case .size2: counts.size2 += 1
+            case .size3: counts.size3 += 1
+            case .size4: counts.size4 += 1
+            }
         }
 
-        #expect(size2Templates.count == 35)
-        #expect(size3Templates.count == 22)
-        #expect(size4Templates.count == 11)
+        #expect(counts.size2 == 35)
+        #expect(counts.size3 == 22)
+        #expect(counts.size4 == 11)
     }
 
     @Test("CustomGradientTemplate creates valid template")
