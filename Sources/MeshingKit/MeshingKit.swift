@@ -93,8 +93,13 @@ public struct MeshingKit: Sendable {
         -> MeshGradient
     {
         MeshGradient(
-            width: template.size, height: template.size,
-            points: template.points, colors: template.colors)
+            width: template.size,
+            height: template.size,
+            locations: .points(template.points),
+            colors: .colors(template.colors),
+            background: template.background,
+            smoothsColors: true
+        )
     }
 
     /// Creates a `MeshGradient` from a predefined template.
@@ -144,14 +149,17 @@ public struct MeshingKit: Sendable {
     @MainActor public static func animatedGradient(
         _ template: any GradientTemplate,
         showAnimation: Binding<Bool>,
-        animationSpeed: Double = 1.0
+        animationSpeed: Double = 1.0,
+        animationPattern: AnimationPattern? = nil
     ) -> some View {
         AnimatedMeshGradientView(
             gridSize: template.size,
             showAnimation: showAnimation,
             positions: template.points,
             colors: template.colors,
-            background: template.background
+            background: template.background,
+            animationSpeed: animationSpeed,
+            animationPattern: animationPattern
         )
     }
 
@@ -180,21 +188,25 @@ public struct MeshingKit: Sendable {
     @MainActor public static func animatedGradient(
         _ template: PredefinedTemplate,
         showAnimation: Binding<Bool>,
-        animationSpeed: Double = 1.0
+        animationSpeed: Double = 1.0,
+        animationPattern: AnimationPattern? = nil
     ) -> some View {
         switch template {
         case .size2(let template):
             return animatedGradient(
                 template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed)
+                animationSpeed: animationSpeed,
+                animationPattern: animationPattern)
         case .size3(let template):
             return animatedGradient(
                 template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed)
+                animationSpeed: animationSpeed,
+                animationPattern: animationPattern)
         case .size4(let template):
             return animatedGradient(
                 template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed)
+                animationSpeed: animationSpeed,
+                animationPattern: animationPattern)
         }
     }
 }

@@ -75,6 +75,11 @@ public struct AnimatedMeshGradientView: View {
     /// A value of 1.0 represents normal speed, 2.0 is twice as fast, and 0.5 is half speed.
     var animationSpeed: Double
 
+    /// Optional animation pattern for point-based animations.
+    ///
+    /// When provided, this pattern is applied to `positions` each frame.
+    var animationPattern: AnimationPattern?
+
     /// Creates a new animated mesh gradient view with the specified parameters.
     ///
     /// - Parameters:
@@ -90,7 +95,8 @@ public struct AnimatedMeshGradientView: View {
         positions: [SIMD2<Float>],
         colors: [Color],
         background: Color,
-        animationSpeed: Double = 1.0
+        animationSpeed: Double = 1.0,
+        animationPattern: AnimationPattern? = nil
     ) {
         self.gridSize = gridSize
         self._showAnimation = showAnimation
@@ -98,6 +104,7 @@ public struct AnimatedMeshGradientView: View {
         self.colors = colors
         self.background = background
         self.animationSpeed = animationSpeed
+        self.animationPattern = animationPattern
     }
 
     /// The body of the view, displaying an animated mesh gradient.
@@ -121,6 +128,11 @@ public struct AnimatedMeshGradientView: View {
         let adjustedTimeInterval =
             date.timeIntervalSinceReferenceDate * animationSpeed
 
+        if let animationPattern, gridSize >= 3 {
+            let animated = animationPattern.apply(to: positions, at: adjustedTimeInterval)
+            return clampedToUnitSquare(animated)
+        }
+
         switch gridSize {
         case 3:
             return animatedPositionsForGridSize3(
@@ -136,6 +148,7 @@ public struct AnimatedMeshGradientView: View {
     private func animatedPositionsForGridSize3(
         phase: Double, positions: [SIMD2<Float>]
     ) -> [SIMD2<Float>] {
+        guard positions.count >= 9 else { return positions }
         var animatedPositions = positions
 
         animatedPositions[1].x = AnimationConstants.GridSize3.centerX
@@ -163,6 +176,7 @@ public struct AnimatedMeshGradientView: View {
     private func animatedPositionsForGridSize4(
         phase: Double, positions: [SIMD2<Float>]
     ) -> [SIMD2<Float>] {
+        guard positions.count >= 16 else { return positions }
         let adjustedPhase = phase / AnimationConstants.GridSize4.phaseDivider
         var animatedPositions = positions
 
@@ -229,5 +243,14 @@ public struct AnimatedMeshGradientView: View {
         positions[10].y = AnimationConstants.GridSize4.position2
             - AnimationConstants.GridSize4.innerAmplitude
             * Float(cos(phase * AnimationConstants.GridSize4.frequency8))
+    }
+
+    private func clampedToUnitSquare(_ positions: [SIMD2<Float>]) -> [SIMD2<Float>] {
+        positions.map { point in
+            .init(
+                x: min(max(point.x, 0.0), 1.0),
+                y: min(max(point.y, 0.0), 1.0)
+            )
+        }
     }
 }

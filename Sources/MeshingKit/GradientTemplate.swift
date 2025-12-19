@@ -16,7 +16,9 @@ public protocol GradientTemplate: Sendable {
     /// The name of the gradient template.
     var name: String { get }
 
-    /// The size of the gradient, representing both width and height in pixels.
+    /// The grid size of the gradient.
+    ///
+    /// For example, a size of `3` represents a 3×3 grid (9 control points/colors).
     var size: Int { get }
 
     /// An array of 2D points that define the control points of the gradient.
@@ -43,7 +45,9 @@ public struct CustomGradientTemplate: GradientTemplate {
     /// The name of the gradient template.
     public let name: String
 
-    /// The size of the gradient, representing both width and height in pixels.
+    /// The grid size of the gradient.
+    ///
+    /// For example, a size of `4` represents a 4×4 grid (16 control points/colors).
     public let size: Int
 
     /// An array of 2D points that define the control points of the gradient.
@@ -67,7 +71,7 @@ public struct CustomGradientTemplate: GradientTemplate {
     ///
     /// - Parameters:
     ///   - name: A string that identifies the gradient template.
-    ///   - size: The dimensions of the gradient in pixels (width and height are equal).
+    ///   - size: The grid size (width and height are equal).
     ///   - points: An array of `SIMD2<Float>` values representing the control points.
     ///   - colors: An array of `Color` values corresponding to each control point.
     ///   - background: The base color of the gradient.
