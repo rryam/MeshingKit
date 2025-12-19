@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import simd
 
 /// Animation constants for mesh gradient animations.
 private enum AnimationConstants {
@@ -75,6 +76,16 @@ public struct AnimatedMeshGradientView: View {
     /// A value of 1.0 represents normal speed, 2.0 is twice as fast, and 0.5 is half speed.
     var animationSpeed: Double
 
+    /// Optional animation pattern for point-based animations.
+    ///
+    /// When provided, this pattern is applied to `positions` each frame.
+    var animationPattern: AnimationPattern?
+
+    /// Whether the gradient should smooth between colors.
+    ///
+    /// Defaults to `true` for softer transitions.
+    var smoothsColors: Bool
+
     /// Creates a new animated mesh gradient view with the specified parameters.
     ///
     /// - Parameters:
@@ -84,13 +95,17 @@ public struct AnimatedMeshGradientView: View {
     ///   - colors: An array of colors associated with the control points.
     ///   - background: The background color of the gradient.
     ///   - animationSpeed: The speed multiplier for the animation (default: 1.0).
+    ///   - animationPattern: Optional custom animation pattern to apply.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     public init(
         gridSize: Int,
         showAnimation: Binding<Bool>,
         positions: [SIMD2<Float>],
         colors: [Color],
         background: Color,
-        animationSpeed: Double = 1.0
+        animationSpeed: Double = 1.0,
+        animationPattern: AnimationPattern? = nil,
+        smoothsColors: Bool = true
     ) {
         self.gridSize = gridSize
         self._showAnimation = showAnimation
@@ -98,6 +113,8 @@ public struct AnimatedMeshGradientView: View {
         self.colors = colors
         self.background = background
         self.animationSpeed = animationSpeed
+        self.animationPattern = animationPattern
+        self.smoothsColors = smoothsColors
     }
 
     /// The body of the view, displaying an animated mesh gradient.
@@ -111,7 +128,7 @@ public struct AnimatedMeshGradientView: View {
                 locations: .points(animatedPositions(for: phase.date)),
                 colors: .colors(colors),
                 background: background,
-                smoothsColors: true
+                smoothsColors: smoothsColors
             )
             .ignoresSafeArea()
         }
@@ -120,6 +137,11 @@ public struct AnimatedMeshGradientView: View {
     private func animatedPositions(for date: Date) -> [SIMD2<Float>] {
         let adjustedTimeInterval =
             date.timeIntervalSinceReferenceDate * animationSpeed
+
+        if let animationPattern, gridSize >= 3 {
+            let animated = animationPattern.apply(to: positions, at: adjustedTimeInterval)
+            return clampedToUnitSquare(animated)
+        }
 
         switch gridSize {
         case 3:
@@ -136,6 +158,7 @@ public struct AnimatedMeshGradientView: View {
     private func animatedPositionsForGridSize3(
         phase: Double, positions: [SIMD2<Float>]
     ) -> [SIMD2<Float>] {
+        guard positions.count >= 9 else { return positions }
         var animatedPositions = positions
 
         animatedPositions[1].x = AnimationConstants.GridSize3.centerX
@@ -163,6 +186,7 @@ public struct AnimatedMeshGradientView: View {
     private func animatedPositionsForGridSize4(
         phase: Double, positions: [SIMD2<Float>]
     ) -> [SIMD2<Float>] {
+        guard positions.count >= 16 else { return positions }
         let adjustedPhase = phase / AnimationConstants.GridSize4.phaseDivider
         var animatedPositions = positions
 
@@ -229,5 +253,13 @@ public struct AnimatedMeshGradientView: View {
         positions[10].y = AnimationConstants.GridSize4.position2
             - AnimationConstants.GridSize4.innerAmplitude
             * Float(cos(phase * AnimationConstants.GridSize4.frequency8))
+    }
+
+    private func clampedToUnitSquare(_ positions: [SIMD2<Float>]) -> [SIMD2<Float>] {
+        let lowerBound = SIMD2<Float>.zero
+        let upperBound = SIMD2<Float>(repeating: 1.0)
+        return positions.map { point in
+            simd_clamp(point, lowerBound, upperBound)
+        }
     }
 }

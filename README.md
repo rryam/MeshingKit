@@ -147,6 +147,14 @@ let pointAnimations = [
 ]
 
 let customPattern = AnimationPattern(animations: pointAnimations)
+
+// Apply the pattern to an animated gradient
+MeshingKit.animatedGradient(
+    .size3(.cosmicAurora),
+    showAnimation: $showAnimation,
+    animationSpeed: 1.0,
+    animationPattern: customPattern
+)
 ```
 
 **Animation Parameters:**
@@ -250,7 +258,7 @@ let gradient = MeshingKit.gradient(template: template)
 Create custom gradients by defining your own `GradientTemplate`:
 
 ```swift
-let customTemplate = GradientTemplate(
+let customTemplate = CustomGradientTemplate(
     name: "Custom Gradient",
     size: 3,
     points: [
@@ -266,12 +274,7 @@ let customTemplate = GradientTemplate(
     background: Color.black
 )
 
-let customGradient = MeshGradient(
-    width: customTemplate.size,
-    height: customTemplate.size,
-    points: customTemplate.points,
-    colors: customTemplate.colors
-)
+let customGradient = MeshingKit.gradient(template: customTemplate)
 ```
 
 ## Advanced Animation Examples

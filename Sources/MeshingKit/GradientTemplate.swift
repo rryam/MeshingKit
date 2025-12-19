@@ -16,7 +16,9 @@ public protocol GradientTemplate: Sendable {
     /// The name of the gradient template.
     var name: String { get }
 
-    /// The size of the gradient, representing both width and height in pixels.
+    /// The grid size of the gradient.
+    ///
+    /// For example, a size of `3` represents a 3×3 grid (9 control points/colors).
     var size: Int { get }
 
     /// An array of 2D points that define the control points of the gradient.
@@ -43,7 +45,9 @@ public struct CustomGradientTemplate: GradientTemplate {
     /// The name of the gradient template.
     public let name: String
 
-    /// The size of the gradient, representing both width and height in pixels.
+    /// The grid size of the gradient.
+    ///
+    /// For example, a size of `4` represents a 4×4 grid (16 control points/colors).
     public let size: Int
 
     /// An array of 2D points that define the control points of the gradient.
@@ -63,11 +67,91 @@ public struct CustomGradientTemplate: GradientTemplate {
     /// This color is used as the base color for areas not directly affected by the control points.
     public let background: Color
 
+    /// Validation issues for custom gradient templates.
+    public enum ValidationError: Error, Equatable {
+        case invalidSize(Int)
+        case pointsCount(expected: Int, actual: Int)
+        case colorsCount(expected: Int, actual: Int)
+        case pointOutOfRange(index: Int, x: Float, y: Float)
+    }
+
+    /// A collection of validation errors for a custom gradient template.
+    public struct ValidationErrors: Error, Equatable {
+        public let errors: [ValidationError]
+
+        public init(errors: [ValidationError]) {
+            self.errors = errors
+        }
+    }
+
+    /// Validates the provided template data without triggering a precondition.
+    ///
+    /// - Returns: An array of validation errors. Empty means the data is valid.
+    public static func validate(
+        size: Int,
+        points: [SIMD2<Float>],
+        colors: [Color]
+    ) -> [ValidationError] {
+        var errors: [ValidationError] = []
+
+        guard size > 0 else {
+            errors.append(.invalidSize(size))
+            return errors
+        }
+
+        let expectedCount = size * size
+
+        if points.count != expectedCount {
+            errors.append(.pointsCount(expected: expectedCount, actual: points.count))
+        }
+
+        if colors.count != expectedCount {
+            errors.append(.colorsCount(expected: expectedCount, actual: colors.count))
+        }
+
+        for (index, point) in points.enumerated() {
+            if point.x < 0.0 || point.x > 1.0 || point.y < 0.0 || point.y > 1.0 {
+                errors.append(.pointOutOfRange(index: index, x: point.x, y: point.y))
+            }
+        }
+
+        return errors
+    }
+
+    /// Validates the current template data without triggering a precondition.
+    ///
+    /// - Returns: An array of validation errors. Empty means the data is valid.
+    public func validate() -> [ValidationError] {
+        Self.validate(size: size, points: points, colors: colors)
+    }
+
+    /// Creates a new custom gradient template with validation.
+    ///
+    /// - Throws: `ValidationErrors` if validation fails.
+    public init(
+        validating name: String,
+        size: Int,
+        points: [SIMD2<Float>],
+        colors: [Color],
+        background: Color
+    ) throws {
+        let errors = Self.validate(size: size, points: points, colors: colors)
+        guard errors.isEmpty else {
+            throw ValidationErrors(errors: errors)
+        }
+
+        self.name = name
+        self.size = size
+        self.points = points
+        self.colors = colors
+        self.background = background
+    }
+
     /// Creates a new custom gradient template with the specified parameters.
     ///
     /// - Parameters:
     ///   - name: A string that identifies the gradient template.
-    ///   - size: The dimensions of the gradient in pixels (width and height are equal).
+    ///   - size: The grid size (width and height are equal).
     ///   - points: An array of `SIMD2<Float>` values representing the control points.
     ///   - colors: An array of `Color` values corresponding to each control point.
     ///   - background: The base color of the gradient.

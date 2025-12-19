@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A view that applies a parameterized noise effect to a MeshGradient.
 ///
-/// Use `ParameterizedNoiseView` to add a customizable noise effect to a `MeshGradient` view.
+/// Use `ParameterizedNoiseView` to add a customizable noise effect to a view (commonly a `MeshGradient`).
 /// The noise effect is controlled by three parameters: intensity, frequency, and opacity.
 ///
 /// Example usage:
@@ -13,10 +13,10 @@ import SwiftUI
 /// ```
 ///
 /// - Important: This view requires iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, or visionOS 2.0 and later.
-public struct ParameterizedNoiseView: View {
+public struct ParameterizedNoiseView<Content: View>: View {
 
-    /// The MeshGradient to which the noise effect is applied.
-    let gradient: MeshGradient
+    /// The view to which the noise effect is applied.
+    let content: Content
 
     /// The intensity of the noise effect.
     ///
@@ -40,25 +40,29 @@ public struct ParameterizedNoiseView: View {
     ///   - intensity: A binding to the intensity of the noise effect.
     ///   - frequency: A binding to the frequency of the noise pattern.
     ///   - opacity: A binding to the opacity of the noise effect.
-    ///   - content: A closure that returns the MeshGradient to which the noise effect will be applied.
+    ///   - content: A closure that returns the view to which the noise effect will be applied.
     public init(
         intensity: Binding<Float>, frequency: Binding<Float>,
-        opacity: Binding<Float>, @ViewBuilder content: () -> MeshGradient
+        opacity: Binding<Float>, @ViewBuilder content: () -> Content
     ) {
         self._intensity = intensity
         self._frequency = frequency
         self._opacity = opacity
-        self.gradient = content()
+        self.content = content()
     }
 
     /// The body of the view, applying the noise effect to the MeshGradient.
     public var body: some View {
-        gradient
+        let clampedIntensity = min(max(intensity, 0), 1)
+        let clampedFrequency = max(frequency, 0)
+        let clampedOpacity = min(max(opacity, 0), 1)
+
+        content
             .colorEffect(
                 ShaderLibrary.parameterizedNoise(
-                    .float(intensity),
-                    .float(frequency),
-                    .float(opacity)
+                    .float(clampedIntensity),
+                    .float(clampedFrequency),
+                    .float(clampedOpacity)
                 )
             )
     }

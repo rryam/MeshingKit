@@ -22,17 +22,22 @@ public struct MeshingKit: Sendable {
     /// This function takes a `GradientTemplateSize3` and converts it into a `MeshGradient`,
     /// using the template's size, points, and colors.
     ///
-    /// - Parameter template: A `GradientTemplateSize3` containing the gradient's specifications.
+    /// - Parameters:
+    ///   - template: A `GradientTemplateSize3` containing the gradient's specifications.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A `MeshGradient` instance created from the provided template.
     ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradientSize3(template: .auroraBorealis)
     /// ```
-    @MainActor public static func gradientSize3(template: GradientTemplateSize3)
+    @MainActor public static func gradientSize3(
+        template: GradientTemplateSize3,
+        smoothsColors: Bool = true
+    )
         -> MeshGradient
     {
-        gradient(template: template)
+        gradient(template: template, smoothsColors: smoothsColors)
     }
 
     /// Creates a `MeshGradient` from a given `GradientTemplateSize2`.
@@ -40,17 +45,22 @@ public struct MeshingKit: Sendable {
     /// This function takes a `GradientTemplateSize2` and converts it into a `MeshGradient`,
     /// using the template's size, points, and colors.
     ///
-    /// - Parameter template: A `GradientTemplateSize2` containing the gradient's specifications.
+    /// - Parameters:
+    ///   - template: A `GradientTemplateSize2` containing the gradient's specifications.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A `MeshGradient` instance created from the provided template.
     ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradientSize2(template: .mysticTwilight)
     /// ```
-    @MainActor public static func gradientSize2(template: GradientTemplateSize2)
+    @MainActor public static func gradientSize2(
+        template: GradientTemplateSize2,
+        smoothsColors: Bool = true
+    )
         -> MeshGradient
     {
-        gradient(template: template)
+        gradient(template: template, smoothsColors: smoothsColors)
     }
 
     /// Creates a `MeshGradient` from a given `GradientTemplateSize4`.
@@ -58,17 +68,22 @@ public struct MeshingKit: Sendable {
     /// This function takes a `GradientTemplateSize4` and converts it into a `MeshGradient`,
     /// using the template's size, points, and colors.
     ///
-    /// - Parameter template: A `GradientTemplateSize4` containing the gradient's specifications.
+    /// - Parameters:
+    ///   - template: A `GradientTemplateSize4` containing the gradient's specifications.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A `MeshGradient` instance created from the provided template.
     ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradientSize4(template: .cosmicNebula)
     /// ```
-    @MainActor public static func gradientSize4(template: GradientTemplateSize4)
+    @MainActor public static func gradientSize4(
+        template: GradientTemplateSize4,
+        smoothsColors: Bool = true
+    )
         -> MeshGradient
     {
-        gradient(template: template)
+        gradient(template: template, smoothsColors: smoothsColors)
     }
 
     /// Creates a `MeshGradient` from a given `GradientTemplate`.
@@ -76,7 +91,9 @@ public struct MeshingKit: Sendable {
     /// This function takes any `GradientTemplate` and converts it into a `MeshGradient`,
     /// using the template's size, points, and colors.
     ///
-    /// - Parameter template: A `GradientTemplate` containing the gradient's specifications.
+    /// - Parameters:
+    ///   - template: A `GradientTemplate` containing the gradient's specifications.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A `MeshGradient` instance created from the provided template.
     ///
     /// Example:
@@ -89,34 +106,46 @@ public struct MeshingKit: Sendable {
     ///                                              points: [...], colors: [...], background: .black)
     /// let gradient = MeshingKit.gradient(template: customTemplate)
     /// ```
-    @MainActor public static func gradient(template: GradientTemplate)
+    @MainActor public static func gradient(
+        template: GradientTemplate,
+        smoothsColors: Bool = true
+    )
         -> MeshGradient
     {
         MeshGradient(
-            width: template.size, height: template.size,
-            points: template.points, colors: template.colors)
+            width: template.size,
+            height: template.size,
+            locations: .points(template.points),
+            colors: .colors(template.colors),
+            background: template.background,
+            smoothsColors: smoothsColors
+        )
     }
 
     /// Creates a `MeshGradient` from a predefined template.
     ///
-    /// - Parameter template: The predefined template to use.
+    /// - Parameters:
+    ///   - template: The predefined template to use.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A `MeshGradient` instance created from the provided template.
     ///
     /// Example:
     /// ```swift
     /// let gradient = MeshingKit.gradient(template: .size3(.auroraBorealis))
     /// ```
-    @MainActor public static func gradient(template: PredefinedTemplate)
+    @MainActor public static func gradient(
+        template: PredefinedTemplate,
+        smoothsColors: Bool = true
+    )
         -> MeshGradient
     {
-        switch template {
-        case .size2(let template):
-            return gradient(template: template)
-        case .size3(let template):
-            return gradient(template: template)
-        case .size4(let template):
-            return gradient(template: template)
+        let baseTemplate: any GradientTemplate = switch template {
+        case .size2(let specificTemplate): specificTemplate
+        case .size3(let specificTemplate): specificTemplate
+        case .size4(let specificTemplate): specificTemplate
         }
+
+        return gradient(template: baseTemplate, smoothsColors: smoothsColors)
     }
 
     /// Creates an animated `MeshGradient` view from any gradient template.
@@ -125,6 +154,8 @@ public struct MeshingKit: Sendable {
     ///   - template: A gradient template to use.
     ///   - showAnimation: A binding to control the animation's play/pause state.
     ///   - animationSpeed: Controls the speed of the animation (default: 1.0).
+    ///   - animationPattern: Optional custom animation pattern to apply.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A view containing the animated `MeshGradient`.
     ///
     /// Example:
@@ -144,14 +175,19 @@ public struct MeshingKit: Sendable {
     @MainActor public static func animatedGradient(
         _ template: any GradientTemplate,
         showAnimation: Binding<Bool>,
-        animationSpeed: Double = 1.0
+        animationSpeed: Double = 1.0,
+        animationPattern: AnimationPattern? = nil,
+        smoothsColors: Bool = true
     ) -> some View {
         AnimatedMeshGradientView(
             gridSize: template.size,
             showAnimation: showAnimation,
             positions: template.points,
             colors: template.colors,
-            background: template.background
+            background: template.background,
+            animationSpeed: animationSpeed,
+            animationPattern: animationPattern,
+            smoothsColors: smoothsColors
         )
     }
 
@@ -161,6 +197,8 @@ public struct MeshingKit: Sendable {
     ///   - template: A predefined template to use.
     ///   - showAnimation: A binding to control the animation's play/pause state.
     ///   - animationSpeed: Controls the speed of the animation (default: 1.0).
+    ///   - animationPattern: Optional custom animation pattern to apply.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     /// - Returns: A view containing the animated `MeshGradient`.
     ///
     /// Example:
@@ -180,21 +218,22 @@ public struct MeshingKit: Sendable {
     @MainActor public static func animatedGradient(
         _ template: PredefinedTemplate,
         showAnimation: Binding<Bool>,
-        animationSpeed: Double = 1.0
+        animationSpeed: Double = 1.0,
+        animationPattern: AnimationPattern? = nil,
+        smoothsColors: Bool = true
     ) -> some View {
-        switch template {
-        case .size2(let template):
-            return animatedGradient(
-                template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed)
-        case .size3(let template):
-            return animatedGradient(
-                template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed)
-        case .size4(let template):
-            return animatedGradient(
-                template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed)
+        let baseTemplate: any GradientTemplate = switch template {
+        case .size2(let specificTemplate): specificTemplate
+        case .size3(let specificTemplate): specificTemplate
+        case .size4(let specificTemplate): specificTemplate
         }
+
+        return animatedGradient(
+            baseTemplate,
+            showAnimation: showAnimation,
+            animationSpeed: animationSpeed,
+            animationPattern: animationPattern,
+            smoothsColors: smoothsColors
+        )
     }
 }
