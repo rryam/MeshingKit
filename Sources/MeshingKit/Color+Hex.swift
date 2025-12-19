@@ -6,6 +6,18 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
+struct RGBAComponents {
+    let r: Double
+    let g: Double
+    let b: Double
+    let a: Double
+}
 
 extension Color {
 
@@ -51,5 +63,50 @@ extension Color {
             blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
+    }
+
+    func rgbaComponents() -> RGBAComponents? {
+#if canImport(UIKit)
+        let platformColor = UIColor(self)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &a) else {
+            return nil
+        }
+        return RGBAComponents(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+#elseif canImport(AppKit)
+        let platformColor = NSColor(self)
+        let srgb = platformColor.usingColorSpace(.sRGB) ?? platformColor
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        srgb.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return RGBAComponents(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+#else
+        return nil
+#endif
+    }
+
+    /// Returns a hex string for the color in sRGB space.
+    ///
+    /// - Parameter includeAlpha: When true, returns #AARRGGBB. Otherwise returns #RRGGBB.
+    /// - Returns: A hex string if the color can be converted to sRGB.
+    public func hexString(includeAlpha: Bool = false) -> String? {
+        guard let components = rgbaComponents() else {
+            return nil
+        }
+
+        let r = Int(round(components.r * 255))
+        let g = Int(round(components.g * 255))
+        let b = Int(round(components.b * 255))
+        let a = Int(round(components.a * 255))
+
+        if includeAlpha {
+            return String(format: "#%02X%02X%02X%02X", a, r, g, b)
+        }
+        return String(format: "#%02X%02X%02X", r, g, b)
     }
 }

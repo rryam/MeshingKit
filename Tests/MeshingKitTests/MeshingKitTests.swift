@@ -93,6 +93,13 @@ struct MeshingKitTests {
         }
     }
 
+    @Test("Hex color extension outputs hex string")
+    func hexColorOutputsHexString() {
+        let color = Color(hex: "#FF0000")
+        #expect(color.hexString() == "#FF0000")
+        #expect(color.hexString(includeAlpha: true) == "#FFFF0000")
+    }
+
     private func validateTemplates<T: GradientTemplate>(
         _ templates: [T],
         expectedSize: Int
@@ -142,6 +149,27 @@ struct MeshingKitTests {
         #expect(counts.size2 == 35)
         #expect(counts.size3 == 22)
         #expect(counts.size4 == 11)
+    }
+
+    @Test("Export helpers generate snippets")
+    func exportHelpersSnippets() {
+        let template = GradientTemplateSize2.mysticTwilight
+        let swiftUIStops = MeshingKit.swiftUIStopsSnippet(template: template)
+        let cssStops = MeshingKit.cssLinearGradientSnippet(template: template)
+
+        #expect(swiftUIStops.contains("Color(hex:"))
+        #expect(cssStops.contains("linear-gradient("))
+        #expect(cssStops.contains("#"))
+    }
+
+    @Test("Export helpers generate stops")
+    func exportHelpersStops() {
+        let template = GradientTemplateSize2.mysticTwilight
+        let stops = MeshingKit.previewStops(template: template)
+
+        #expect(stops.count == template.colors.count)
+        #expect(isApproximatelyEqual(Double(stops.first?.location ?? 0), 0))
+        #expect(isApproximatelyEqual(Double(stops.last?.location ?? 0), 1))
     }
 
     @Test("CustomGradientTemplate creates valid template")
