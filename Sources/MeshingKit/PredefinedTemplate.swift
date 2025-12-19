@@ -76,6 +76,22 @@ public struct TemplateMetadata: Sendable {
 }
 
 public extension PredefinedTemplate {
+    /// Cached template metadata for performance.
+    private var cachedMetadata: TemplateMetadata {
+        let nameTokens = Self.normalizedTokens(from: rawName)
+        let moodList = Self.moods(for: nameTokens)
+        let moodTokens = moodList.map(\.rawValue)
+        let tags = Self.uniqueTokens(nameTokens + moodTokens)
+
+        return TemplateMetadata(
+            name: template.name,
+            tags: tags,
+            moods: moodList,
+            palette: template.colors,
+            background: template.background
+        )
+    }
+
     /// The underlying template for this predefined case.
     var template: any GradientTemplate {
         switch self {
@@ -102,32 +118,23 @@ public extension PredefinedTemplate {
 
     /// Tags derived from the template name and mood.
     var tags: [String] {
-        let nameTokens = Self.normalizedTokens(from: rawName)
-        let moods = Self.moods(for: nameTokens)
-        let moodTokens = moods.map(\.rawValue)
-        return Self.uniqueTokens(nameTokens + moodTokens)
+        cachedMetadata.tags
     }
 
     /// Moods derived from the template name.
     var moods: [TemplateMood] {
-        Self.moods(for: Self.normalizedTokens(from: rawName))
+        cachedMetadata.moods
     }
 
     /// Combined metadata for the template.
     var metadata: TemplateMetadata {
-        TemplateMetadata(
-            name: name,
-            tags: tags,
-            moods: moods,
-            palette: palette,
-            background: background
-        )
+        cachedMetadata
     }
 
     /// Finds templates that best match the query.
     ///
     /// - Parameters:
-    ///   - query: Search terms (name, tags, or mood).
+    ///   - query: Search terms (tags or mood keywords).
     ///   - limit: Optional limit for the number of results.
     /// - Returns: Templates ordered by best match.
     static func find(by query: String, limit: Int? = nil) -> [PredefinedTemplate] {
