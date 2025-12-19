@@ -191,22 +191,17 @@ public struct MeshingKit: Sendable {
         animationSpeed: Double = 1.0,
         animationPattern: AnimationPattern? = nil
     ) -> some View {
-        switch template {
-        case .size2(let template):
-            return animatedGradient(
-                template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed,
-                animationPattern: animationPattern)
-        case .size3(let template):
-            return animatedGradient(
-                template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed,
-                animationPattern: animationPattern)
-        case .size4(let template):
-            return animatedGradient(
-                template, showAnimation: showAnimation,
-                animationSpeed: animationSpeed,
-                animationPattern: animationPattern)
+        let baseTemplate: any GradientTemplate = switch template {
+        case .size2(let specificTemplate): specificTemplate
+        case .size3(let specificTemplate): specificTemplate
+        case .size4(let specificTemplate): specificTemplate
         }
+
+        return animatedGradient(
+            baseTemplate,
+            showAnimation: showAnimation,
+            animationSpeed: animationSpeed,
+            animationPattern: animationPattern
+        )
     }
 }

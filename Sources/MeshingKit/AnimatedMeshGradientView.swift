@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import simd
 
 /// Animation constants for mesh gradient animations.
 private enum AnimationConstants {
@@ -246,11 +247,10 @@ public struct AnimatedMeshGradientView: View {
     }
 
     private func clampedToUnitSquare(_ positions: [SIMD2<Float>]) -> [SIMD2<Float>] {
-        positions.map { point in
-            .init(
-                x: min(max(point.x, 0.0), 1.0),
-                y: min(max(point.y, 0.0), 1.0)
-            )
+        let lowerBound = SIMD2<Float>.zero
+        let upperBound = SIMD2<Float>(repeating: 1.0)
+        return positions.map { point in
+            simd_clamp(point, lowerBound, upperBound)
         }
     }
 }
