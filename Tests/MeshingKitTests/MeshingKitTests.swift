@@ -1,6 +1,11 @@
 import Testing
 @testable import MeshingKit
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 @Suite("MeshingKit Tests")
 struct MeshingKitTests {
@@ -68,6 +73,24 @@ struct MeshingKitTests {
         // 8-character hex (ARGB)
         let color = Color(hex: "#80FF0000")
         #expect(type(of: color) == Color.self)
+    }
+
+    @Test("Hex color extension handles invalid input")
+    func hexColorInvalidInput() {
+        let invalidColors = [
+            "not-a-hex",
+            "#GGGGGG",
+            "#12345"
+        ]
+
+        for hexValue in invalidColors {
+            let color = Color(hex: hexValue)
+            let rgba = resolvedRGBA(color)
+            #expect(isApproximatelyEqual(rgba.r, 1.0))
+            #expect(isApproximatelyEqual(rgba.g, 1.0))
+            #expect(isApproximatelyEqual(rgba.b, 1.0))
+            #expect(isApproximatelyEqual(rgba.a, 1.0))
+        }
     }
 
     private func validateTemplates<T: GradientTemplate>(
@@ -141,6 +164,51 @@ struct MeshingKitTests {
         #expect(template.size == 2)
         #expect(template.points.count == 4)
         #expect(template.colors.count == 4)
+    }
+
+    @Test("CustomGradientTemplate validation reports errors")
+    func customGradientTemplateValidation() {
+        let points: [SIMD2<Float>] = [
+            .init(x: -0.1, y: 0.0),
+            .init(x: 1.2, y: 1.1)
+        ]
+        let colors: [Color] = [.red]
+
+        let errors = CustomGradientTemplate.validate(
+            size: 2,
+            points: points,
+            colors: colors
+        )
+
+        #expect(errors.contains(.pointsCount(expected: 4, actual: 2)))
+        #expect(errors.contains(.colorsCount(expected: 4, actual: 1)))
+        #expect(errors.contains(where: { error in
+            if case .pointOutOfRange(index: 0, x: _, y: _) = error { return true }
+            return false
+        }))
+    }
+
+    @Test("CustomGradientTemplate validating initializer throws")
+    func customGradientTemplateValidatingInitThrows() {
+        let points: [SIMD2<Float>] = [
+            .init(x: 0.0, y: 0.0)
+        ]
+        let colors: [Color] = [.red]
+
+        do {
+            _ = try CustomGradientTemplate(
+                validating: "Invalid",
+                size: 2,
+                points: points,
+                colors: colors,
+                background: .black
+            )
+            #expect(false, "Expected validating initializer to throw")
+        } catch let error as CustomGradientTemplate.ValidationErrors {
+            #expect(!error.errors.isEmpty)
+        } catch {
+            #expect(false, "Unexpected error type: \(error)")
+        }
     }
 
     @Test("AnimationPattern default for grid size 3")
@@ -240,5 +308,41 @@ struct MeshingKitTests {
 
         // Different frequencies should produce different positions at same phase
         #expect(point1.x != point2.x, "Different frequencies should produce different results")
+    }
+
+    private struct RGBA {
+        let r: Double
+        let g: Double
+        let b: Double
+        let a: Double
+    }
+
+    private func resolvedRGBA(_ color: Color) -> RGBA {
+#if canImport(UIKit)
+        let platformColor = UIColor(color)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        platformColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return RGBA(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+#elseif canImport(AppKit)
+        let platformColor = NSColor(color)
+        let srgb = platformColor.usingColorSpace(.sRGB) ?? platformColor
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        srgb.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return RGBA(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+#else
+        return RGBA(r: 0, g: 0, b: 0, a: 0)
+#endif
+    }
+
+    private func isApproximatelyEqual(_ lhs: Double, _ rhs: Double, tolerance: Double = 0.0001)
+        -> Bool
+    {
+        abs(lhs - rhs) <= tolerance
     }
 }

@@ -81,6 +81,11 @@ public struct AnimatedMeshGradientView: View {
     /// When provided, this pattern is applied to `positions` each frame.
     var animationPattern: AnimationPattern?
 
+    /// Whether the gradient should smooth between colors.
+    ///
+    /// Defaults to `true` for softer transitions.
+    var smoothsColors: Bool
+
     /// Creates a new animated mesh gradient view with the specified parameters.
     ///
     /// - Parameters:
@@ -90,6 +95,8 @@ public struct AnimatedMeshGradientView: View {
     ///   - colors: An array of colors associated with the control points.
     ///   - background: The background color of the gradient.
     ///   - animationSpeed: The speed multiplier for the animation (default: 1.0).
+    ///   - animationPattern: Optional custom animation pattern to apply.
+    ///   - smoothsColors: Whether the gradient should smooth between colors (default: `true`).
     public init(
         gridSize: Int,
         showAnimation: Binding<Bool>,
@@ -97,7 +104,8 @@ public struct AnimatedMeshGradientView: View {
         colors: [Color],
         background: Color,
         animationSpeed: Double = 1.0,
-        animationPattern: AnimationPattern? = nil
+        animationPattern: AnimationPattern? = nil,
+        smoothsColors: Bool = true
     ) {
         self.gridSize = gridSize
         self._showAnimation = showAnimation
@@ -106,6 +114,7 @@ public struct AnimatedMeshGradientView: View {
         self.background = background
         self.animationSpeed = animationSpeed
         self.animationPattern = animationPattern
+        self.smoothsColors = smoothsColors
     }
 
     /// The body of the view, displaying an animated mesh gradient.
@@ -119,7 +128,7 @@ public struct AnimatedMeshGradientView: View {
                 locations: .points(animatedPositions(for: phase.date)),
                 colors: .colors(colors),
                 background: background,
-                smoothsColors: true
+                smoothsColors: smoothsColors
             )
             .ignoresSafeArea()
         }
