@@ -163,6 +163,30 @@ struct MeshingKitTests {
         #expect(results.contains(.size3(.auroraBorealis)))
     }
 
+    @Test("PredefinedTemplate find is case-insensitive")
+    func predefinedTemplateFindCaseInsensitive() {
+        let results = PredefinedTemplate.find(by: "Aurora")
+        #expect(results.contains(.size3(.auroraBorealis)))
+    }
+
+    @Test("PredefinedTemplate find matches moods")
+    func predefinedTemplateFindMoods() {
+        let results = PredefinedTemplate.find(by: "cool")
+        #expect(results.contains(.size2(.arcticFrost)))
+    }
+
+    @Test("PredefinedTemplate find respects limit")
+    func predefinedTemplateFindLimit() {
+        let results = PredefinedTemplate.find(by: "aurora", limit: 1)
+        #expect(results.count == 1)
+    }
+
+    @Test("PredefinedTemplate find returns all for empty query")
+    func predefinedTemplateFindEmptyQuery() {
+        let results = PredefinedTemplate.find(by: "   ")
+        #expect(results.count == PredefinedTemplate.allCases.count)
+    }
+
     @Test("CustomGradientTemplate creates valid template")
     func customGradientTemplateCreation() {
         let points: [SIMD2<Float>] = [
@@ -329,39 +353,40 @@ struct MeshingKitTests {
         #expect(point1.x != point2.x, "Different frequencies should produce different results")
     }
 
-    private struct RGBA {
-        let r: Double
-        let g: Double
-        let b: Double
-        let a: Double
-    }
+}
 
-    private func resolvedRGBA(_ color: Color) -> RGBA {
+private struct RGBA {
+    let r: Double
+    let g: Double
+    let b: Double
+    let a: Double
+}
+
+private func resolvedRGBA(_ color: Color) -> RGBA {
 #if canImport(UIKit)
-        let platformColor = UIColor(color)
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        platformColor.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return RGBA(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+    let platformColor = UIColor(color)
+    var r: CGFloat = 0
+    var g: CGFloat = 0
+    var b: CGFloat = 0
+    var a: CGFloat = 0
+    platformColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+    return RGBA(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
 #elseif canImport(AppKit)
-        let platformColor = NSColor(color)
-        let srgb = platformColor.usingColorSpace(.sRGB) ?? platformColor
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        srgb.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return RGBA(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+    let platformColor = NSColor(color)
+    let srgb = platformColor.usingColorSpace(.sRGB) ?? platformColor
+    var r: CGFloat = 0
+    var g: CGFloat = 0
+    var b: CGFloat = 0
+    var a: CGFloat = 0
+    srgb.getRed(&r, green: &g, blue: &b, alpha: &a)
+    return RGBA(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
 #else
-        return RGBA(r: 0, g: 0, b: 0, a: 0)
+    return RGBA(r: 0, g: 0, b: 0, a: 0)
 #endif
-    }
+}
 
-    private func isApproximatelyEqual(_ lhs: Double, _ rhs: Double, tolerance: Double = 0.0001)
-        -> Bool
-    {
-        abs(lhs - rhs) <= tolerance
-    }
+private func isApproximatelyEqual(_ lhs: Double, _ rhs: Double, tolerance: Double = 0.0001)
+    -> Bool
+{
+    abs(lhs - rhs) <= tolerance
 }
