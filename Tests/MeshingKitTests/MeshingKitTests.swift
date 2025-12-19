@@ -203,11 +203,11 @@ struct MeshingKitTests {
                 colors: colors,
                 background: .black
             )
-            #expect(false, "Expected validating initializer to throw")
+            #expect(Bool(false), "Expected validating initializer to throw")
         } catch let error as CustomGradientTemplate.ValidationErrors {
             #expect(!error.errors.isEmpty)
         } catch {
-            #expect(false, "Unexpected error type: \(error)")
+            #expect(Bool(false), "Unexpected error type: \(error)")
         }
     }
 
