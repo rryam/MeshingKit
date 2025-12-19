@@ -144,6 +144,25 @@ struct MeshingKitTests {
         #expect(counts.size4 == 11)
     }
 
+    @Test("PredefinedTemplate tags include name tokens")
+    func predefinedTemplateTags() {
+        let template = PredefinedTemplate.size3(.auroraBorealis)
+        #expect(template.tags.contains("aurora"))
+        #expect(template.tags.contains("borealis"))
+    }
+
+    @Test("PredefinedTemplate moods derived from name")
+    func predefinedTemplateMoods() {
+        let template = PredefinedTemplate.size2(.arcticFrost)
+        #expect(template.moods.contains(.cool))
+    }
+
+    @Test("PredefinedTemplate find by query")
+    func predefinedTemplateFind() {
+        let results = PredefinedTemplate.find(by: "aurora")
+        #expect(results.contains(.size3(.auroraBorealis)))
+    }
+
     @Test("CustomGradientTemplate creates valid template")
     func customGradientTemplateCreation() {
         let points: [SIMD2<Float>] = [
