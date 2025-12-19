@@ -194,15 +194,19 @@ public extension MeshingKit {
 
 private extension MeshingKit {
     static func cssColorString(for color: Color, includeAlpha: Bool) -> String {
-        guard includeAlpha, let components = color.rgbaComponents() else {
-            return color.hexString() ?? "#FFFFFF"
+        if includeAlpha {
+            if let components = color.rgbaComponents() {
+                let r = Int(round(components.r * 255))
+                let g = Int(round(components.g * 255))
+                let b = Int(round(components.b * 255))
+                let a = String(format: "%.2f", components.a)
+                return "rgba(\(r), \(g), \(b), \(a))"
+            }
+
+            return color.hexString(includeAlpha: true) ?? "#FFFFFFFF"
         }
 
-        let r = Int(round(components.r * 255))
-        let g = Int(round(components.g * 255))
-        let b = Int(round(components.b * 255))
-        let a = String(format: "%.2f", components.a)
-        return "rgba(\(r), \(g), \(b), \(a))"
+        return color.hexString() ?? "#FFFFFF"
     }
 }
 

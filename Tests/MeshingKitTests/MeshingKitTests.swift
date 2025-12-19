@@ -155,11 +155,21 @@ struct MeshingKitTests {
     func exportHelpersSnippets() {
         let template = GradientTemplateSize2.mysticTwilight
         let swiftUIStops = MeshingKit.swiftUIStopsSnippet(template: template)
+        let swiftUIStopsWithAlpha = MeshingKit.swiftUIStopsSnippet(
+            template: template,
+            includeAlpha: true
+        )
         let cssStops = MeshingKit.cssLinearGradientSnippet(template: template)
+        let cssStopsWithAlpha = MeshingKit.cssLinearGradientSnippet(
+            template: template,
+            includeAlpha: true
+        )
 
         #expect(swiftUIStops.contains("Color(hex:"))
+        #expect(swiftUIStopsWithAlpha.contains("Color(hex: \"#FF"))
         #expect(cssStops.contains("linear-gradient("))
         #expect(cssStops.contains("#"))
+        #expect(cssStopsWithAlpha.contains("rgba("))
     }
 
     @Test("Export helpers generate stops")
