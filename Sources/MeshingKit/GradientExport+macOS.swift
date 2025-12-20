@@ -408,7 +408,8 @@ public extension MeshingKit {
 
             let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
 
-            guard let imageData = bitmapRep.representation(using: format.fileType, properties: [:]) else {
+            guard let fileType = format.fileType,
+                  let imageData = bitmapRep.representation(using: fileType, properties: [:]) else {
                 let errorMessage = "Failed to encode image"
                 let userInfo = [NSLocalizedDescriptionKey: errorMessage]
                 completion(.failure(NSError(domain: "MeshingKit", code: -3, userInfo: userInfo)))

@@ -42,15 +42,10 @@ public enum VideoExportError: Error, Sendable {
 }
 
 /// Export format for saving gradients.
-///
-/// - Note: `mp4` is only available on iOS.
 public enum ExportFormat: String, CaseIterable, Identifiable, Sendable {
     case png
     case jpg
-
-#if os(iOS)
     case mp4
-#endif
 
     public var id: Self { self }
 
@@ -61,12 +56,15 @@ public enum ExportFormat: String, CaseIterable, Identifiable, Sendable {
 
 #if os(macOS)
     /// The NSBitmapImageRep file type for this format (macOS only).
-    public var fileType: NSBitmapImageRep.FileType {
+    /// Returns `nil` for non-image formats like MP4.
+    public var fileType: NSBitmapImageRep.FileType? {
         switch self {
         case .png:
             return .png
         case .jpg:
             return .jpeg
+        case .mp4:
+            return nil
         }
     }
 #endif
