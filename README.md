@@ -223,6 +223,22 @@ let size3Count = GradientTemplateSize3.allCases.count
 let size4Count = GradientTemplateSize4.allCases.count
 ```
 
+### Searching Templates
+
+You can search across template names, tags, and moods using `PredefinedTemplate.find(by:)`:
+
+```swift
+// Find templates by keyword
+let matches = PredefinedTemplate.find(by: "aurora")
+
+// Inspect metadata
+if let first = matches.first {
+    print(first.tags)
+    print(first.moods)
+    print(first.palette)
+}
+```
+
 ### Popular Template Examples
 
 **2x2 Grid Templates (35 total):**
