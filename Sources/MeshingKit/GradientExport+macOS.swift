@@ -218,72 +218,128 @@ public extension MeshingKit {
         return nil
     }
 
-    /// Writes video frames to a file using AVAssetWriter.
-    nonisolated private static func writeImagesAsMovie(
-        allImages: [NSImage],
-        outputURL: URL,
-        videoSize: CGSize,
-        frameRate: Int32,
-        fileType: AVFileType
+    /// Configuration for video export parameters.
+    private struct VideoExportConfig {
+        let outputURL: URL
+        let videoSize: CGSize
+        let frameRate: Int32
+        let fileType: AVFileType
+        let duration: TimeInterval
+        let snapshot: VideoExportSnapshot
+    }
+
+    /// Writes video frames to a file using AVAssetWriter with streaming approach.
+    nonisolated private static func writeVideo(
+        config: VideoExportConfig
     ) async throws {
-        guard !allImages.isEmpty else {
-            throw VideoExportError.frameRenderingFailed
+        if FileManager.default.fileExists(atPath: config.outputURL.path) {
+            try FileManager.default.removeItem(at: config.outputURL)
         }
 
-        if FileManager.default.fileExists(atPath: outputURL.path) {
-            try FileManager.default.removeItem(at: outputURL)
-        }
-
-        let config = try configureAssetWriter(
-            outputURL: outputURL,
-            fileType: fileType,
-            videoSize: videoSize
+        let assetConfig = try configureAssetWriter(
+            outputURL: config.outputURL,
+            fileType: config.fileType,
+            videoSize: config.videoSize
         )
 
-        let frameDuration = CMTimeMake(value: 1, timescale: frameRate)
+        let frameDuration = CMTimeMake(value: 1, timescale: config.frameRate)
         let context = CIContext(options: [.useSoftwareRenderer: false])
+
+        let totalFrames = max(
+            1,
+            Int((config.duration * Double(config.frameRate)).rounded(.toNearestOrAwayFromZero))
+        )
+        let timePerFrame = 1.0 / Double(config.frameRate)
 
         let state = VideoWriterState()
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            config.writerInput.requestMediaDataWhenReady(
+            assetConfig.writerInput.requestMediaDataWhenReady(
                 on: DispatchQueue(label: "meshing.video.writer")
             ) {
-                guard !state.isFinished else { return }
+                let loopConfig = FrameLoopConfig(
+                    totalFrames: totalFrames,
+                    timePerFrame: timePerFrame,
+                    videoSize: config.videoSize,
+                    snapshot: config.snapshot
+                )
 
-                while config.writerInput.isReadyForMoreMediaData
-                    && state.frameIndex < allImages.count {
-                    let index = state.frameIndex
-                    let image = allImages[index]
-                    let presentationTime = CMTimeMultiply(
-                        frameDuration,
-                        multiplier: Int32(index)
+                await Self.writeFrameLoop(
+                    config: assetConfig,
+                    context: context,
+                    frameDuration: frameDuration,
+                    state: state,
+                    loopConfig: loopConfig,
+                    continuation: continuation
+                )
+            }
+        }
+    }
+
+    /// Configuration for frame writing loop parameters.
+    private struct FrameLoopConfig {
+        let totalFrames: Int
+        let timePerFrame: Double
+        let videoSize: CGSize
+        let snapshot: VideoExportSnapshot
+    }
+
+    /// Writes frames in a loop, rendering each frame on-demand.
+    private nonisolated static func writeFrameLoop(
+        config: AssetWriterConfig,
+        context: CIContext,
+        frameDuration: CMTime,
+        state: VideoWriterState,
+        loopConfig: FrameLoopConfig,
+        continuation: CheckedContinuation<Void, Error>
+    ) async {
+        guard !state.isFinished else { return }
+
+        while config.writerInput.isReadyForMoreMediaData
+            && state.frameIndex < loopConfig.totalFrames {
+            let index = state.frameIndex
+            let phase = Double(index) * loopConfig.timePerFrame
+
+            // Render frame on MainActor
+            guard let image = await MainActor.run(
+                body: {
+                    renderFrame(
+                        at: phase,
+                        size: loopConfig.videoSize,
+                        snapshot: loopConfig.snapshot
                     )
-
-                    if let error = Self.processFrame(
-                        image: image,
-                        presentationTime: presentationTime,
-                        adaptor: config.adaptor,
-                        context: context,
-                        state: state
-                    ) {
-                        continuation.resume(throwing: error)
-                        return
-                    }
-
-                    state.frameIndex = index + 1
                 }
+            ) else {
+                state.isFinished = true
+                continuation.resume(throwing: VideoExportError.frameRenderingFailed)
+                return
+            }
 
-                if state.frameIndex >= allImages.count && !state.isFinished {
-                    state.isFinished = true
-                    config.writerInput.markAsFinished()
-                    config.assetWriter.finishWriting {
-                        if let error = config.assetWriter.error {
-                            continuation.resume(throwing: error)
-                        } else {
-                            continuation.resume()
-                        }
-                    }
+            let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(index))
+
+            if let error = Self.processFrame(
+                image: image,
+                presentationTime: presentationTime,
+                adaptor: config.adaptor,
+                context: context,
+                state: state
+            ) {
+                state.isFinished = true
+                continuation.resume(throwing: error)
+                return
+            }
+
+            state.frameIndex = index + 1
+        }
+
+        if state.frameIndex >= loopConfig.totalFrames && !state.isFinished {
+            state.isFinished = true
+            config.writerInput.markAsFinished()
+            config.assetWriter.finishWriting {
+                if let error = config.assetWriter.error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
                 }
             }
         }
@@ -333,20 +389,16 @@ public extension MeshingKit {
         )
 
         let exportTask = Task.detached(priority: .userInitiated) {
-            let allImages = try await Self.generateFrames(
-                duration: duration,
-                frameRate: frameRate,
-                size: size,
-                snapshot: snapshot
-            )
-
-            try await Self.writeImagesAsMovie(
-                allImages: allImages,
+            let exportConfig = VideoExportConfig(
                 outputURL: outputURL,
                 videoSize: size,
                 frameRate: frameRate,
-                fileType: .mp4
+                fileType: .mp4,
+                duration: duration,
+                snapshot: snapshot
             )
+
+            try await Self.writeVideo(config: exportConfig)
 
             guard FileManager.default.fileExists(atPath: outputURL.path) else {
                 throw VideoExportError.fileNotAccessible
