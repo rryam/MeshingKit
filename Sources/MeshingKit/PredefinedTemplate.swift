@@ -76,8 +76,8 @@ public struct TemplateMetadata: Sendable {
 }
 
 public extension PredefinedTemplate {
-    /// Cached template metadata for performance.
-    private var cachedMetadata: TemplateMetadata {
+    /// Template metadata computed on demand.
+    private var metadataValue: TemplateMetadata {
         let nameTokens = Self.normalizedTokens(from: rawName)
         let moodList = Self.moods(for: nameTokens)
         let moodTokens = moodList.map(\.rawValue)
@@ -118,17 +118,17 @@ public extension PredefinedTemplate {
 
     /// Tags derived from the template name and mood.
     var tags: [String] {
-        cachedMetadata.tags
+        metadataValue.tags
     }
 
     /// Moods derived from the template name.
     var moods: [TemplateMood] {
-        cachedMetadata.moods
+        metadataValue.moods
     }
 
     /// Combined metadata for the template.
     var metadata: TemplateMetadata {
-        cachedMetadata
+        metadataValue
     }
 
     /// Finds templates that best match the query.
