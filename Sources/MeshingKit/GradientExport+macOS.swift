@@ -53,6 +53,13 @@ public extension MeshingKit {
         var isFinished: Bool = false
     }
 
+    /// Configuration for AVAssetWriter setup.
+    private struct AssetWriterConfig {
+        let assetWriter: AVAssetWriter
+        let writerInput: AVAssetWriterInput
+        let adaptor: AVAssetWriterInputPixelBufferAdaptor
+    }
+
     /// Generates all video frames for the given parameters.
     private static func generateFrames(
         duration: TimeInterval,
@@ -140,7 +147,7 @@ public extension MeshingKit {
         outputURL: URL,
         fileType: AVFileType,
         videoSize: CGSize
-    ) throws -> (assetWriter: AVAssetWriter, writerInput: AVAssetWriterInput, adaptor: AVAssetWriterInputPixelBufferAdaptor) {
+    ) throws -> AssetWriterConfig {
         let videoSettings: [String: Any] = [
             AVVideoCodecKey: AVVideoCodecType.h264,
             AVVideoWidthKey: Int(videoSize.width),
@@ -177,7 +184,11 @@ public extension MeshingKit {
 
         assetWriter.startSession(atSourceTime: .zero)
 
-        return (assetWriter, writerInput, adaptor)
+        return AssetWriterConfig(
+            assetWriter: assetWriter,
+            writerInput: writerInput,
+            adaptor: adaptor
+        )
     }
 
     /// Processes a single frame and returns an error if it occurred.
@@ -223,7 +234,7 @@ public extension MeshingKit {
             try FileManager.default.removeItem(at: outputURL)
         }
 
-        let (assetWriter, writerInput, adaptor) = try configureAssetWriter(
+        let config = try configureAssetWriter(
             outputURL: outputURL,
             fileType: fileType,
             videoSize: videoSize
@@ -235,18 +246,24 @@ public extension MeshingKit {
         let state = VideoWriterState()
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            writerInput.requestMediaDataWhenReady(on: DispatchQueue(label: "meshing.video.writer")) {
+            config.writerInput.requestMediaDataWhenReady(
+                on: DispatchQueue(label: "meshing.video.writer")
+            ) {
                 guard !state.isFinished else { return }
 
-                while writerInput.isReadyForMoreMediaData && state.frameIndex < allImages.count {
+                while config.writerInput.isReadyForMoreMediaData
+                    && state.frameIndex < allImages.count {
                     let index = state.frameIndex
                     let image = allImages[index]
-                    let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(index))
+                    let presentationTime = CMTimeMultiply(
+                        frameDuration,
+                        multiplier: Int32(index)
+                    )
 
                     if let error = Self.processFrame(
                         image: image,
                         presentationTime: presentationTime,
-                        adaptor: adaptor,
+                        adaptor: config.adaptor,
                         context: context,
                         state: state
                     ) {
@@ -259,9 +276,9 @@ public extension MeshingKit {
 
                 if state.frameIndex >= allImages.count && !state.isFinished {
                     state.isFinished = true
-                    writerInput.markAsFinished()
-                    assetWriter.finishWriting {
-                        if let error = assetWriter.error {
+                    config.writerInput.markAsFinished()
+                    config.assetWriter.finishWriting {
+                        if let error = config.assetWriter.error {
                             continuation.resume(throwing: error)
                         } else {
                             continuation.resume()
