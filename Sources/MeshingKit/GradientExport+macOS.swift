@@ -44,6 +44,13 @@ public struct VideoExportSnapshot: Sendable {
     }
 }
 
+/// Errors that can occur when saving to disk.
+public enum SaveToDiskError: Error, Sendable {
+    case userCancelled
+    case cgImageCreationFailed
+    case imageEncodingFailed(Error)
+}
+
 public extension MeshingKit {
     // MARK: - Video Export
 
@@ -462,16 +469,12 @@ public extension MeshingKit {
 
         savePanel.begin { response in
             guard response == .OK, let url = savePanel.url else {
-                let errorMessage = "User cancelled save"
-                let userInfo = [NSLocalizedDescriptionKey: errorMessage]
-                completion(.failure(NSError(domain: "MeshingKit", code: -1, userInfo: userInfo)))
+                completion(.failure(SaveToDiskError.userCancelled))
                 return
             }
 
             guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-                let errorMessage = "Failed to get CGImage"
-                let userInfo = [NSLocalizedDescriptionKey: errorMessage]
-                completion(.failure(NSError(domain: "MeshingKit", code: -2, userInfo: userInfo)))
+                completion(.failure(SaveToDiskError.cgImageCreationFailed))
                 return
             }
 
@@ -479,9 +482,9 @@ public extension MeshingKit {
 
             guard let fileType = format.fileType,
                   let imageData = bitmapRep.representation(using: fileType, properties: [:]) else {
-                let errorMessage = "Failed to encode image"
-                let userInfo = [NSLocalizedDescriptionKey: errorMessage]
-                completion(.failure(NSError(domain: "MeshingKit", code: -3, userInfo: userInfo)))
+                completion(.failure(SaveToDiskError.imageEncodingFailed(
+                    NSError(domain: "MeshingKit", code: -3)
+                )))
                 return
             }
 
@@ -489,7 +492,7 @@ public extension MeshingKit {
                 try imageData.write(to: url)
                 completion(.success(url))
             } catch {
-                completion(.failure(error))
+                completion(.failure(SaveToDiskError.imageEncodingFailed(error)))
             }
         }
     }
@@ -536,9 +539,9 @@ public extension MeshingKit {
         renderer.proposedSize = ProposedViewSize(width: size.width, height: size.height)
 
         guard let nsImage = renderer.nsImage else {
-            let errorMessage = "Failed to render image"
-            let userInfo = [NSLocalizedDescriptionKey: errorMessage]
-            completion(.failure(NSError(domain: "MeshingKit", code: -1, userInfo: userInfo)))
+            completion(.failure(SaveToDiskError.imageEncodingFailed(
+                NSError(domain: "MeshingKit", code: -1)
+            )))
             return
         }
 
