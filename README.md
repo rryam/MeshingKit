@@ -364,6 +364,28 @@ This extension supports various hex formats:
 - "#RRGGBB" (24-bit)
 - "#AARRGGBB" (32-bit with alpha)
 
+## Export Helpers
+
+MeshingKit includes helpers to export previews and snippets for design tools:
+
+```swift
+// Snapshot a mesh gradient (CGImage)
+let image = MeshingKit.snapshotCGImage(
+    template: GradientTemplateSize3.auroraBorealis,
+    size: CGSize(width: 600, height: 600)
+)
+
+// Generate SwiftUI Gradient.Stop snippet
+let swiftUIStops = MeshingKit.swiftUIStopsSnippet(
+    template: GradientTemplateSize3.auroraBorealis
+)
+
+// Generate CSS linear-gradient preview
+let css = MeshingKit.cssLinearGradientSnippet(
+    template: GradientTemplateSize3.auroraBorealis
+)
+```
+
 ## Contributing
 
 Contributions to MeshingKit are welcome! Please feel free to submit a Pull Request.

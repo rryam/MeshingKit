@@ -37,6 +37,15 @@ public enum PredefinedTemplate: Identifiable, CaseIterable, Equatable {
         case .size4(let template): return "size4_\(template.rawValue)"
         }
     }
+
+    /// Returns the underlying base template for this predefined template.
+    var baseTemplate: any GradientTemplate {
+        switch self {
+        case .size2(let template): return template
+        case .size3(let template): return template
+        case .size4(let template): return template
+        }
+    }
 }
 
 /// Describes the mood of a gradient template for browsing and search.
