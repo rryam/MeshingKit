@@ -383,6 +383,8 @@ Sources/MeshingKit/
 ├── GradientExport+iOS.swift               # iOS photo library
 ├── GradientExport+macOS.swift             # macOS disk save
 ├── GradientAnimation.swift                # Animation functions
+├── GradientVideoExport.swift              # Video export public API
+├── GradientVideoExportHelper.swift        # Video export implementation
 ├── Color+Hex.swift                        # Color utilities
 ├── AnimatedMeshGradientView.swift         # Animated view
 ├── AnimationPattern.swift                 # Animation patterns
@@ -391,11 +393,67 @@ Sources/MeshingKit/
 ├── GradientTemplateSize3.swift            # 3x3 templates
 └── GradientTemplateSize4.swift            # 4x4 templates
 
-Sources/Meshin/                            # Demo app
+Sources/Meshin/                            # Demo app (SwiftUI)
+├── MeshinApp.swift                        # App entry point
+├── MeshinViewModel.swift                  # Export state management
+└── GradientSamplesView.swift              # Template list + export UI
+
 Tests/MeshingKitTests/                     # Swift Testing suite
 scripts/                                   # Git hooks
 codemagic.yaml                             # CI configuration
 .swiftlint.yml                             # SwiftLint config
+```
+
+## Meshin Demo App
+
+The Meshin app demonstrates how to use MeshingKit in a real SwiftUI application:
+
+### Running Meshin
+
+```bash
+# macOS
+xcodebuild build -project Sources/Meshin/Meshin.xcodeproj -scheme Meshin -destination "generic/platform=macOS"
+
+# iOS Simulator
+xcodebuild build -project Sources/Meshin/Meshin.xcodeproj -scheme Meshin -destination "generic/platform=iOS Simulator"
+```
+
+### Features
+
+- **Template Browser**: Browse all 68 predefined gradients by size (2x2, 3x3, 4x4)
+- **Full-Screen Preview**: Tap any template to view it full-screen
+- **Animation Toggle**: Enable/disable gradient animation
+- **Export Options**:
+  - iOS: Save to Photo Library, Export Video to Photo Library
+  - macOS: Save to Disk (PNG/JPG), Export Video to Disk
+
+### Key Files
+
+- `MeshinViewModel.swift` - Demonstrates proper usage of MeshingKit export APIs
+- `GradientSamplesView.swift` - Shows how to integrate gradients with UI
+
+### Example: Using MeshinViewModel
+
+```swift
+@MainActor
+final class MyViewModel: ObservableObject {
+    @Published var selectedTemplate: PredefinedTemplate?
+    @Published var isExporting = false
+
+    func saveToPhotoLibrary() {
+        guard let template = selectedTemplate else { return }
+
+        MeshingKit.saveGradientToPhotoAlbum(
+            template: template,
+            size: CGSize(width: 1080, height: 1920)
+        ) { result in
+            switch result {
+            case .success: print("Saved!")
+            case .failure(let error): print("Error: \(error)")
+            }
+        }
+    }
+}
 ```
 
 ## Important Conventions

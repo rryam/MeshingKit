@@ -14,13 +14,13 @@ import CoreImage
 
 public extension MeshingKit {
     /// Tracks video writing progress.
-    private final class VideoWriterState {
+    final class VideoWriterState {
         var frameIndex: Int = 0
         var isFinished: Bool = false
     }
 
     /// Configuration for AVAssetWriter setup.
-    private struct AssetWriterConfig {
+    struct AssetWriterConfig {
         let assetWriter: AVAssetWriter
         let writerInput: AVAssetWriterInput
         let adaptor: AVAssetWriterInputPixelBufferAdaptor
@@ -109,7 +109,7 @@ public extension MeshingKit {
     }
 
     /// Configures the video asset writer with input and adaptor.
-    private static func configureAssetWriter(
+    static func configureAssetWriter(
         outputURL: URL,
         fileType: AVFileType,
         videoSize: CGSize
@@ -203,7 +203,7 @@ public extension MeshingKit {
     }
 
     /// Serializes frame writing to avoid overlapping loops.
-    private actor FrameLoopDriver {
+    actor FrameLoopDriver {
         private let assetConfig: AssetWriterConfig
         private let context: CIContext
         private let frameDuration: CMTime
@@ -314,51 +314,5 @@ public extension MeshingKit {
         }
     }
 
-    /// Writes video frames to a file using AVAssetWriter with streaming approach.
-    nonisolated static func writeVideo(
-        config: VideoExportConfig
-    ) async throws {
-        if FileManager.default.fileExists(atPath: config.outputURL.path) {
-            try FileManager.default.removeItem(at: config.outputURL)
-        }
-
-        let assetConfig = try configureAssetWriter(
-            outputURL: config.outputURL,
-            fileType: config.fileType,
-            videoSize: config.videoSize
-        )
-
-        let frameDuration = CMTimeMake(value: 1, timescale: config.frameRate)
-        let context = CIContext(options: [.useSoftwareRenderer: false])
-
-        let totalFrames = max(
-            1,
-            Int((config.duration * Double(config.frameRate)).rounded(.toNearestOrAwayFromZero))
-        )
-        let timePerFrame = 1.0 / Double(config.frameRate)
-
-        let state = VideoWriterState()
-        let loopDriver = FrameLoopDriver(
-            assetConfig: assetConfig,
-            context: context,
-            frameDuration: frameDuration,
-            state: state
-        )
-
-        let videoSize = config.videoSize
-        let snapshot = config.snapshot
-
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Task {
-                await loopDriver.startWriting(
-                    totalFrames: totalFrames,
-                    timePerFrame: timePerFrame,
-                    videoSize: videoSize,
-                    snapshot: snapshot,
-                    continuation: continuation
-                )
-            }
-        }
-    }
 }
 #endif

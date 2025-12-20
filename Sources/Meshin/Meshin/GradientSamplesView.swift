@@ -81,7 +81,10 @@ struct GradientSamplesView: View {
 
     private var exportButton: some View {
         Button {
-            viewModel.selectedTemplate = .aurora
+            if viewModel.selectedTemplate == nil {
+                viewModel.selectedTemplate = PredefinedTemplate.allCases.first
+            }
+            viewModel.showExportOptions()
         } label: {
             Image(systemName: "square.and.arrow.up")
         }
@@ -202,7 +205,10 @@ struct FullScreenGradientView: View {
 struct ExportSheetView: View {
     @ObservedObject var viewModel: MeshinViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedFormat: ExportFormat = .png
+
+    private var hasSelection: Bool {
+        viewModel.selectedTemplate != nil
+    }
 
     var body: some View {
         NavigationStack {
@@ -210,11 +216,12 @@ struct ExportSheetView: View {
                 Section("Image Export") {
                     #if os(iOS)
                     Button {
-                        viewModel.saveToPhotoAlbum(template: viewModel.selectedTemplate)
+                        viewModel.saveToPhotoLibrary()
                         dismiss()
                     } label: {
                         Label("Save to Photo Library", systemImage: "photo.on.rectangle")
                     }
+                    .disabled(!hasSelection)
                     #endif
 
                     #if os(macOS)
@@ -228,6 +235,7 @@ struct ExportSheetView: View {
                                 systemImage: "photo"
                             )
                         }
+                        .disabled(!hasSelection)
                     }
                     #endif
                 }
@@ -240,6 +248,7 @@ struct ExportSheetView: View {
                     } label: {
                         Label("Export Video to Photo Library", systemImage: "video")
                     }
+                    .disabled(!hasSelection)
                     #endif
 
                     #if os(macOS)
@@ -249,11 +258,11 @@ struct ExportSheetView: View {
                     } label: {
                         Label("Export Video to Disk", systemImage: "video")
                     }
+                    .disabled(!hasSelection)
                     #endif
                 }
             }
             .navigationTitle("Export Options")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {

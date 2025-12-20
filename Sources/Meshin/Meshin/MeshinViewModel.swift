@@ -94,7 +94,7 @@ final class MeshinViewModel: ObservableObject {
         MeshingKit.saveGradientToDisk(
             template: template,
             size: exportSize,
-            fileName: template.name.replacingOccurrences(of: " ", with: "-"),
+            fileName: "mesh-gradient",
             format: format
         ) { [weak self] result in
             Task { @MainActor in
