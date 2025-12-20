@@ -132,7 +132,8 @@ public extension MeshingKit {
     ///   - showDots: Whether to show dots (default: false).
     ///   - animate: Whether to animate (default: true).
     ///   - smoothsColors: Whether to smooth colors (default: true).
-    ///   - completion: Called with the result.
+    ///   - completion: Called with the result containing a temporary file URL.
+    ///     The caller is responsible for deleting this file after use.
     static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
         size: CGSize,
@@ -160,6 +161,7 @@ public extension MeshingKit {
                 let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
                 guard status == .authorized else {
                     completion(.failure(VideoExportError.photosPermissionDenied))
+                    try? FileManager.default.removeItem(at: videoURL)
                     return
                 }
 
@@ -167,7 +169,6 @@ public extension MeshingKit {
                     PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
                 }
 
-                try? FileManager.default.removeItem(at: videoURL)
                 completion(.success(videoURL))
             } catch {
                 completion(.failure(error))
@@ -176,6 +177,9 @@ public extension MeshingKit {
     }
 
     /// Exports a predefined template as video to photo library.
+    ///
+    /// - Parameter completion: Called with the result containing a temporary file URL.
+    ///   The caller is responsible for deleting this file after use.
     static func exportVideoToPhotoLibrary(
         template: PredefinedTemplate,
         size: CGSize,
