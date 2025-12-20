@@ -122,7 +122,7 @@ public struct CustomGradientTemplate: GradientTemplate {
     ///
     /// - Returns: An array of validation errors. Empty means the data is valid.
     public func validate() -> [ValidationError] {
-        Self.validate(size: size, points: points, colors: colors)
+        return Self.validate(size: size, points: points, colors: colors)
     }
 
     /// Creates a new custom gradient template with validation.

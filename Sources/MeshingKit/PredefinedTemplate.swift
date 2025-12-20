@@ -86,7 +86,7 @@ public struct TemplateMetadata: Sendable {
 
 public extension PredefinedTemplate {
     /// Template metadata computed on demand.
-    private var metadataValue: TemplateMetadata {
+    package var metadataValue: TemplateMetadata {
         let nameTokens = Self.normalizedTokens(from: rawName)
         let moodList = Self.moods(for: nameTokens)
         let moodTokens = moodList.map(\.rawValue)
@@ -102,7 +102,7 @@ public extension PredefinedTemplate {
     }
 
     /// The underlying template for this predefined case.
-    var template: any GradientTemplate {
+    package var template: any GradientTemplate {
         switch self {
         case .size2(let specificTemplate): return specificTemplate
         case .size3(let specificTemplate): return specificTemplate
@@ -111,32 +111,32 @@ public extension PredefinedTemplate {
     }
 
     /// A user-facing name for the template.
-    var name: String {
+    package var name: String {
         template.name
     }
 
     /// The palette colors for the template.
-    var palette: [Color] {
+    package var palette: [Color] {
         template.colors
     }
 
     /// The background color for the template.
-    var background: Color {
+    package var background: Color {
         template.background
     }
 
     /// Tags derived from the template name and mood.
-    var tags: [String] {
+    package var tags: [String] {
         metadataValue.tags
     }
 
     /// Moods derived from the template name.
-    var moods: [TemplateMood] {
+    package var moods: [TemplateMood] {
         metadataValue.moods
     }
 
     /// Combined metadata for the template.
-    var metadata: TemplateMetadata {
+    package var metadata: TemplateMetadata {
         metadataValue
     }
 

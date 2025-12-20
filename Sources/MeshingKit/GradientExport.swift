@@ -9,9 +9,19 @@ import SwiftUI
 
 #if canImport(UIKit)
 import UIKit
+
+/// A platform-specific image type for cross-platform API compatibility.
+///
+/// - On iOS, tvOS, and watchOS: Equivalent to `UIImage`.
+/// - On macOS: Equivalent to `NSImage`.
 public typealias PlatformImage = UIImage
 #elseif canImport(AppKit)
 import AppKit
+
+/// A platform-specific image type for cross-platform API compatibility.
+///
+/// - On iOS, tvOS, and watchOS: Equivalent to `UIImage`.
+/// - On macOS: Equivalent to `NSImage`.
 public typealias PlatformImage = NSImage
 #endif
 

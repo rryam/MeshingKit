@@ -67,7 +67,7 @@ struct FullScreenGradientView: View {
         .buttonStyle(.borderedProminent)
       }
     }
-    .edgesIgnoringSafeArea(.all)
+    .ignoresSafeArea(edges: .all)
   }
 }
 

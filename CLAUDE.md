@@ -16,7 +16,7 @@ swift build
 swift build --target MeshingKit
 
 # Xcode build for iOS Simulator
-xcodebuild clean build -project Sources/Meshin/Meshin.xcodeproj -scheme Meshin -destination "platform=iOS Simulator,name=iPhone 17 Pro"
+xcodebuild build -project Sources/Meshin/Meshin.xcodeproj -scheme Meshin -destination "generic/platform=iOS Simulator"
 ```
 
 ## Test Commands
