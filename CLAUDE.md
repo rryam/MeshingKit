@@ -49,6 +49,12 @@ A pre-commit hook runs SwiftLint on staged files. Setup with `scripts/setup-hook
 
 **Search:** `PredefinedTemplate.find(by: token)` uses NaturalLanguage for lemmatization and camelCase splitting.
 
+**Export APIs (platform-specific):**
+- `GradientExport.swift` - Shared `ExportFormat` enum and `VideoExportError` enum
+- `GradientExport+iOS.swift` - iOS: `saveGradientToPhotoAlbum`, `exportVideoToPhotoLibrary`
+- `GradientExport+macOS.swift` - macOS: `saveToDisk`, `saveGradientToDisk`, `exportVideo`
+- `GradientAnimation.swift` - `animatedPositions` for gradient frame animation
+
 ## Important Conventions
 
 - All public types conform to `Sendable` for concurrency safety
