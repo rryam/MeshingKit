@@ -9,6 +9,7 @@ import SwiftUI
 
 #if canImport(UIKit)
 import UIKit
+import AVFoundation
 
 /// A platform-specific image type for cross-platform API compatibility.
 ///
@@ -17,6 +18,7 @@ import UIKit
 public typealias PlatformImage = UIImage
 #elseif canImport(AppKit)
 import AppKit
+import AVFoundation
 
 /// A platform-specific image type for cross-platform API compatibility.
 ///
@@ -24,6 +26,51 @@ import AppKit
 /// - On macOS: Equivalent to `NSImage`.
 public typealias PlatformImage = NSImage
 #endif
+
+/// Errors that can occur during video export.
+public enum VideoExportError: Error, Sendable {
+    case frameRenderingFailed
+    case failedToStartWriting
+    case pixelBufferPoolCreationFailed
+    case pixelBufferCreationFailed
+    case failedToAppendPixelBuffer
+    case failedToAddInput
+    case failedToCreateOutputURL
+    case fileNotAccessible
+    case unsupportedFormat
+    case photosPermissionDenied
+}
+
+/// Export format for saving gradients.
+///
+/// - Note: `mp4` is only available on iOS.
+public enum ExportFormat: String, CaseIterable, Identifiable, Sendable {
+    case png
+    case jpg
+
+#if os(iOS)
+    case mp4
+#endif
+
+    public var id: Self { self }
+
+    /// The file extension for this format.
+    public var fileExtension: String {
+        rawValue
+    }
+
+#if os(macOS)
+    /// The NSBitmapImageRep file type for this format (macOS only).
+    public var fileType: NSBitmapImageRep.FileType {
+        switch self {
+        case .png:
+            return .png
+        case .jpg:
+            return .jpeg
+        }
+    }
+#endif
+}
 
 public extension MeshingKit {
     /// Generates evenly spaced gradient stops for previewing template colors.
@@ -94,6 +141,8 @@ public extension MeshingKit {
     ) -> String {
         cssLinearGradientSnippet(template: template.baseTemplate, angle: angle, includeAlpha: includeAlpha)
     }
+
+    // MARK: - Image Snapshots
 
     /// Renders a mesh gradient template to a CGImage snapshot.
     @MainActor
