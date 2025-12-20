@@ -194,28 +194,13 @@ public extension MeshingKit {
 
 private extension MeshingKit {
     static func cssColorString(for color: Color, includeAlpha: Bool) -> String {
-        if includeAlpha {
-            if let components = color.rgbaComponents() {
-                let r = Int(round(components.r * 255))
-                let g = Int(round(components.g * 255))
-                let b = Int(round(components.b * 255))
-                let a = String(format: "%.2f", components.a)
-                return "rgba(\(r), \(g), \(b), \(a))"
-            }
-
-            return color.hexString(includeAlpha: true) ?? "#FFFFFFFF"
+        if includeAlpha, let components = color.rgbaComponents() {
+            let r = Int(round(components.r * 255))
+            let g = Int(round(components.g * 255))
+            let b = Int(round(components.b * 255))
+            let a = String(format: "%.2f", components.a)
+            return "rgba(\(r), \(g), \(b), \(a))"
         }
-
-        return color.hexString() ?? "#FFFFFF"
-    }
-}
-
-private extension PredefinedTemplate {
-    var baseTemplate: any GradientTemplate {
-        switch self {
-        case .size2(let specificTemplate): return specificTemplate
-        case .size3(let specificTemplate): return specificTemplate
-        case .size4(let specificTemplate): return specificTemplate
-        }
+        return color.hexString(includeAlpha: includeAlpha) ?? "#FFFFFF"
     }
 }

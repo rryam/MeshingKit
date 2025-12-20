@@ -139,13 +139,7 @@ public struct MeshingKit: Sendable {
     )
         -> MeshGradient
     {
-        let baseTemplate: any GradientTemplate = switch template {
-        case .size2(let specificTemplate): specificTemplate
-        case .size3(let specificTemplate): specificTemplate
-        case .size4(let specificTemplate): specificTemplate
-        }
-
-        return gradient(template: baseTemplate, smoothsColors: smoothsColors)
+        gradient(template: template.baseTemplate, smoothsColors: smoothsColors)
     }
 
     /// Creates an animated `MeshGradient` view from any gradient template.
@@ -222,14 +216,8 @@ public struct MeshingKit: Sendable {
         animationPattern: AnimationPattern? = nil,
         smoothsColors: Bool = true
     ) -> some View {
-        let baseTemplate: any GradientTemplate = switch template {
-        case .size2(let specificTemplate): specificTemplate
-        case .size3(let specificTemplate): specificTemplate
-        case .size4(let specificTemplate): specificTemplate
-        }
-
-        return animatedGradient(
-            baseTemplate,
+        animatedGradient(
+            template.baseTemplate,
             showAnimation: showAnimation,
             animationSpeed: animationSpeed,
             animationPattern: animationPattern,
