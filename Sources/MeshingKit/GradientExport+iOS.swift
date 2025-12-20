@@ -18,20 +18,36 @@ public extension MeshingKit {
     /// - Parameters:
     ///   - image: The image to save.
     ///   - completion: A completion handler called with the result.
-    static func saveToPhotoAlbum(image: UIImage, completion: @escaping (Error?) -> Void) {
-        UIImageWriteToSavedPhotosAlbum(image, nil, #selector(saveCompleted), nil)
+    static func saveToPhotoAlbum(
+        image: UIImage,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        Task {
+            do {
+                let status = await PHPhotoLibrary.requestAuthorization(
+                    for: .addOnly
+                )
+
+                guard status == .authorized else {
+                    completion(.failure(PhotoLibraryError.permissionDenied))
+                    return
+                }
+
+                try await PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAsset(from: image)
+                }
+
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
     }
 
-    @objc private static func saveCompleted(
-        _ image: UIImage,
-        didFinishSavingWithError error: Error?,
-        contextInfo: UnsafeRawPointer
-    ) {
-        if let error = error {
-            print("Error saving image: \(error.localizedDescription)")
-        } else {
-            print("Image saved successfully to photo library")
-        }
+    /// Errors that can occur when saving to the photo library.
+    public enum PhotoLibraryError: Error, Sendable {
+        case permissionDenied
+        case saveFailed(Error)
     }
 
     /// Renders and saves a gradient template to the photo library.
@@ -43,7 +59,7 @@ public extension MeshingKit {
     ///   - blurRadius: Optional blur radius (default: 0).
     ///   - showDots: Whether to show control point dots (default: false).
     ///   - smoothsColors: Whether to smooth colors (default: true).
-    ///   - completion: Called when saving completes with an optional error.
+    ///   - completion: Called with the result.
     @MainActor
     static func saveGradientToPhotoAlbum(
         template: any GradientTemplate,
@@ -52,7 +68,7 @@ public extension MeshingKit {
         blurRadius: CGFloat = 0,
         showDots: Bool = false,
         smoothsColors: Bool = true,
-        completion: @escaping (Error?) -> Void
+        completion: @escaping (Result<Void, Error>) -> Void
     ) {
         let renderer = ImageRenderer(
             content: MeshGradient(
@@ -71,12 +87,12 @@ public extension MeshingKit {
         renderer.proposedSize = ProposedViewSize(width: size.width, height: size.height)
 
         guard let uiImage = renderer.uiImage else {
-            let errorMessage = "Failed to render image"
-            completion(NSError(
+            let error = PhotoLibraryError.saveFailed(NSError(
                 domain: "MeshingKit",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: errorMessage]
+                userInfo: [NSLocalizedDescriptionKey: "Failed to render image"]
             ))
+            completion(.failure(error))
             return
         }
 
@@ -92,7 +108,7 @@ public extension MeshingKit {
         blurRadius: CGFloat = 0,
         showDots: Bool = false,
         smoothsColors: Bool = true,
-        completion: @escaping (Error?) -> Void
+        completion: @escaping (Result<Void, Error>) -> Void
     ) {
         saveGradientToPhotoAlbum(
             template: template.baseTemplate,

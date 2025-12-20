@@ -186,7 +186,7 @@ public extension MeshingKit {
         presentationTime: CMTime,
         adaptor: AVAssetWriterInputPixelBufferAdaptor,
         context: CIContext,
-        state: VideoWriterState
+        state: MeshingKit.VideoWriterState
     ) -> VideoExportError? {
         guard let pixelBufferPool = adaptor.pixelBufferPool else {
             return .pixelBufferPoolCreationFailed
@@ -231,11 +231,6 @@ public extension MeshingKit {
 
         let frameDuration = CMTimeMake(value: 1, timescale: frameRate)
         let context = CIContext(options: [.useSoftwareRenderer: false])
-
-        final class VideoWriterState: @unchecked Sendable {
-            var frameIndex: Int = 0
-            var isFinished: Bool = false
-        }
 
         let state = VideoWriterState()
 
