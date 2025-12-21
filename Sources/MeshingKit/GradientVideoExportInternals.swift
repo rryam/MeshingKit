@@ -38,7 +38,7 @@ public extension MeshingKit {
         let snapshot: VideoExportSnapshot
     }
 
-    private struct FrameLoopConfig {
+    fileprivate struct FrameLoopConfig {
         let totalFrames: Int
         let timePerFrame: Double
         let viewSize: CGSize
@@ -65,7 +65,7 @@ public extension MeshingKit {
             self.state = state
         }
 
-        func startWriting(
+        fileprivate func startWriting(
             loopConfig: FrameLoopConfig,
             continuation: CheckedContinuation<Void, Error>
         ) {
