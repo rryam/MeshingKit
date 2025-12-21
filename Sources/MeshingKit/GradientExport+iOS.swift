@@ -179,6 +179,32 @@ public extension MeshingKit {
         }
     }
 
+    /// Exports a gradient as a video using a configuration and saves it to the photo library.
+    ///
+    /// - Parameters:
+    ///   - template: The gradient template to export.
+    ///   - configuration: Video export configuration.
+    ///   - completion: Called with the result containing a temporary file URL.
+    ///     The caller is responsible for deleting this file after use.
+    static func exportVideoToPhotoLibrary(
+        template: any GradientTemplate,
+        configuration: VideoExportConfiguration,
+        completion: @escaping @Sendable (Result<URL, Error>) -> Void
+    ) {
+        exportVideoToPhotoLibrary(
+            template: template,
+            size: configuration.size,
+            duration: configuration.duration,
+            frameRate: configuration.frameRate,
+            blurRadius: configuration.blurRadius,
+            showDots: configuration.showDots,
+            animate: configuration.animate,
+            smoothsColors: configuration.smoothsColors,
+            renderScale: configuration.renderScale,
+            completion: completion
+        )
+    }
+
     /// Exports a predefined template as video to photo library.
     ///
     /// - Parameter completion: Called with the result containing a temporary file URL.
@@ -205,6 +231,22 @@ public extension MeshingKit {
             animate: animate,
             smoothsColors: smoothsColors,
             renderScale: renderScale,
+            completion: completion
+        )
+    }
+
+    /// Exports a predefined template as video to photo library using a configuration.
+    ///
+    /// - Parameter completion: Called with the result containing a temporary file URL.
+    ///   The caller is responsible for deleting this file after use.
+    static func exportVideoToPhotoLibrary(
+        template: PredefinedTemplate,
+        configuration: VideoExportConfiguration,
+        completion: @escaping @Sendable (Result<URL, Error>) -> Void
+    ) {
+        exportVideoToPhotoLibrary(
+            template: template.baseTemplate,
+            configuration: configuration,
             completion: completion
         )
     }

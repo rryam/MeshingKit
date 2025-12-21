@@ -51,8 +51,59 @@ public struct VideoExportSnapshot: Sendable {
     }
 }
 
+/// Configuration for exporting gradient videos.
+public struct VideoExportConfiguration: Sendable {
+    public var size: CGSize
+    public var duration: TimeInterval
+    public var frameRate: Int32
+    public var blurRadius: CGFloat
+    public var showDots: Bool
+    public var animate: Bool
+    public var smoothsColors: Bool
+    public var renderScale: CGFloat
+
+    public init(
+        size: CGSize,
+        duration: TimeInterval = 5.0,
+        frameRate: Int32 = 30,
+        blurRadius: CGFloat = 0,
+        showDots: Bool = false,
+        animate: Bool = true,
+        smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0
+    ) {
+        self.size = size
+        self.duration = duration
+        self.frameRate = frameRate
+        self.blurRadius = blurRadius
+        self.showDots = showDots
+        self.animate = animate
+        self.smoothsColors = smoothsColors
+        self.renderScale = renderScale
+    }
+}
+
 public extension MeshingKit {
     // MARK: - Video Export
+
+    /// Exports an animated mesh gradient as an MP4 video file.
+    @MainActor
+    static func exportVideo(
+        template: any GradientTemplate,
+        configuration: VideoExportConfiguration
+    ) async throws -> URL {
+        try await exportVideo(
+            template: template,
+            size: configuration.size,
+            duration: configuration.duration,
+            frameRate: configuration.frameRate,
+            blurRadius: configuration.blurRadius,
+            showDots: configuration.showDots,
+            animate: configuration.animate,
+            smoothsColors: configuration.smoothsColors,
+            renderScale: configuration.renderScale
+        )
+    }
 
     /// Exports an animated mesh gradient as an MP4 video file.
     @MainActor
@@ -120,6 +171,18 @@ public extension MeshingKit {
         }
 
         return try await exportTask.value
+    }
+
+    /// Exports a predefined template as an MP4 video.
+    @MainActor
+    static func exportVideo(
+        template: PredefinedTemplate,
+        configuration: VideoExportConfiguration
+    ) async throws -> URL {
+        try await exportVideo(
+            template: template.baseTemplate,
+            configuration: configuration
+        )
     }
 
     /// Exports a predefined template as an MP4 video.
