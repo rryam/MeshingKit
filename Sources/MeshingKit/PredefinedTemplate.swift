@@ -111,7 +111,7 @@ public extension PredefinedTemplate {
     }
 
     /// A user-facing name for the template.
-    public var name: String {
+    var name: String {
         template.name
     }
 
