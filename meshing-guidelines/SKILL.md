@@ -1,7 +1,12 @@
 ---
-name: meshingkit
+name: meshing-guidelines
 description: Mesh gradient library for SwiftUI. Use for creating, animating, and exporting mesh gradients. Supports 2x2, 3x3, and 4x4 grid templates, animated gradients, Metal shaders, and platform-specific export to photo library or disk.
-allowed-tools: Read, Grep, Glob, Edit, Write, Bash
+license: MIT
+compatibility: Requires Swift 6.2+, Xcode 16.0+, iOS 18.0+, macOS 15.0+, tvOS 18.0+, watchOS 11.0+, visionOS 2.0+.
+metadata:
+  author: rryam
+  version: "2.4.0"
+allowed-tools: Read Grep Glob Edit Write Bash
 ---
 
 # MeshingKit
