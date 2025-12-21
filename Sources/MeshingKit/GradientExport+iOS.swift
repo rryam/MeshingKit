@@ -19,7 +19,7 @@ public extension MeshingKit {
     /// - Parameters:
     ///   - image: The image to save.
     ///   - completion: A completion handler called with the result.
-    static func saveToPhotoAlbum(
+    public static func saveToPhotoAlbum(
         image: UIImage,
         completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
@@ -63,7 +63,7 @@ public extension MeshingKit {
     ///   - smoothsColors: Whether to smooth colors (default: true).
     ///   - completion: Called with the result.
     @MainActor
-    static func saveGradientToPhotoAlbum(
+    public static func saveGradientToPhotoAlbum(
         template: any GradientTemplate,
         size: CGSize,
         scale: CGFloat = 1.0,
@@ -98,7 +98,7 @@ public extension MeshingKit {
 
     /// Saves a predefined template to the photo library.
     @MainActor
-    static func saveGradientToPhotoAlbum(
+    public static func saveGradientToPhotoAlbum(
         template: PredefinedTemplate,
         size: CGSize,
         scale: CGFloat = 1.0,
@@ -131,7 +131,7 @@ public extension MeshingKit {
     ///   - smoothsColors: Whether to smooth colors (default: true).
     ///   - completion: Called with the result containing a temporary file URL.
     ///     The caller is responsible for deleting this file after use.
-    static func exportVideoToPhotoLibrary(
+    public static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
         size: CGSize,
         duration: TimeInterval = 5.0,
@@ -185,7 +185,7 @@ public extension MeshingKit {
     ///   - configuration: Video export configuration.
     ///   - completion: Called with the result containing a temporary file URL.
     ///     The caller is responsible for deleting this file after use.
-    static func exportVideoToPhotoLibrary(
+    public static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
         configuration: VideoExportConfiguration,
         completion: @escaping @Sendable (Result<URL, Error>) -> Void
@@ -208,7 +208,7 @@ public extension MeshingKit {
     ///
     /// - Parameter completion: Called with the result containing a temporary file URL.
     ///   The caller is responsible for deleting this file after use.
-    static func exportVideoToPhotoLibrary(
+    public static func exportVideoToPhotoLibrary(
         template: PredefinedTemplate,
         size: CGSize,
         duration: TimeInterval = 5.0,
@@ -238,7 +238,7 @@ public extension MeshingKit {
     ///
     /// - Parameter completion: Called with the result containing a temporary file URL.
     ///   The caller is responsible for deleting this file after use.
-    static func exportVideoToPhotoLibrary(
+    public static func exportVideoToPhotoLibrary(
         template: PredefinedTemplate,
         configuration: VideoExportConfiguration,
         completion: @escaping @Sendable (Result<URL, Error>) -> Void
