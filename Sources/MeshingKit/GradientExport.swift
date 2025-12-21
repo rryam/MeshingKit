@@ -39,6 +39,7 @@ public enum VideoExportError: Error, Sendable {
     case fileNotAccessible
     case unsupportedFormat
     case photosPermissionDenied
+    case invalidConfiguration(String)
 }
 
 /// Export format for saving gradients.

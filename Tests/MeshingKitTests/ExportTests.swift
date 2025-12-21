@@ -1,6 +1,10 @@
 import Testing
 @testable import MeshingKit
 import SwiftUI
+import Foundation
+#if canImport(AVFoundation)
+import AVFoundation
+#endif
 
 @Suite("Export Tests")
 struct ExportTests {
@@ -45,6 +49,53 @@ struct ExportTests {
 
         #expect(image != nil)
     }
+
+    @Test("Video export rejects invalid configuration")
+    func exportVideoRejectsInvalidConfiguration() async {
+        do {
+            _ = try await MeshingKit.exportVideo(
+                template: .size2(.mysticTwilight),
+                size: .zero,
+                duration: 0,
+                frameRate: 0
+            )
+            #expect(Bool(false), "Expected exportVideo to throw for invalid configuration.")
+        } catch let error as VideoExportError {
+            if case .invalidConfiguration = error {
+                #expect(Bool(true))
+            } else {
+                #expect(Bool(false), "Unexpected error: \(error)")
+            }
+        } catch {
+            #expect(Bool(false), "Unexpected error type: \(error)")
+        }
+    }
+
+#if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
+    @Test("Video export writes a file")
+    func exportVideoWritesFile() async throws {
+        let url = try await MeshingKit.exportVideo(
+            template: .size2(.mysticTwilight),
+            size: CGSize(width: 320, height: 320),
+            duration: 1.0,
+            frameRate: 2
+        )
+
+        #expect(FileManager.default.fileExists(atPath: url.path))
+#if canImport(AVFoundation)
+        let asset = AVURLAsset(url: url)
+        let duration = try await asset.load(.duration)
+        #expect(duration.isNumeric)
+        #expect(duration.seconds > 0)
+#endif
+        let keepVideo = ProcessInfo.processInfo.environment["MESHKIT_KEEP_VIDEO"] == "1"
+        if keepVideo {
+            print("MeshingKit export video saved at: \(url.path)")
+        } else {
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+#endif
 }
 
 private func isApproximatelyEqual(_ lhs: Double, _ rhs: Double, tolerance: Double = 0.0001)

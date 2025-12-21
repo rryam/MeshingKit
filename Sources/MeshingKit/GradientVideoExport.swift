@@ -26,6 +26,7 @@ public struct VideoExportSnapshot: Sendable {
     public let blurRadius: CGFloat
     public let showDots: Bool
     public let shouldAnimate: Bool
+    public let renderScale: CGFloat
 
     public init(
         gridSize: Int,
@@ -35,7 +36,8 @@ public struct VideoExportSnapshot: Sendable {
         smoothsColors: Bool,
         blurRadius: CGFloat,
         showDots: Bool,
-        shouldAnimate: Bool
+        shouldAnimate: Bool,
+        renderScale: CGFloat
     ) {
         self.gridSize = gridSize
         self.positions = positions
@@ -45,6 +47,7 @@ public struct VideoExportSnapshot: Sendable {
         self.blurRadius = blurRadius
         self.showDots = showDots
         self.shouldAnimate = shouldAnimate
+        self.renderScale = renderScale
     }
 }
 
@@ -61,14 +64,28 @@ public extension MeshingKit {
         blurRadius: CGFloat = 0,
         showDots: Bool = false,
         animate: Bool = true,
-        smoothsColors: Bool = true
+        smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0
     ) async throws -> URL {
+        try validateVideoExportConfiguration(
+            template: template,
+            size: size,
+            duration: duration,
+            frameRate: frameRate,
+            renderScale: renderScale
+        )
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let dateString = dateFormatter.string(from: Date())
 
         let tempDir = FileManager.default.temporaryDirectory
-        let outputURL = tempDir.appendingPathComponent("meshGradient_\(dateString).mp4")
+        let uniqueID = UUID().uuidString
+        let outputURL = tempDir.appendingPathComponent("meshGradient_\(dateString)_\(uniqueID).mp4")
+
+        let outputWidth = max(1, Int((size.width * renderScale).rounded()))
+        let outputHeight = max(1, Int((size.height * renderScale).rounded()))
+        let outputSize = CGSize(width: outputWidth, height: outputHeight)
 
         let snapshot = VideoExportSnapshot(
             gridSize: template.size,
@@ -78,13 +95,15 @@ public extension MeshingKit {
             smoothsColors: smoothsColors,
             blurRadius: blurRadius,
             showDots: showDots,
-            shouldAnimate: animate
+            shouldAnimate: animate,
+            renderScale: renderScale
         )
 
         let exportTask = Task.detached(priority: .userInitiated) {
             let exportConfig = VideoExportConfig(
                 outputURL: outputURL,
-                videoSize: size,
+                viewSize: size,
+                outputSize: outputSize,
                 frameRate: frameRate,
                 fileType: .mp4,
                 duration: duration,
@@ -113,7 +132,8 @@ public extension MeshingKit {
         blurRadius: CGFloat = 0,
         showDots: Bool = false,
         animate: Bool = true,
-        smoothsColors: Bool = true
+        smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0
     ) async throws -> URL {
         try await exportVideo(
             template: template.baseTemplate,
@@ -123,8 +143,52 @@ public extension MeshingKit {
             blurRadius: blurRadius,
             showDots: showDots,
             animate: animate,
-            smoothsColors: smoothsColors
+            smoothsColors: smoothsColors,
+            renderScale: renderScale
         )
+    }
+}
+
+private extension MeshingKit {
+    static func validateVideoExportConfiguration(
+        template: any GradientTemplate,
+        size: CGSize,
+        duration: TimeInterval,
+        frameRate: Int32,
+        renderScale: CGFloat
+    ) throws {
+        guard duration > 0 else {
+            throw VideoExportError.invalidConfiguration("Duration must be greater than 0.")
+        }
+
+        guard frameRate > 0 else {
+            throw VideoExportError.invalidConfiguration("Frame rate must be greater than 0.")
+        }
+
+        guard size.width.isFinite, size.height.isFinite, size.width > 0, size.height > 0 else {
+            throw VideoExportError.invalidConfiguration("Video size must be finite and greater than 0.")
+        }
+
+        guard renderScale.isFinite, renderScale > 0 else {
+            throw VideoExportError.invalidConfiguration("Render scale must be finite and greater than 0.")
+        }
+
+        let expectedCount = template.size * template.size
+        guard template.size > 0 else {
+            throw VideoExportError.invalidConfiguration("Template size must be greater than 0.")
+        }
+
+        guard template.points.count == expectedCount else {
+            throw VideoExportError.invalidConfiguration(
+                "Template points count must equal size * size."
+            )
+        }
+
+        guard template.colors.count == expectedCount else {
+            throw VideoExportError.invalidConfiguration(
+                "Template colors count must equal size * size."
+            )
+        }
     }
 }
 #endif

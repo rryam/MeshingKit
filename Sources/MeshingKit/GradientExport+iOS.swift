@@ -144,6 +144,7 @@ public extension MeshingKit {
         showDots: Bool = false,
         animate: Bool = true,
         smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0,
         completion: @escaping @Sendable (Result<URL, Error>) -> Void
     ) {
         Task {
@@ -156,7 +157,8 @@ public extension MeshingKit {
                     blurRadius: blurRadius,
                     showDots: showDots,
                     animate: animate,
-                    smoothsColors: smoothsColors
+                    smoothsColors: smoothsColors,
+                    renderScale: renderScale
                 )
 
                 let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
@@ -190,6 +192,7 @@ public extension MeshingKit {
         showDots: Bool = false,
         animate: Bool = true,
         smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0,
         completion: @escaping @Sendable (Result<URL, Error>) -> Void
     ) {
         exportVideoToPhotoLibrary(
@@ -201,6 +204,7 @@ public extension MeshingKit {
             showDots: showDots,
             animate: animate,
             smoothsColors: smoothsColors,
+            renderScale: renderScale,
             completion: completion
         )
     }

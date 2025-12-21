@@ -30,7 +30,8 @@ public extension MeshingKit {
 
     struct VideoExportConfig {
         let outputURL: URL
-        let videoSize: CGSize
+        let viewSize: CGSize
+        let outputSize: CGSize
         let frameRate: Int32
         let fileType: AVFileType
         let duration: TimeInterval
@@ -40,7 +41,8 @@ public extension MeshingKit {
     private struct FrameLoopConfig {
         let totalFrames: Int
         let timePerFrame: Double
-        let videoSize: CGSize
+        let viewSize: CGSize
+        let outputSize: CGSize
         let snapshot: VideoExportSnapshot
     }
 
@@ -66,14 +68,16 @@ public extension MeshingKit {
         func startWriting(
             totalFrames: Int,
             timePerFrame: Double,
-            videoSize: CGSize,
+            viewSize: CGSize,
+            outputSize: CGSize,
             snapshot: VideoExportSnapshot,
             continuation: CheckedContinuation<Void, Error>
         ) {
             let loopConfig = FrameLoopConfig(
                 totalFrames: totalFrames,
                 timePerFrame: timePerFrame,
-                videoSize: videoSize,
+                viewSize: viewSize,
+                outputSize: outputSize,
                 snapshot: snapshot
             )
 
@@ -106,7 +110,7 @@ public extension MeshingKit {
                     body: {
                         renderFrame(
                             at: phase,
-                            size: loopConfig.videoSize,
+                            size: loopConfig.viewSize,
                             snapshot: loopConfig.snapshot
                         )
                     }
@@ -122,7 +126,8 @@ public extension MeshingKit {
                     image: image,
                     presentationTime: presentationTime,
                     adaptor: assetConfig.adaptor,
-                    context: context
+                    context: context,
+                    targetSize: loopConfig.outputSize
                 ) {
                     state.isFinished = true
                     continuation.resume(throwing: error)
@@ -153,11 +158,18 @@ public extension MeshingKit {
             }
         }
 
+        func cancelWritingAndCleanup(outputURL: URL) {
+            assetConfig.writerInput.markAsFinished()
+            assetConfig.assetWriter.cancelWriting()
+            try? FileManager.default.removeItem(at: outputURL)
+        }
+
         private static func processFrame(
             image: PlatformImage,
             presentationTime: CMTime,
             adaptor: AVAssetWriterInputPixelBufferAdaptor,
-            context: CIContext
+            context: CIContext,
+            targetSize: CGSize
         ) -> VideoExportError? {
             guard let pixelBufferPool = adaptor.pixelBufferPool else {
                 return .pixelBufferPoolCreationFailed
@@ -166,7 +178,8 @@ public extension MeshingKit {
             guard let pixelBuffer = Self.pixelBuffer(
                 from: image,
                 pixelBufferPool: pixelBufferPool,
-                context: context
+                context: context,
+                targetSize: targetSize
             ) else {
                 return .pixelBufferCreationFailed
             }
@@ -181,7 +194,8 @@ public extension MeshingKit {
         private static func pixelBuffer(
             from image: PlatformImage,
             pixelBufferPool: CVPixelBufferPool,
-            context: CIContext
+            context: CIContext,
+            targetSize: CGSize
         ) -> CVPixelBuffer? {
             guard let cgImage = Self.cgImage(from: image) else {
                 return nil
@@ -199,7 +213,7 @@ public extension MeshingKit {
             CVPixelBufferLockBaseAddress(buffer, [])
             defer { CVPixelBufferUnlockBaseAddress(buffer, []) }
 
-            let bounds = CGRect(origin: .zero, size: image.size)
+            let bounds = CGRect(origin: .zero, size: targetSize)
             context.render(ciImage, to: buffer, bounds: bounds, colorSpace: CGColorSpaceCreateDeviceRGB())
 
             return buffer
@@ -242,7 +256,7 @@ public extension MeshingKit {
         .cornerRadius(snapshot.showDots ? 0 : 12)
 
         let renderer = ImageRenderer(content: frame)
-        renderer.scale = 1
+        renderer.scale = snapshot.renderScale
         #if canImport(UIKit)
         return renderer.uiImage
         #elseif canImport(AppKit)
@@ -255,12 +269,25 @@ public extension MeshingKit {
     static func configureAssetWriter(
         outputURL: URL,
         fileType: AVFileType,
-        videoSize: CGSize
+        videoSize: CGSize,
+        frameRate: Int32
     ) throws -> AssetWriterConfig {
+        let pixels = Double(videoSize.width * videoSize.height)
+        let bitsPerPixel: Double = 0.2
+        let estimatedBitRate = Int(pixels * Double(frameRate) * bitsPerPixel)
+        let averageBitRate = max(2_000_000, estimatedBitRate)
+        let compressionSettings: [String: Any] = [
+            AVVideoAverageBitRateKey: averageBitRate,
+            AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
+            AVVideoExpectedSourceFrameRateKey: Int(frameRate),
+            AVVideoMaxKeyFrameIntervalKey: Int(frameRate)
+        ]
+
         let videoSettings: [String: Any] = [
             AVVideoCodecKey: AVVideoCodecType.h264,
             AVVideoWidthKey: Int(videoSize.width),
-            AVVideoHeightKey: Int(videoSize.height)
+            AVVideoHeightKey: Int(videoSize.height),
+            AVVideoCompressionPropertiesKey: compressionSettings
         ]
 
         let assetWriter = try AVAssetWriter(url: outputURL, fileType: fileType)
@@ -271,7 +298,7 @@ public extension MeshingKit {
         writerInput.expectsMediaDataInRealTime = false
 
         let attributes: [String: Any] = [
-            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32ARGB),
+            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA),
             kCVPixelBufferWidthKey as String: Int(videoSize.width),
             kCVPixelBufferHeightKey as String: Int(videoSize.height)
         ]
@@ -311,7 +338,8 @@ public extension MeshingKit {
         let assetConfig = try configureAssetWriter(
             outputURL: config.outputURL,
             fileType: config.fileType,
-            videoSize: config.videoSize
+            videoSize: config.outputSize,
+            frameRate: config.frameRate
         )
 
         let frameDuration = CMTimeMake(value: 1, timescale: config.frameRate)
@@ -331,19 +359,26 @@ public extension MeshingKit {
             state: state
         )
 
-        let videoSize = config.videoSize
+        let viewSize = config.viewSize
+        let outputSize = config.outputSize
         let snapshot = config.snapshot
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Task {
-                await loopDriver.startWriting(
-                    totalFrames: totalFrames,
-                    timePerFrame: timePerFrame,
-                    videoSize: videoSize,
-                    snapshot: snapshot,
-                    continuation: continuation
-                )
+        do {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                Task {
+                    await loopDriver.startWriting(
+                        totalFrames: totalFrames,
+                        timePerFrame: timePerFrame,
+                        viewSize: viewSize,
+                        outputSize: outputSize,
+                        snapshot: snapshot,
+                        continuation: continuation
+                    )
+                }
             }
+        } catch {
+            await loopDriver.cancelWritingAndCleanup(outputURL: config.outputURL)
+            throw error
         }
     }
 }

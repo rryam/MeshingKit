@@ -27,7 +27,7 @@ public extension MeshingKit {
         var animatedPositions = positions
 
         let count = positions.count
-        if count > 4 && count < 16 {
+        if count == 9 {
             animatedPositions = animateMediumGrid(for: date, positions: animatedPositions)
         } else if count == 16 {
             animatedPositions = animateLargeGrid(for: date, positions: animatedPositions)
