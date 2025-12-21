@@ -23,6 +23,11 @@ workflows:
     triggering:
       <<: *events
     scripts:
+      - name: Download Metal Toolchain
+        script: |
+          #!/bin/zsh
+          xcodebuild -downloadComponent MetalToolchain
+
       - name: Lint Swift Code
         script: |
           #!/bin/zsh
@@ -58,11 +63,6 @@ workflows:
 
           # Generate code coverage report
           swift test --enable-code-coverage
-
-      - name: Download Metal Toolchain
-        script: |
-          #!/bin/zsh
-          xcodebuild -downloadComponent MetalToolchain
 
       - name: Build with Xcode (Multi-Platform)
         script: |
