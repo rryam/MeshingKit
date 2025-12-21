@@ -66,21 +66,9 @@ public extension MeshingKit {
         }
 
         func startWriting(
-            totalFrames: Int,
-            timePerFrame: Double,
-            viewSize: CGSize,
-            outputSize: CGSize,
-            snapshot: VideoExportSnapshot,
+            loopConfig: FrameLoopConfig,
             continuation: CheckedContinuation<Void, Error>
         ) {
-            let loopConfig = FrameLoopConfig(
-                totalFrames: totalFrames,
-                timePerFrame: timePerFrame,
-                viewSize: viewSize,
-                outputSize: outputSize,
-                snapshot: snapshot
-            )
-
             assetConfig.writerInput.requestMediaDataWhenReady(
                 on: DispatchQueue(label: "meshing.video.writer")
             ) {
@@ -366,12 +354,16 @@ public extension MeshingKit {
         do {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 Task {
-                    await loopDriver.startWriting(
+                    let loopConfig = FrameLoopConfig(
                         totalFrames: totalFrames,
                         timePerFrame: timePerFrame,
                         viewSize: viewSize,
                         outputSize: outputSize,
-                        snapshot: snapshot,
+                        snapshot: snapshot
+                    )
+
+                    await loopDriver.startWriting(
+                        loopConfig: loopConfig,
                         continuation: continuation
                     )
                 }
