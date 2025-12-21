@@ -14,6 +14,7 @@ import AppKit
 public enum SaveToDiskError: Error, Sendable {
     case userCancelled
     case cgImageCreationFailed
+    case imageRenderingFailed
     case imageEncodingFailed(Error)
 }
 
@@ -115,9 +116,7 @@ public extension MeshingKit {
         renderer.proposedSize = ProposedViewSize(width: size.width, height: size.height)
 
         guard let nsImage = renderer.nsImage else {
-            completion(.failure(SaveToDiskError.imageEncodingFailed(
-                NSError(domain: "MeshingKit", code: -1)
-            )))
+            completion(.failure(SaveToDiskError.imageRenderingFailed))
             return
         }
 

@@ -161,18 +161,21 @@ public extension MeshingKit {
                     renderScale: renderScale
                 )
 
-                let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
-                guard status == .authorized else {
-                    completion(.failure(VideoExportError.photosPermissionDenied))
+                do {
+                    let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+                    guard status == .authorized else {
+                        throw VideoExportError.photosPermissionDenied
+                    }
+
+                    try await PHPhotoLibrary.shared().performChanges {
+                        PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
+                    }
+
+                    completion(.success(videoURL))
+                } catch {
                     try? FileManager.default.removeItem(at: videoURL)
-                    return
+                    completion(.failure(error))
                 }
-
-                try await PHPhotoLibrary.shared().performChanges {
-                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
-                }
-
-                completion(.success(videoURL))
             } catch {
                 completion(.failure(error))
             }

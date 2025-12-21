@@ -75,7 +75,7 @@ public protocol GradientTemplate: Sendable {
 
 ```swift
 struct MyGradient: GradientTemplate {
-    var size: Int { 4 }
+    var size: Int { 3 }
 
     var points: [SIMD2<Float>] {
         [
