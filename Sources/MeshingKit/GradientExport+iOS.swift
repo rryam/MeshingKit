@@ -48,6 +48,7 @@ public extension MeshingKit {
     /// Errors that can occur when saving to the photo library.
     public enum PhotoLibraryError: Error, Sendable {
         case permissionDenied
+        case imageRenderingFailed
         case saveFailed(Error)
     }
 
@@ -88,12 +89,7 @@ public extension MeshingKit {
         renderer.proposedSize = ProposedViewSize(width: size.width, height: size.height)
 
         guard let uiImage = renderer.uiImage else {
-            let error = PhotoLibraryError.saveFailed(NSError(
-                domain: "MeshingKit",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to render image"]
-            ))
-            completion(.failure(error))
+            completion(.failure(PhotoLibraryError.imageRenderingFailed))
             return
         }
 

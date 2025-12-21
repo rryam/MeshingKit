@@ -15,6 +15,7 @@ public enum SaveToDiskError: Error, Sendable {
     case userCancelled
     case cgImageCreationFailed
     case imageRenderingFailed
+    case imageRepresentationCreationFailed
     case imageEncodingFailed(Error)
 }
 
@@ -59,9 +60,7 @@ public extension MeshingKit {
 
             guard let fileType = format.fileType,
                   let imageData = bitmapRep.representation(using: fileType, properties: [:]) else {
-                completion(.failure(SaveToDiskError.imageEncodingFailed(
-                    NSError(domain: "MeshingKit", code: -3)
-                )))
+                completion(.failure(SaveToDiskError.imageRepresentationCreationFailed))
                 return
             }
 

@@ -53,6 +53,8 @@ public extension MeshingKit {
         private let state: VideoWriterState
         private var isWriting = false
 
+        fileprivate static let minimumAverageBitrate = 2_000_000
+
         init(
             assetConfig: AssetWriterConfig,
             context: CIContext,
@@ -263,7 +265,7 @@ public extension MeshingKit {
         let pixels = Double(videoSize.width * videoSize.height)
         let bitsPerPixel: Double = 0.2
         let estimatedBitRate = Int(pixels * Double(frameRate) * bitsPerPixel)
-        let averageBitRate = max(2_000_000, estimatedBitRate)
+        let averageBitRate = max(FrameLoopDriver.minimumAverageBitrate, estimatedBitRate)
         let compressionSettings: [String: Any] = [
             AVVideoAverageBitRateKey: averageBitRate,
             AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
