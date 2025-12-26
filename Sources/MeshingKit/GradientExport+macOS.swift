@@ -9,6 +9,7 @@ import SwiftUI
 
 #if os(macOS)
 import AppKit
+import UniformTypeIdentifiers
 
 /// Errors that can occur when saving to disk.
 public enum SaveToDiskError: Error, Sendable {
@@ -36,7 +37,8 @@ public extension MeshingKit {
         completion: @escaping (Result<URL, Error>) -> Void
     ) {
         let savePanel = NSSavePanel()
-        savePanel.allowedContentTypes = [.png, .jpeg]
+        let fileType: NSBitmapImageRep.FileType = format == .jpg ? .jpeg : .png
+        savePanel.allowedContentTypes = [UTType.png, UTType.jpeg]
         savePanel.canCreateDirectories = true
         savePanel.isExtensionHidden = false
         savePanel.allowsOtherFileTypes = false
@@ -46,9 +48,15 @@ public extension MeshingKit {
         savePanel.nameFieldStringValue = "\(fileName).\(format.fileExtension)"
 
         savePanel.begin { response in
-            guard response == .OK, let url = savePanel.url else {
+            guard response == .OK, var url = savePanel.url else {
                 completion(.failure(SaveToDiskError.userCancelled))
                 return
+            }
+
+            // Ensure correct extension
+            let expectedExtension = format.fileExtension
+            if url.pathExtension.lowercased() != expectedExtension {
+                url = url.deletingPathExtension().appendingPathExtension(expectedExtension)
             }
 
             guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
@@ -58,8 +66,11 @@ public extension MeshingKit {
 
             let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
 
-            guard let fileType = format.fileType,
-                  let imageData = bitmapRep.representation(using: fileType, properties: [:]) else {
+            let properties: [NSBitmapImageRep.PropertyKey: Any] = format == .jpg
+                ? [.compressionFactor: 0.9]
+                : [:]
+
+            guard let imageData = bitmapRep.representation(using: fileType, properties: properties) else {
                 completion(.failure(SaveToDiskError.imageRepresentationCreationFailed))
                 return
             }

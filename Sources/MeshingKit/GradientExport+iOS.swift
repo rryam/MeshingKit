@@ -129,8 +129,7 @@ public extension MeshingKit {
     ///   - showDots: Whether to show dots (default: false).
     ///   - animate: Whether to animate (default: true).
     ///   - smoothsColors: Whether to smooth colors (default: true).
-    ///   - completion: Called with the result containing a temporary file URL.
-    ///     The caller is responsible for deleting this file after use.
+    ///   - completion: Called with the result. Temporary files are cleaned up automatically.
     public static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
         size: CGSize,
@@ -167,6 +166,7 @@ public extension MeshingKit {
                         PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
                     }
 
+                    try? FileManager.default.removeItem(at: videoURL)
                     completion(.success(videoURL))
                 } catch {
                     try? FileManager.default.removeItem(at: videoURL)
@@ -183,8 +183,7 @@ public extension MeshingKit {
     /// - Parameters:
     ///   - template: The gradient template to export.
     ///   - configuration: Video export configuration.
-    ///   - completion: Called with the result containing a temporary file URL.
-    ///     The caller is responsible for deleting this file after use.
+    ///   - completion: Called with the result. Temporary files are cleaned up automatically.
     public static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
         configuration: VideoExportConfiguration,
@@ -206,8 +205,7 @@ public extension MeshingKit {
 
     /// Exports a predefined template as video to photo library.
     ///
-    /// - Parameter completion: Called with the result containing a temporary file URL.
-    ///   The caller is responsible for deleting this file after use.
+    /// - Parameter completion: Called with the result. Temporary files are cleaned up automatically.
     public static func exportVideoToPhotoLibrary(
         template: PredefinedTemplate,
         size: CGSize,
@@ -236,8 +234,7 @@ public extension MeshingKit {
 
     /// Exports a predefined template as video to photo library using a configuration.
     ///
-    /// - Parameter completion: Called with the result containing a temporary file URL.
-    ///   The caller is responsible for deleting this file after use.
+    /// - Parameter completion: Called with the result. Temporary files are cleaned up automatically.
     public static func exportVideoToPhotoLibrary(
         template: PredefinedTemplate,
         configuration: VideoExportConfiguration,

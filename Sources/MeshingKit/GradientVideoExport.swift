@@ -205,37 +205,41 @@ public extension MeshingKit {
 
     private static func performVideoExport(params: VideoExportParams) async throws -> URL {
         let outputURLCopy = params.outputURL
-        return try await withThrowingTaskGroup(of: URL.self) { group in
-            group.addTask {
-                let exportConfig = VideoExportConfig(
-                    outputURL: outputURLCopy,
-                    viewSize: params.viewSize,
-                    outputSize: params.outputSize,
-                    frameRate: params.frameRate,
-                    fileType: .mp4,
-                    duration: params.duration,
-                    snapshot: params.snapshot
-                )
 
-                try await Self.writeVideo(config: exportConfig)
+        do {
+            return try await withThrowingTaskGroup(of: URL.self) { group in
+                group.addTask {
+                    let exportConfig = VideoExportConfig(
+                        outputURL: outputURLCopy,
+                        viewSize: params.viewSize,
+                        outputSize: params.outputSize,
+                        frameRate: params.frameRate,
+                        fileType: .mp4,
+                        duration: params.duration,
+                        snapshot: params.snapshot
+                    )
 
-                guard FileManager.default.fileExists(atPath: outputURLCopy.path) else {
-                    throw VideoExportError.fileNotAccessible
+                    try await Self.writeVideo(config: exportConfig)
+
+                    guard FileManager.default.fileExists(atPath: outputURLCopy.path) else {
+                        throw VideoExportError.fileNotAccessible
+                    }
+
+                    return outputURLCopy
                 }
 
-                return outputURLCopy
-            }
+                group.addTask {
+                    try await Task.sleep(nanoseconds: UInt64(params.timeout * 1_000_000_000))
+                    throw VideoExportError.videoExportTimedOut(params.timeout)
+                }
 
-            group.addTask {
-                try await Task.sleep(nanoseconds: UInt64(params.timeout * 1_000_000_000))
-                throw VideoExportError.invalidConfiguration(
-                    "Video export timed out after \(params.timeout) seconds."
-                )
+                let result = try await group.next()!
+                group.cancelAll()
+                return result
             }
-
-            let result = try await group.next()!
-            group.cancelAll()
-            return result
+        } catch {
+            try? FileManager.default.removeItem(at: outputURLCopy)
+            throw error
         }
     }
 
