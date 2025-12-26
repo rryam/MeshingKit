@@ -111,7 +111,7 @@ public extension PredefinedTemplate {
     }
 
     /// A user-facing name for the template.
-    package var name: String {
+    var name: String {
         template.name
     }
 

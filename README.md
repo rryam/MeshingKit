@@ -386,6 +386,55 @@ let css = MeshingKit.cssLinearGradientSnippet(
 )
 ```
 
+## Video Export
+
+Export animated mesh gradients to MP4 files with quality controls:
+
+```swift
+let config = VideoExportConfiguration(
+    size: CGSize(width: 1080, height: 1080),
+    duration: 5.0,
+    frameRate: 30,
+    blurRadius: 0,
+    showDots: false,
+    animate: true,
+    smoothsColors: true,
+    renderScale: 2.0
+)
+
+let url = try await MeshingKit.exportVideo(
+    template: .size3(.auroraBorealis),
+    configuration: config
+)
+```
+
+You can also use the parameter overload:
+
+```swift
+let url = try await MeshingKit.exportVideo(
+    template: .size3(.auroraBorealis),
+    size: CGSize(width: 1080, height: 1080),
+    duration: 5.0,
+    frameRate: 30,
+    renderScale: 2.0
+)
+```
+
+### Video Export Configuration
+
+| Setting | Description | Notes |
+| --- | --- | --- |
+| `size` | Output view size in points. | Required. |
+| `duration` | Video length in seconds. | Default: 5.0 |
+| `frameRate` | Frames per second. | Default: 30 |
+| `blurRadius` | Blur applied to each frame. | Default: 0 |
+| `showDots` | Show control points as dots. | Default: false |
+| `animate` | Animate control points. | Default: true |
+| `smoothsColors` | Smooth color transitions. | Default: true |
+| `renderScale` | Render scale multiplier for output resolution. | Default: 1.0 |
+
+> Tip: Increase `renderScale` for sharper output without changing layout size.
+
 ## Contributing
 
 Contributions to MeshingKit are welcome! Please feel free to submit a Pull Request.
