@@ -17,64 +17,6 @@ import AppKit
 #endif
 
 public extension MeshingKit {
-    final class VideoWriterState {
-        var frameIndex: Int = 0
-        var isFinished: Bool = false
-    }
-
-    /// Thread-safe holder for the continuation to enable cancellation handling.
-    final class ContinuationHolder: @unchecked Sendable {
-        private let lock = NSLock()
-        private var continuation: CheckedContinuation<Void, Error>?
-        private var hasResumed = false
-
-        func set(_ continuation: CheckedContinuation<Void, Error>) {
-            lock.lock()
-            defer { lock.unlock() }
-            self.continuation = continuation
-        }
-
-        func resumeWithCancellation() {
-            lock.lock()
-            defer { lock.unlock() }
-            guard !hasResumed, let cont = continuation else { return }
-            hasResumed = true
-            continuation = nil
-            cont.resume(throwing: CancellationError())
-        }
-
-        func markResumed() {
-            lock.lock()
-            defer { lock.unlock() }
-            hasResumed = true
-            continuation = nil
-        }
-    }
-
-    struct AssetWriterConfig {
-        let assetWriter: AVAssetWriter
-        let writerInput: AVAssetWriterInput
-        let adaptor: AVAssetWriterInputPixelBufferAdaptor
-    }
-
-    struct VideoExportConfig {
-        let outputURL: URL
-        let viewSize: CGSize
-        let outputSize: CGSize
-        let frameRate: Int32
-        let fileType: AVFileType
-        let duration: TimeInterval
-        let snapshot: VideoExportSnapshot
-    }
-
-    fileprivate struct FrameLoopConfig {
-        let totalFrames: Int
-        let timePerFrame: Double
-        let viewSize: CGSize
-        let outputSize: CGSize
-        let snapshot: VideoExportSnapshot
-    }
-
     actor FrameLoopDriver {
         private let assetConfig: AssetWriterConfig
         private let context: CIContext
@@ -378,35 +320,8 @@ public extension MeshingKit {
             try FileManager.default.removeItem(at: config.outputURL)
         }
 
-        let assetConfig = try configureAssetWriter(
-            outputURL: config.outputURL,
-            fileType: config.fileType,
-            videoSize: config.outputSize,
-            frameRate: config.frameRate
-        )
-
-        let frameDuration = CMTimeMake(value: 1, timescale: config.frameRate)
-        let context = CIContext(options: [.useSoftwareRenderer: false])
-
-        let totalFrames = max(
-            1,
-            Int((config.duration * Double(config.frameRate)).rounded(.toNearestOrAwayFromZero))
-        )
-        let timePerFrame = 1.0 / Double(config.frameRate)
-
-        let state = VideoWriterState()
-        let loopDriver = FrameLoopDriver(
-            assetConfig: assetConfig,
-            context: context,
-            frameDuration: frameDuration,
-            state: state
-        )
-
-        let viewSize = config.viewSize
-        let outputSize = config.outputSize
-        let snapshot = config.snapshot
-        let outputURL = config.outputURL
-
+        let loopDriver = try makeLoopDriver(config: config)
+        let loopConfig = makeLoopConfig(config: config)
         let continuationHolder = ContinuationHolder()
 
         do {
@@ -415,14 +330,6 @@ public extension MeshingKit {
                     continuationHolder.set(continuation)
 
                     Task {
-                        let loopConfig = FrameLoopConfig(
-                            totalFrames: totalFrames,
-                            timePerFrame: timePerFrame,
-                            viewSize: viewSize,
-                            outputSize: outputSize,
-                            snapshot: snapshot
-                        )
-
                         await loopDriver.startWriting(
                             loopConfig: loopConfig,
                             continuation: continuation,
@@ -433,7 +340,7 @@ public extension MeshingKit {
             } onCancel: {
                 continuationHolder.resumeWithCancellation()
                 Task {
-                    await loopDriver.cancelWritingAndCleanup(outputURL: outputURL)
+                    await loopDriver.cancelWritingAndCleanup(outputURL: config.outputURL)
                 }
             }
         } catch {
