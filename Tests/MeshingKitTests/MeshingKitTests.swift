@@ -100,6 +100,18 @@ struct MeshingKitTests {
         #expect(color.hexString(includeAlpha: true) == "#FFFF0000")
     }
 
+    @Test("Animated positions ignore unsupported counts")
+    func animatedPositionsUnsupportedCounts() {
+        let positions = Array(repeating: SIMD2<Float>(x: 0.5, y: 0.5), count: 5)
+        let animated = MeshingKit.animatedPositions(
+            for: 0.5,
+            positions: positions,
+            animate: true
+        )
+
+        #expect(animated == positions)
+    }
+
     private func validateTemplates<T: GradientTemplate>(
         _ templates: [T],
         expectedSize: Int
