@@ -22,6 +22,35 @@ public extension MeshingKit {
         var isFinished: Bool = false
     }
 
+    /// Thread-safe holder for the continuation to enable cancellation handling.
+    final class ContinuationHolder: @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuation: CheckedContinuation<Void, Error>?
+        private var hasResumed = false
+
+        func set(_ continuation: CheckedContinuation<Void, Error>) {
+            lock.lock()
+            defer { lock.unlock() }
+            self.continuation = continuation
+        }
+
+        func resumeWithCancellation() {
+            lock.lock()
+            defer { lock.unlock() }
+            guard !hasResumed, let cont = continuation else { return }
+            hasResumed = true
+            continuation = nil
+            cont.resume(throwing: CancellationError())
+        }
+
+        func markResumed() {
+            lock.lock()
+            defer { lock.unlock() }
+            hasResumed = true
+            continuation = nil
+        }
+    }
+
     struct AssetWriterConfig {
         let assetWriter: AVAssetWriter
         let writerInput: AVAssetWriterInput
@@ -69,7 +98,8 @@ public extension MeshingKit {
 
         fileprivate func startWriting(
             loopConfig: FrameLoopConfig,
-            continuation: CheckedContinuation<Void, Error>
+            continuation: CheckedContinuation<Void, Error>,
+            continuationHolder: ContinuationHolder
         ) {
             assetConfig.writerInput.requestMediaDataWhenReady(
                 on: DispatchQueue(label: "meshing.video.writer")
@@ -77,7 +107,8 @@ public extension MeshingKit {
                 Task {
                     await self.writeFrames(
                         loopConfig: loopConfig,
-                        continuation: continuation
+                        continuation: continuation,
+                        continuationHolder: continuationHolder
                     )
                 }
             }
@@ -85,7 +116,8 @@ public extension MeshingKit {
 
         private func writeFrames(
             loopConfig: FrameLoopConfig,
-            continuation: CheckedContinuation<Void, Error>
+            continuation: CheckedContinuation<Void, Error>,
+            continuationHolder: ContinuationHolder
         ) async {
             guard !state.isFinished, !isWriting else { return }
             isWriting = true
@@ -106,6 +138,7 @@ public extension MeshingKit {
                     }
                 ) else {
                     state.isFinished = true
+                    continuationHolder.markResumed()
                     continuation.resume(throwing: VideoExportError.frameRenderingFailed)
                     return
                 }
@@ -120,6 +153,7 @@ public extension MeshingKit {
                     targetSize: loopConfig.outputSize
                 ) {
                     state.isFinished = true
+                    continuationHolder.markResumed()
                     continuation.resume(throwing: error)
                     return
                 }
@@ -132,15 +166,20 @@ public extension MeshingKit {
                 assetConfig.writerInput.markAsFinished()
                 assetConfig.assetWriter.finishWriting {
                     Task {
-                        await self.handleFinish(continuation: continuation)
+                        await self.handleFinish(
+                            continuation: continuation,
+                            continuationHolder: continuationHolder
+                        )
                     }
                 }
             }
         }
 
         private func handleFinish(
-            continuation: CheckedContinuation<Void, Error>
+            continuation: CheckedContinuation<Void, Error>,
+            continuationHolder: ContinuationHolder
         ) {
+            continuationHolder.markResumed()
             if let error = assetConfig.assetWriter.error {
                 continuation.resume(throwing: error)
             } else {
@@ -149,9 +188,23 @@ public extension MeshingKit {
         }
 
         func cancelWritingAndCleanup(outputURL: URL) {
+            guard !state.isFinished else { return }
+            state.isFinished = true
             assetConfig.writerInput.markAsFinished()
             assetConfig.assetWriter.cancelWriting()
             try? FileManager.default.removeItem(at: outputURL)
+        }
+
+        func cancelWithContinuation(
+            outputURL: URL,
+            continuation: CheckedContinuation<Void, Error>
+        ) {
+            guard !state.isFinished else { return }
+            state.isFinished = true
+            assetConfig.writerInput.markAsFinished()
+            assetConfig.assetWriter.cancelWriting()
+            try? FileManager.default.removeItem(at: outputURL)
+            continuation.resume(throwing: CancellationError())
         }
 
         private static func processFrame(
@@ -352,22 +405,35 @@ public extension MeshingKit {
         let viewSize = config.viewSize
         let outputSize = config.outputSize
         let snapshot = config.snapshot
+        let outputURL = config.outputURL
+
+        let continuationHolder = ContinuationHolder()
 
         do {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                Task {
-                    let loopConfig = FrameLoopConfig(
-                        totalFrames: totalFrames,
-                        timePerFrame: timePerFrame,
-                        viewSize: viewSize,
-                        outputSize: outputSize,
-                        snapshot: snapshot
-                    )
+            try await withTaskCancellationHandler {
+                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                    continuationHolder.set(continuation)
 
-                    await loopDriver.startWriting(
-                        loopConfig: loopConfig,
-                        continuation: continuation
-                    )
+                    Task {
+                        let loopConfig = FrameLoopConfig(
+                            totalFrames: totalFrames,
+                            timePerFrame: timePerFrame,
+                            viewSize: viewSize,
+                            outputSize: outputSize,
+                            snapshot: snapshot
+                        )
+
+                        await loopDriver.startWriting(
+                            loopConfig: loopConfig,
+                            continuation: continuation,
+                            continuationHolder: continuationHolder
+                        )
+                    }
+                }
+            } onCancel: {
+                continuationHolder.resumeWithCancellation()
+                Task {
+                    await loopDriver.cancelWritingAndCleanup(outputURL: outputURL)
                 }
             }
         } catch {
