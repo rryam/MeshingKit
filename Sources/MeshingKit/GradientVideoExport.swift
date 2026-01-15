@@ -322,6 +322,13 @@ private extension MeshingKit {
             )
         }
 
+        let outputSize = calculateOutputSize(from: size, renderScale: renderScale)
+        guard validateSize(outputSize) else {
+            throw VideoExportError.invalidConfiguration(
+                "Output size must not exceed 8192x8192 after applying render scale."
+            )
+        }
+
         guard template.size > 0,
               template.points.count == template.size * template.size,
               template.colors.count == template.size * template.size else {

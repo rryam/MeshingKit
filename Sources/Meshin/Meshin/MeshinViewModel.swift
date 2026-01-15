@@ -103,6 +103,9 @@ final class MeshinViewModel: ObservableObject {
                 case .success(let url):
                     self?.exportSuccessMessage = "Saved to \(url.lastPathComponent)"
                 case .failure(let error):
+                    if let saveError = error as? SaveToDiskError, case .userCancelled = saveError {
+                        return
+                    }
                     self?.exportError = error.localizedDescription
                 }
             }
@@ -116,19 +119,23 @@ final class MeshinViewModel: ObservableObject {
         isExporting = true
         exportError = nil
 
-        Task {
-            do {
-                let url = try await MeshingKit.exportVideo(
-                    template: template,
-                    size: exportSize,
-                    duration: videoDuration,
-                    frameRate: videoFrameRate
-                )
-                isExporting = false
-                exportSuccessMessage = "Video saved to \(url.lastPathComponent)"
-            } catch {
-                isExporting = false
-                exportError = error.localizedDescription
+        MeshingKit.exportVideoToDisk(
+            template: template,
+            size: exportSize,
+            duration: videoDuration,
+            frameRate: videoFrameRate
+        ) { [weak self] result in
+            Task { @MainActor in
+                self?.isExporting = false
+                switch result {
+                case .success(let url):
+                    self?.exportSuccessMessage = "Video saved to \(url.lastPathComponent)"
+                case .failure(let error):
+                    if let saveError = error as? VideoSaveError, case .userCancelled = saveError {
+                        return
+                    }
+                    self?.exportError = error.localizedDescription
+                }
             }
         }
     }

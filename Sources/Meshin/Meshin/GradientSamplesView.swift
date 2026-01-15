@@ -81,9 +81,6 @@ struct GradientSamplesView: View {
 
     private var exportButton: some View {
         Button {
-            if viewModel.selectedTemplate == nil {
-                viewModel.selectedTemplate = PredefinedTemplate.allCases.first
-            }
             viewModel.showExportOptions()
         } label: {
             Image(systemName: "square.and.arrow.up")

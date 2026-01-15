@@ -140,7 +140,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
-        completion: @escaping @Sendable (Result<URL, Error>) -> Void
+        completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
         Task {
             do {
@@ -167,7 +167,7 @@ public extension MeshingKit {
                     }
 
                     try? FileManager.default.removeItem(at: videoURL)
-                    completion(.success(videoURL))
+                    completion(.success(()))
                 } catch {
                     try? FileManager.default.removeItem(at: videoURL)
                     completion(.failure(error))
@@ -187,7 +187,7 @@ public extension MeshingKit {
     public static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
         configuration: VideoExportConfiguration,
-        completion: @escaping @Sendable (Result<URL, Error>) -> Void
+        completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
         exportVideoToPhotoLibrary(
             template: template,
@@ -216,7 +216,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
-        completion: @escaping @Sendable (Result<URL, Error>) -> Void
+        completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
         exportVideoToPhotoLibrary(
             template: template.baseTemplate,
@@ -238,7 +238,7 @@ public extension MeshingKit {
     public static func exportVideoToPhotoLibrary(
         template: PredefinedTemplate,
         configuration: VideoExportConfiguration,
-        completion: @escaping @Sendable (Result<URL, Error>) -> Void
+        completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
         exportVideoToPhotoLibrary(
             template: template.baseTemplate,
