@@ -1,4 +1,6 @@
 # MeshingKit
+[![Star History Chart](https://api.star-history.com/svg?repos=rryam/MeshingKit&type=Date)](https://star-history.com/#rryam/MeshingKit&Date)
+
 
 ![Gradient](Sources/Resources/gradient.jpg)
 
