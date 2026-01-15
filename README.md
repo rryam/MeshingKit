@@ -1,5 +1,4 @@
 # MeshingKit
-[![Star History Chart](https://api.star-history.com/svg?repos=rryam/MeshingKit&type=Date)](https://star-history.com/#rryam/MeshingKit&Date)
 
 
 ![Gradient](Sources/Resources/gradient.jpg)
@@ -444,3 +443,5 @@ Contributions to MeshingKit are welcome! Please feel free to submit a Pull Reque
 ## License
 
 MeshingKit is available under the MIT license. See the LICENSE file for more info.
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rryam/MeshingKit&type=Date)](https://star-history.com/#rryam/MeshingKit&Date)
