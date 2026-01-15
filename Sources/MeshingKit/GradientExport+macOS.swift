@@ -18,6 +18,43 @@ public enum SaveToDiskError: Error, Sendable {
     case imageRenderingFailed
     case imageRepresentationCreationFailed
     case imageEncodingFailed(Error)
+    case unsupportedFormat
+}
+
+/// Errors that can occur when saving video exports to disk.
+public enum VideoSaveError: Error, Sendable {
+    case userCancelled
+    case fileMoveFailed(Error)
+}
+
+extension SaveToDiskError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .userCancelled:
+            return "Save was cancelled."
+        case .cgImageCreationFailed:
+            return "Unable to create image data from the rendered output."
+        case .imageRenderingFailed:
+            return "Failed to render the gradient image."
+        case .imageRepresentationCreationFailed:
+            return "Failed to prepare the image for saving."
+        case .imageEncodingFailed(let error):
+            return "Failed to write the image to disk: \(error.localizedDescription)"
+        case .unsupportedFormat:
+            return "Only PNG and JPG formats are supported for image exports."
+        }
+    }
+}
+
+extension VideoSaveError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .userCancelled:
+            return "Export was cancelled."
+        case .fileMoveFailed(let error):
+            return "Failed to move the exported video: \(error.localizedDescription)"
+        }
+    }
 }
 
 public extension MeshingKit {
@@ -36,9 +73,14 @@ public extension MeshingKit {
         format: ExportFormat = .png,
         completion: @escaping (Result<URL, Error>) -> Void
     ) {
+        guard let fileType = format.fileType else {
+            completion(.failure(SaveToDiskError.unsupportedFormat))
+            return
+        }
+
+        let contentType: UTType = format == .jpg ? .jpeg : .png
         let savePanel = NSSavePanel()
-        let fileType: NSBitmapImageRep.FileType = format == .jpg ? .jpeg : .png
-        savePanel.allowedContentTypes = [UTType.png, UTType.jpeg]
+        savePanel.allowedContentTypes = [contentType]
         savePanel.canCreateDirectories = true
         savePanel.isExtensionHidden = false
         savePanel.allowsOtherFileTypes = false
@@ -66,7 +108,7 @@ public extension MeshingKit {
 
             let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
 
-            let properties: [NSBitmapImageRep.PropertyKey: Any] = format == .jpg
+            let properties: [NSBitmapImageRep.PropertyKey: Any] = fileType == .jpeg
                 ? [.compressionFactor: 0.9]
                 : [:]
 
@@ -155,6 +197,164 @@ public extension MeshingKit {
             smoothsColors: smoothsColors,
             fileName: fileName,
             format: format,
+            completion: completion
+        )
+    }
+
+    // MARK: - Video Export (macOS)
+    /// Exports a gradient as a video file using a save panel dialog.
+    ///
+    /// - Parameters:
+    ///   - template: The gradient template to export.
+    ///   - size: The video dimensions.
+    ///   - duration: Video duration in seconds (default: 5.0).
+    ///   - frameRate: Frames per second (default: 30).
+    ///   - blurRadius: Blur radius (default: 0).
+    ///   - showDots: Whether to show dots (default: false).
+    ///   - animate: Whether to animate (default: true).
+    ///   - smoothsColors: Whether to smooth colors (default: true).
+    ///   - renderScale: Render scale multiplier (default: 1.0).
+    ///   - fileName: The default file name (default: "mesh-gradient").
+    ///   - timeout: Maximum time allowed for export (default: 30 minutes).
+    ///   - completion: Called with the result URL or error.
+    @MainActor
+    static func exportVideoToDisk(
+        template: any GradientTemplate,
+        size: CGSize,
+        duration: TimeInterval = 5.0,
+        frameRate: Int32 = 30,
+        blurRadius: CGFloat = 0,
+        showDots: Bool = false,
+        animate: Bool = true,
+        smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0,
+        fileName: String = "mesh-gradient",
+        timeout: TimeInterval = videoExportTimeout,
+        completion: @escaping (Result<URL, Error>) -> Void
+    ) {
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.mpeg4Movie]
+        savePanel.canCreateDirectories = true
+        savePanel.isExtensionHidden = false
+        savePanel.allowsOtherFileTypes = false
+        savePanel.title = "Save Gradient Video"
+        savePanel.message = "Choose a location to save your gradient video."
+        savePanel.nameFieldLabel = "File name:"
+        savePanel.nameFieldStringValue = "\(fileName).mp4"
+
+        savePanel.begin { response in
+            guard response == .OK, var url = savePanel.url else {
+                completion(.failure(VideoSaveError.userCancelled))
+                return
+            }
+
+            if url.pathExtension.lowercased() != "mp4" {
+                url = url.deletingPathExtension().appendingPathExtension("mp4")
+            }
+
+            Task {
+                do {
+                    let tempURL = try await exportVideo(
+                        template: template,
+                        size: size,
+                        duration: duration,
+                        frameRate: frameRate,
+                        blurRadius: blurRadius,
+                        showDots: showDots,
+                        animate: animate,
+                        smoothsColors: smoothsColors,
+                        renderScale: renderScale,
+                        timeout: timeout
+                    )
+
+                    do {
+                        if FileManager.default.fileExists(atPath: url.path) {
+                            try FileManager.default.removeItem(at: url)
+                        }
+                        try FileManager.default.moveItem(at: tempURL, to: url)
+                        completion(.success(url))
+                    } catch {
+                        try? FileManager.default.removeItem(at: tempURL)
+                        completion(.failure(VideoSaveError.fileMoveFailed(error)))
+                    }
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    /// Exports a predefined template as a video file using a save panel dialog.
+    @MainActor
+    static func exportVideoToDisk(
+        template: PredefinedTemplate,
+        size: CGSize,
+        duration: TimeInterval = 5.0,
+        frameRate: Int32 = 30,
+        blurRadius: CGFloat = 0,
+        showDots: Bool = false,
+        animate: Bool = true,
+        smoothsColors: Bool = true,
+        renderScale: CGFloat = 1.0,
+        fileName: String = "mesh-gradient",
+        timeout: TimeInterval = videoExportTimeout,
+        completion: @escaping (Result<URL, Error>) -> Void
+    ) {
+        exportVideoToDisk(
+            template: template.baseTemplate,
+            size: size,
+            duration: duration,
+            frameRate: frameRate,
+            blurRadius: blurRadius,
+            showDots: showDots,
+            animate: animate,
+            smoothsColors: smoothsColors,
+            renderScale: renderScale,
+            fileName: fileName,
+            timeout: timeout,
+            completion: completion
+        )
+    }
+
+    /// Exports a gradient as a video file using a configuration and save panel.
+    @MainActor
+    static func exportVideoToDisk(
+        template: any GradientTemplate,
+        configuration: VideoExportConfiguration,
+        fileName: String = "mesh-gradient",
+        timeout: TimeInterval = videoExportTimeout,
+        completion: @escaping (Result<URL, Error>) -> Void
+    ) {
+        exportVideoToDisk(
+            template: template,
+            size: configuration.size,
+            duration: configuration.duration,
+            frameRate: configuration.frameRate,
+            blurRadius: configuration.blurRadius,
+            showDots: configuration.showDots,
+            animate: configuration.animate,
+            smoothsColors: configuration.smoothsColors,
+            renderScale: configuration.renderScale,
+            fileName: fileName,
+            timeout: timeout,
+            completion: completion
+        )
+    }
+
+    /// Exports a predefined template as a video file using a configuration and save panel.
+    @MainActor
+    static func exportVideoToDisk(
+        template: PredefinedTemplate,
+        configuration: VideoExportConfiguration,
+        fileName: String = "mesh-gradient",
+        timeout: TimeInterval = videoExportTimeout,
+        completion: @escaping (Result<URL, Error>) -> Void
+    ) {
+        exportVideoToDisk(
+            template: template.baseTemplate,
+            configuration: configuration,
+            fileName: fileName,
+            timeout: timeout,
             completion: completion
         )
     }
