@@ -41,9 +41,9 @@ struct MeshingKitTests {
         let size3Count = GradientTemplateSize3.allCases.count
         let size4Count = GradientTemplateSize4.allCases.count
 
-        #expect(size2Count == 35)
-        #expect(size3Count == 22)
-        #expect(size4Count == 11)
+        #expect(size2Count == TemplateCatalogLock.size2Count)
+        #expect(size3Count == TemplateCatalogLock.size3Count)
+        #expect(size4Count == TemplateCatalogLock.size4Count)
 
         // Verify PredefinedTemplate.allCases matches the sum
         #expect(PredefinedTemplate.allCases.count == size2Count + size3Count + size4Count)
@@ -80,7 +80,9 @@ struct MeshingKitTests {
         let invalidColors = [
             "not-a-hex",
             "#GGGGGG",
-            "#12345"
+            "#12345",
+            "#FF0000ZZ",
+            "#80FF0000extra"
         ]
 
         for hexValue in invalidColors {
@@ -142,7 +144,7 @@ struct MeshingKitTests {
         let allTemplates = PredefinedTemplate.allCases
 
         // Verify count
-        #expect(allTemplates.count == 68)
+        #expect(allTemplates.count == TemplateCatalogLock.totalCount)
 
         // Verify all IDs are unique
         let ids = allTemplates.map { $0.id }
@@ -158,10 +160,17 @@ struct MeshingKitTests {
             }
         }
 
-        #expect(counts.size2 == 35)
-        #expect(counts.size3 == 22)
-        #expect(counts.size4 == 11)
+        #expect(counts.size2 == TemplateCatalogLock.size2Count)
+        #expect(counts.size3 == TemplateCatalogLock.size3Count)
+        #expect(counts.size4 == TemplateCatalogLock.size4Count)
     }
+}
+
+private enum TemplateCatalogLock {
+    static let size2Count = 35
+    static let size3Count = 22
+    static let size4Count = 11
+    static let totalCount = size2Count + size3Count + size4Count
 }
 
 private struct RGBA {

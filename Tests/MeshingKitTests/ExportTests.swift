@@ -71,6 +71,28 @@ struct ExportTests {
         }
     }
 
+    @Test("Video export rejects invalid timeout")
+    func exportVideoRejectsInvalidTimeout() async {
+        do {
+            _ = try await MeshingKit.exportVideo(
+                template: .size2(.mysticTwilight),
+                size: CGSize(width: 320, height: 320),
+                duration: 1,
+                frameRate: 2,
+                timeout: .infinity
+            )
+            #expect(Bool(false), "Expected exportVideo to throw for invalid timeout.")
+        } catch let error as VideoExportError {
+            if case .invalidConfiguration(let message) = error {
+                #expect(message.contains("Timeout"))
+            } else {
+                #expect(Bool(false), "Unexpected error: \(error)")
+            }
+        } catch {
+            #expect(Bool(false), "Unexpected error type: \(error)")
+        }
+    }
+
 #if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
     @Test("Video export writes a file")
     func exportVideoWritesFile() async throws {

@@ -40,16 +40,23 @@ public extension MeshingKit {
 
         fileprivate func startWriting(
             loopConfig: FrameLoopConfig,
-            continuation: CheckedContinuation<Void, Error>,
             continuationHolder: ContinuationHolder
         ) {
+            guard !state.isFinished else { return }
+            guard assetConfig.assetWriter.status == .writing else {
+                state.isFinished = true
+                continuationHolder.resume(
+                    throwing: assetConfig.assetWriter.error ?? VideoExportError.failedToStartWriting
+                )
+                return
+            }
+
             assetConfig.writerInput.requestMediaDataWhenReady(
                 on: DispatchQueue(label: "meshing.video.writer")
             ) {
                 Task {
                     await self.writeFrames(
                         loopConfig: loopConfig,
-                        continuation: continuation,
                         continuationHolder: continuationHolder
                     )
                 }
@@ -58,7 +65,6 @@ public extension MeshingKit {
 
         private func writeFrames(
             loopConfig: FrameLoopConfig,
-            continuation: CheckedContinuation<Void, Error>,
             continuationHolder: ContinuationHolder
         ) async {
             guard !state.isFinished, !isWriting else { return }
@@ -80,8 +86,7 @@ public extension MeshingKit {
                     }
                 ) else {
                     state.isFinished = true
-                    continuationHolder.markResumed()
-                    continuation.resume(throwing: VideoExportError.frameRenderingFailed)
+                    continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
                     return
                 }
 
@@ -95,8 +100,7 @@ public extension MeshingKit {
                     targetSize: loopConfig.outputSize
                 ) {
                     state.isFinished = true
-                    continuationHolder.markResumed()
-                    continuation.resume(throwing: error)
+                    continuationHolder.resume(throwing: error)
                     return
                 }
 
@@ -109,7 +113,6 @@ public extension MeshingKit {
                 assetConfig.assetWriter.finishWriting {
                     Task {
                         await self.handleFinish(
-                            continuation: continuation,
                             continuationHolder: continuationHolder
                         )
                     }
@@ -118,14 +121,12 @@ public extension MeshingKit {
         }
 
         private func handleFinish(
-            continuation: CheckedContinuation<Void, Error>,
             continuationHolder: ContinuationHolder
         ) {
-            continuationHolder.markResumed()
             if let error = assetConfig.assetWriter.error {
-                continuation.resume(throwing: error)
+                continuationHolder.resume(throwing: error)
             } else {
-                continuation.resume()
+                continuationHolder.resume()
             }
         }
 
@@ -135,18 +136,6 @@ public extension MeshingKit {
             assetConfig.writerInput.markAsFinished()
             assetConfig.assetWriter.cancelWriting()
             try? FileManager.default.removeItem(at: outputURL)
-        }
-
-        func cancelWithContinuation(
-            outputURL: URL,
-            continuation: CheckedContinuation<Void, Error>
-        ) {
-            guard !state.isFinished else { return }
-            state.isFinished = true
-            assetConfig.writerInput.markAsFinished()
-            assetConfig.assetWriter.cancelWriting()
-            try? FileManager.default.removeItem(at: outputURL)
-            continuation.resume(throwing: CancellationError())
         }
 
         private static func processFrame(
@@ -236,6 +225,27 @@ public extension MeshingKit {
             smoothsColors: snapshot.smoothsColors
         )
         .frame(width: size.width, height: size.height)
+        .overlay(alignment: .topLeading) {
+            if snapshot.showDots {
+                ZStack {
+                    ForEach(Array(points.indices), id: \.self) { index in
+                        let point = points[index]
+                        let dotColor = snapshot.colors.indices.contains(index) ? snapshot.colors[index] : .white
+                        Circle()
+                            .fill(dotColor.opacity(0.9))
+                            .frame(width: 10, height: 10)
+                            .overlay(
+                                Circle().stroke(Color.white.opacity(0.9), lineWidth: 1)
+                            )
+                            .position(
+                                x: CGFloat(point.x) * size.width,
+                                y: CGFloat(point.y) * size.height
+                            )
+                    }
+                }
+                .frame(width: size.width, height: size.height, alignment: .topLeading)
+            }
+        }
         .blur(radius: snapshot.blurRadius)
         .clipped()
         .cornerRadius(snapshot.showDots ? 0 : 12)
@@ -332,7 +342,6 @@ public extension MeshingKit {
                     Task {
                         await loopDriver.startWriting(
                             loopConfig: loopConfig,
-                            continuation: continuation,
                             continuationHolder: continuationHolder
                         )
                     }

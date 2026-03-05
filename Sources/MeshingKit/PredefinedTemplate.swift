@@ -116,27 +116,27 @@ public extension PredefinedTemplate {
     }
 
     /// The palette colors for the template.
-    package var palette: [Color] {
+    var palette: [Color] {
         template.colors
     }
 
     /// The background color for the template.
-    package var background: Color {
+    var background: Color {
         template.background
     }
 
     /// Tags derived from the template name and mood.
-    package var tags: [String] {
+    var tags: [String] {
         metadataValue.tags
     }
 
     /// Moods derived from the template name.
-    package var moods: [TemplateMood] {
+    var moods: [TemplateMood] {
         metadataValue.moods
     }
 
     /// Combined metadata for the template.
-    package var metadata: TemplateMetadata {
+    var metadata: TemplateMetadata {
         metadataValue
     }
 
@@ -166,6 +166,7 @@ public extension PredefinedTemplate {
         .map { $0.template }
 
         if let limit {
+            guard limit >= 0 else { return [] }
             return Array(results.prefix(limit))
         }
         return results

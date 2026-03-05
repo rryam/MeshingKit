@@ -38,8 +38,8 @@ final class MeshinViewModel: ObservableObject {
     func saveToPhotoLibrary() {
         guard let template = selectedTemplate else { return }
 
+        clearMessages()
         isExporting = true
-        exportError = nil
 
         MeshingKit.saveGradientToPhotoAlbum(
             template: template,
@@ -61,8 +61,8 @@ final class MeshinViewModel: ObservableObject {
     func exportVideoToPhotoLibrary() {
         guard let template = selectedTemplate else { return }
 
+        clearMessages()
         isExporting = true
-        exportError = nil
 
         MeshingKit.exportVideoToPhotoLibrary(
             template: template,
@@ -88,8 +88,8 @@ final class MeshinViewModel: ObservableObject {
     func saveToDisk(format: ExportFormat) {
         guard let template = selectedTemplate else { return }
 
+        clearMessages()
         isExporting = true
-        exportError = nil
 
         MeshingKit.saveGradientToDisk(
             template: template,
@@ -116,8 +116,8 @@ final class MeshinViewModel: ObservableObject {
     func exportVideoToDisk() {
         guard let template = selectedTemplate else { return }
 
+        clearMessages()
         isExporting = true
-        exportError = nil
 
         MeshingKit.exportVideoToDisk(
             template: template,

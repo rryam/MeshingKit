@@ -151,17 +151,40 @@ public extension MeshingKit {
         completion: @escaping (Result<URL, Error>) -> Void
     ) {
         let cornerRadius: CGFloat = showDots ? 0 : 12
+        let points = template.points
+        let colors = template.colors
         let renderer = ImageRenderer(
             content: MeshGradient(
                 width: template.size,
                 height: template.size,
-                locations: .points(template.points),
-                colors: .colors(template.colors),
+                locations: .points(points),
+                colors: .colors(colors),
                 background: template.background,
                 smoothsColors: smoothsColors
             )
-            .blur(radius: blurRadius)
             .frame(width: size.width, height: size.height)
+            .overlay(alignment: .topLeading) {
+                if showDots {
+                    ZStack {
+                        ForEach(Array(points.indices), id: \.self) { index in
+                            let point = points[index]
+                            let dotColor = colors.indices.contains(index) ? colors[index] : .white
+                            Circle()
+                                .fill(dotColor.opacity(0.9))
+                                .frame(width: 10, height: 10)
+                                .overlay(
+                                    Circle().stroke(Color.white.opacity(0.9), lineWidth: 1)
+                                )
+                                .position(
+                                    x: CGFloat(point.x) * size.width,
+                                    y: CGFloat(point.y) * size.height
+                                )
+                        }
+                    }
+                    .frame(width: size.width, height: size.height, alignment: .topLeading)
+                }
+            }
+            .blur(radius: blurRadius)
             .cornerRadius(cornerRadius)
         )
         renderer.scale = scale

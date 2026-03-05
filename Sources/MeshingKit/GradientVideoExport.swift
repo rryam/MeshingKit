@@ -129,7 +129,8 @@ public extension MeshingKit {
             size: size,
             duration: duration,
             frameRate: frameRate,
-            renderScale: renderScale
+            renderScale: renderScale,
+            timeout: timeout
         )
 
         let config = VideoExportConfiguration(
@@ -205,6 +206,7 @@ public extension MeshingKit {
 
     private static func performVideoExport(params: VideoExportParams) async throws -> URL {
         let outputURLCopy = params.outputURL
+        let timeoutNanoseconds = try timeoutToNanoseconds(params.timeout)
 
         do {
             return try await withThrowingTaskGroup(of: URL.self) { group in
@@ -229,7 +231,7 @@ public extension MeshingKit {
                 }
 
                 group.addTask {
-                    try await Task.sleep(nanoseconds: UInt64(params.timeout * 1_000_000_000))
+                    try await Task.sleep(nanoseconds: timeoutNanoseconds)
                     throw VideoExportError.videoExportTimedOut(params.timeout)
                 }
 
@@ -292,7 +294,8 @@ private extension MeshingKit {
         size: CGSize,
         duration: TimeInterval,
         frameRate: Int32,
-        renderScale: CGFloat
+        renderScale: CGFloat,
+        timeout: TimeInterval
     ) throws {
         guard validateDuration(duration) else {
             throw VideoExportError.invalidConfiguration(
@@ -319,6 +322,14 @@ private extension MeshingKit {
                 renderScale.isFinite && renderScale > 0
                     ? "Render scale must not exceed 4.0."
                     : "Render scale must be finite and greater than 0."
+            )
+        }
+
+        guard validateTimeout(timeout) else {
+            throw VideoExportError.invalidConfiguration(
+                timeout.isFinite && timeout > 0
+                    ? "Timeout is too large."
+                    : "Timeout must be finite and greater than 0."
             )
         }
 
@@ -353,6 +364,23 @@ private extension MeshingKit {
 
     private static func validateRenderScale(_ renderScale: CGFloat) -> Bool {
         renderScale.isFinite && renderScale > 0 && renderScale <= 4.0
+    }
+
+    private static func validateTimeout(_ timeout: TimeInterval) -> Bool {
+        let timeoutNanoseconds = timeout * 1_000_000_000
+        return timeout.isFinite && timeout > 0
+            && timeoutNanoseconds.isFinite && timeoutNanoseconds <= Double(UInt64.max)
+    }
+
+    private static func timeoutToNanoseconds(_ timeout: TimeInterval) throws -> UInt64 {
+        guard validateTimeout(timeout) else {
+            throw VideoExportError.invalidConfiguration(
+                timeout.isFinite && timeout > 0
+                    ? "Timeout is too large."
+                    : "Timeout must be finite and greater than 0."
+            )
+        }
+        return UInt64((timeout * 1_000_000_000).rounded(.down))
     }
 }
 #endif

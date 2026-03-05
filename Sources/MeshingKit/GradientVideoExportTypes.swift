@@ -26,28 +26,58 @@ public extension MeshingKit {
     final class ContinuationHolder: @unchecked Sendable {
         private let lock = NSLock()
         private var continuation: CheckedContinuation<Void, Error>?
-        private var hasResumed = false
+        private var completion: Result<Void, Error>?
 
         func set(_ continuation: CheckedContinuation<Void, Error>) {
+            var pendingCompletion: Result<Void, Error>?
             lock.lock()
-            defer { lock.unlock() }
-            self.continuation = continuation
+            if let completion {
+                pendingCompletion = completion
+            } else {
+                self.continuation = continuation
+            }
+            lock.unlock()
+
+            guard let pendingCompletion else { return }
+            switch pendingCompletion {
+            case .success:
+                continuation.resume()
+            case .failure(let error):
+                continuation.resume(throwing: error)
+            }
         }
 
         func resumeWithCancellation() {
-            lock.lock()
-            defer { lock.unlock() }
-            guard !hasResumed, let cont = continuation else { return }
-            hasResumed = true
-            continuation = nil
-            cont.resume(throwing: CancellationError())
+            resume(throwing: CancellationError())
         }
 
-        func markResumed() {
+        func resume(throwing error: Error) {
+            complete(with: .failure(error))
+        }
+
+        func resume() {
+            complete(with: .success(()))
+        }
+
+        private func complete(with result: Result<Void, Error>) {
+            var continuationToResume: CheckedContinuation<Void, Error>?
             lock.lock()
-            defer { lock.unlock() }
-            hasResumed = true
+            guard completion == nil else {
+                lock.unlock()
+                return
+            }
+            completion = result
+            continuationToResume = continuation
             continuation = nil
+            lock.unlock()
+
+            guard let continuationToResume else { return }
+            switch result {
+            case .success:
+                continuationToResume.resume()
+            case .failure(let error):
+                continuationToResume.resume(throwing: error)
+            }
         }
     }
 
