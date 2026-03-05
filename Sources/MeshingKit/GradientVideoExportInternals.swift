@@ -9,7 +9,6 @@ import SwiftUI
 
 #if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
 import AVFoundation
-import CoreImage
 #if canImport(UIKit)
 import UIKit
 #elseif canImport(AppKit)
@@ -19,21 +18,19 @@ import AppKit
 public extension MeshingKit {
     actor FrameLoopDriver {
         private let assetConfig: AssetWriterConfig
-        private let context: CIContext
         private let frameDuration: CMTime
         private let state: VideoWriterState
         private var isWriting = false
+        private var cachedStaticFrame: CGImage?
 
         fileprivate static let minimumAverageBitrate = 2_000_000
 
         init(
             assetConfig: AssetWriterConfig,
-            context: CIContext,
             frameDuration: CMTime,
             state: VideoWriterState
         ) {
             self.assetConfig = assetConfig
-            self.context = context
             self.frameDuration = frameDuration
             self.state = state
         }
@@ -74,29 +71,51 @@ public extension MeshingKit {
             while assetConfig.writerInput.isReadyForMoreMediaData
                 && state.frameIndex < loopConfig.totalFrames {
                 let index = state.frameIndex
-                let phase = Double(index) * loopConfig.timePerFrame
+                let frameImage: CGImage
 
-                guard let image = await MainActor.run(
-                    body: {
-                        renderFrame(
-                            at: phase,
-                            size: loopConfig.viewSize,
-                            snapshot: loopConfig.snapshot
+                if loopConfig.snapshot.shouldAnimate {
+                    let points = loopConfig.points(forFrame: index)
+                    guard let renderedFrame = await MainActor.run(
+                        body: {
+                            renderFrame(
+                                points: points,
+                                size: loopConfig.viewSize,
+                                snapshot: loopConfig.snapshot
+                            )
+                        }
+                    ) else {
+                        state.isFinished = true
+                        continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
+                        return
+                    }
+                    frameImage = renderedFrame
+                } else {
+                    if cachedStaticFrame == nil {
+                        cachedStaticFrame = await MainActor.run(
+                            body: {
+                                renderFrame(
+                                    points: loopConfig.snapshot.positions,
+                                    size: loopConfig.viewSize,
+                                    snapshot: loopConfig.snapshot
+                                )
+                            }
                         )
                     }
-                ) else {
-                    state.isFinished = true
-                    continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
-                    return
+
+                    guard let staticFrame = cachedStaticFrame else {
+                        state.isFinished = true
+                        continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
+                        return
+                    }
+                    frameImage = staticFrame
                 }
 
                 let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(index))
 
                 if let error = Self.processFrame(
-                    image: image,
+                    cgImage: frameImage,
                     presentationTime: presentationTime,
                     adaptor: assetConfig.adaptor,
-                    context: context,
                     targetSize: loopConfig.outputSize
                 ) {
                     state.isFinished = true
@@ -139,10 +158,9 @@ public extension MeshingKit {
         }
 
         private static func processFrame(
-            image: PlatformImage,
+            cgImage: CGImage,
             presentationTime: CMTime,
             adaptor: AVAssetWriterInputPixelBufferAdaptor,
-            context: CIContext,
             targetSize: CGSize
         ) -> VideoExportError? {
             guard let pixelBufferPool = adaptor.pixelBufferPool else {
@@ -150,9 +168,8 @@ public extension MeshingKit {
             }
 
             guard let pixelBuffer = Self.pixelBuffer(
-                from: image,
+                from: cgImage,
                 pixelBufferPool: pixelBufferPool,
-                context: context,
                 targetSize: targetSize
             ) else {
                 return .pixelBufferCreationFailed
@@ -166,15 +183,10 @@ public extension MeshingKit {
         }
 
         private static func pixelBuffer(
-            from image: PlatformImage,
+            from cgImage: CGImage,
             pixelBufferPool: CVPixelBufferPool,
-            context: CIContext,
             targetSize: CGSize
         ) -> CVPixelBuffer? {
-            guard let cgImage = Self.cgImage(from: image) else {
-                return nil
-            }
-
             var pixelBuffer: CVPixelBuffer?
             CVPixelBufferPoolCreatePixelBuffer(nil, pixelBufferPool, &pixelBuffer)
 
@@ -182,40 +194,49 @@ public extension MeshingKit {
                 return nil
             }
 
-            let ciImage = CIImage(cgImage: cgImage)
-
             CVPixelBufferLockBaseAddress(buffer, [])
             defer { CVPixelBufferUnlockBaseAddress(buffer, []) }
 
-            let bounds = CGRect(origin: .zero, size: targetSize)
-            context.render(ciImage, to: buffer, bounds: bounds, colorSpace: CGColorSpaceCreateDeviceRGB())
+            guard let baseAddress = CVPixelBufferGetBaseAddress(buffer) else {
+                return nil
+            }
+
+            let width = Int(targetSize.width)
+            let height = Int(targetSize.height)
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(buffer)
+            let bitmapInfo = CGImageAlphaInfo.premultipliedFirst.rawValue
+                | CGBitmapInfo.byteOrder32Little.rawValue
+
+            guard let context = CGContext(
+                data: baseAddress,
+                width: width,
+                height: height,
+                bitsPerComponent: 8,
+                bytesPerRow: bytesPerRow,
+                space: Self.rgbColorSpace,
+                bitmapInfo: bitmapInfo
+            ) else {
+                return nil
+            }
+
+            context.clear(CGRect(x: 0, y: 0, width: width, height: height))
+            context.interpolationQuality = .high
+            context.translateBy(x: 0, y: CGFloat(height))
+            context.scaleBy(x: 1, y: -1)
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
 
             return buffer
         }
 
-        private static func cgImage(from image: PlatformImage) -> CGImage? {
-            #if canImport(UIKit)
-            return image.cgImage
-            #elseif canImport(AppKit)
-            return image.cgImage(forProposedRect: nil, context: nil, hints: nil)
-            #else
-            return nil
-            #endif
-        }
+        private static let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     }
 
     @MainActor
     private static func renderFrame(
-        at progress: Double,
+        points: [SIMD2<Float>],
         size: CGSize,
         snapshot: VideoExportSnapshot
-    ) -> PlatformImage? {
-        let points = animatedPositions(
-            for: progress,
-            positions: snapshot.positions,
-            animate: snapshot.shouldAnimate
-        )
-
+    ) -> CGImage? {
         let frame = MeshGradient(
             width: snapshot.gridSize,
             height: snapshot.gridSize,
@@ -227,23 +248,11 @@ public extension MeshingKit {
         .frame(width: size.width, height: size.height)
         .overlay(alignment: .topLeading) {
             if snapshot.showDots {
-                ZStack {
-                    ForEach(Array(points.indices), id: \.self) { index in
-                        let point = points[index]
-                        let dotColor = snapshot.colors.indices.contains(index) ? snapshot.colors[index] : .white
-                        Circle()
-                            .fill(dotColor.opacity(0.9))
-                            .frame(width: 10, height: 10)
-                            .overlay(
-                                Circle().stroke(Color.white.opacity(0.9), lineWidth: 1)
-                            )
-                            .position(
-                                x: CGFloat(point.x) * size.width,
-                                y: CGFloat(point.y) * size.height
-                            )
-                    }
-                }
-                .frame(width: size.width, height: size.height, alignment: .topLeading)
+                MeshingKit.controlPointsOverlay(
+                    points: points,
+                    colors: snapshot.colors,
+                    size: size
+                )
             }
         }
         .blur(radius: snapshot.blurRadius)
@@ -252,13 +261,8 @@ public extension MeshingKit {
 
         let renderer = ImageRenderer(content: frame)
         renderer.scale = snapshot.renderScale
-        #if canImport(UIKit)
-        return renderer.uiImage
-        #elseif canImport(AppKit)
-        return renderer.nsImage
-        #else
-        return nil
-        #endif
+        renderer.proposedSize = ProposedViewSize(width: size.width, height: size.height)
+        return renderer.cgImage
     }
 
     static func configureAssetWriter(

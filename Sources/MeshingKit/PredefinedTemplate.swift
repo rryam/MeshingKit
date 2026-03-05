@@ -12,7 +12,7 @@ import NaturalLanguage
 #endif
 
 /// A type representing predefined gradient templates of different sizes.
-public enum PredefinedTemplate: Identifiable, CaseIterable, Equatable {
+public enum PredefinedTemplate: Identifiable, CaseIterable, Equatable, Sendable {
     case size2(GradientTemplateSize2)
     case size3(GradientTemplateSize3)
     case size4(GradientTemplateSize4)
@@ -87,18 +87,7 @@ public struct TemplateMetadata: Sendable {
 public extension PredefinedTemplate {
     /// Template metadata computed on demand.
     package var metadataValue: TemplateMetadata {
-        let nameTokens = Self.normalizedTokens(from: rawName)
-        let moodList = Self.moods(for: nameTokens)
-        let moodTokens = moodList.map(\.rawValue)
-        let tags = Self.uniqueTokens(nameTokens + moodTokens)
-
-        return TemplateMetadata(
-            name: template.name,
-            tags: tags,
-            moods: moodList,
-            palette: template.colors,
-            background: template.background
-        )
+        Self.metadataByID[id] ?? Self.makeMetadata(for: self)
     }
 
     /// The underlying template for this predefined case.
@@ -117,12 +106,12 @@ public extension PredefinedTemplate {
 
     /// The palette colors for the template.
     var palette: [Color] {
-        template.colors
+        metadataValue.palette
     }
 
     /// The background color for the template.
     var background: Color {
-        template.background
+        metadataValue.background
     }
 
     /// Tags derived from the template name and mood.
@@ -152,10 +141,9 @@ public extension PredefinedTemplate {
             return allCases
         }
 
-        let results = allCases.compactMap { template -> (score: Int, template: PredefinedTemplate)? in
-            let tokens = template.searchTokens
-            let score = matchScore(for: queryTokens, in: tokens)
-            return score > 0 ? (score, template) : nil
+        let results = searchIndex.compactMap { entry -> (score: Int, template: PredefinedTemplate)? in
+            let score = matchScore(for: queryTokens, in: entry.tokens)
+            return score > 0 ? (score, entry.template) : nil
         }
         .sorted { lhs, rhs in
             if lhs.score == rhs.score {
@@ -174,6 +162,11 @@ public extension PredefinedTemplate {
 }
 
 private extension PredefinedTemplate {
+    struct SearchIndexEntry: Sendable {
+        let template: PredefinedTemplate
+        let tokens: [String]
+    }
+
     var rawName: String {
         switch self {
         case .size2(let specificTemplate): return specificTemplate.rawValue
@@ -182,9 +175,43 @@ private extension PredefinedTemplate {
         }
     }
 
-    var searchTokens: [String] {
-        tags
+    static func makeMetadata(for template: PredefinedTemplate) -> TemplateMetadata {
+        let nameTokens = normalizedTokens(from: template.rawName)
+        let moodList = moods(for: nameTokens)
+        let moodTokens = moodList.map(\.rawValue)
+        let tags = uniqueTokens(nameTokens + moodTokens)
+
+        return TemplateMetadata(
+            name: template.template.name,
+            tags: tags,
+            moods: moodList,
+            palette: template.template.colors,
+            background: template.template.background
+        )
     }
+
+    static let indexedTemplates: [(template: PredefinedTemplate, metadata: TemplateMetadata)] = {
+        allCases.map { template in
+            (template: template, metadata: makeMetadata(for: template))
+        }
+    }()
+
+    static let metadataByID: [String: TemplateMetadata] = {
+        Dictionary(
+            uniqueKeysWithValues: indexedTemplates.map { entry in
+                (entry.template.id, entry.metadata)
+            }
+        )
+    }()
+
+    static let searchIndex: [SearchIndexEntry] = {
+        indexedTemplates.map { entry in
+            SearchIndexEntry(
+                template: entry.template,
+                tokens: entry.metadata.tags
+            )
+        }
+    }()
 
     static func moods(for tokens: [String]) -> [TemplateMood] {
         var matched: [TemplateMood] = []

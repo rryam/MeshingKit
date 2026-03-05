@@ -263,3 +263,36 @@ private extension MeshingKit {
         return color.hexString(includeAlpha: includeAlpha) ?? "#FFFFFF"
     }
 }
+
+extension MeshingKit {
+    @ViewBuilder
+    static func controlPointsOverlay(
+        points: [SIMD2<Float>],
+        colors: [Color],
+        size: CGSize
+    ) -> some View {
+        Canvas { context, _ in
+            let radius: CGFloat = 5
+            let strokeColor = Color.white.opacity(0.9)
+
+            for (index, point) in points.enumerated() {
+                let center = CGPoint(
+                    x: CGFloat(point.x) * size.width,
+                    y: CGFloat(point.y) * size.height
+                )
+                let rect = CGRect(
+                    x: center.x - radius,
+                    y: center.y - radius,
+                    width: radius * 2,
+                    height: radius * 2
+                )
+                let path = Path(ellipseIn: rect)
+                let fillColor = colors.indices.contains(index) ? colors[index].opacity(0.9) : Color.white.opacity(0.9)
+
+                context.fill(path, with: .color(fillColor))
+                context.stroke(path, with: .color(strokeColor), lineWidth: 1)
+            }
+        }
+        .frame(width: size.width, height: size.height)
+    }
+}

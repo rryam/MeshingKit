@@ -13,6 +13,13 @@ workflows:
       vars:
         XCODE_SCHEME: "MeshingKit"
         APP_ID: "MeshingKit"
+    cache:
+      cache_paths:
+        - ~/.swiftpm
+        - ~/Library/Caches/org.swift.swiftpm
+        - ~/Library/Caches/Homebrew
+        - /opt/homebrew/Cellar/swiftlint
+        - /usr/local/Cellar/swiftlint
     when:
       changeset:
         includes:
@@ -37,11 +44,12 @@ workflows:
           # Install swiftlint if not available
           if ! command -v swiftlint &> /dev/null; then
             echo "Installing SwiftLint..."
+            export HOMEBREW_NO_AUTO_UPDATE=1
             brew install swiftlint
           fi
 
           # Run swiftlint with strict mode
-          swiftlint --strict
+          swiftlint --strict --quiet
 
       - name: Build Swift Package
         script: |
@@ -58,11 +66,8 @@ workflows:
 
           echo "Testing MeshingKit..."
 
-          # Run tests with verbose output
-          swift test --verbose
-
-          # Generate code coverage report
-          swift test --enable-code-coverage
+          # Run tests once with coverage enabled.
+          swift test --enable-code-coverage --parallel
 
       - name: Build with Xcode (Multi-Platform)
         script: |
@@ -76,7 +81,7 @@ workflows:
           for DESTINATION in "${DESTINATIONS[@]}"
             do
               echo "Building for destination: $DESTINATION"
-              xcodebuild clean build \
+              xcodebuild build \
                 -project Sources/Meshin/Meshin.xcodeproj \
                 -scheme Meshin \
                 -destination "$DESTINATION" \

@@ -9,7 +9,6 @@ import SwiftUI
 
 #if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
 import AVFoundation
-import CoreImage
 #if canImport(UIKit)
 import UIKit
 #elseif canImport(AppKit)
@@ -103,6 +102,19 @@ public extension MeshingKit {
         let viewSize: CGSize
         let outputSize: CGSize
         let snapshot: VideoExportSnapshot
+        let precomputedAnimatedPositions: [[SIMD2<Float>]]?
+
+        func points(forFrame frameIndex: Int) -> [SIMD2<Float>] {
+            if let precomputedAnimatedPositions {
+                return precomputedAnimatedPositions[frameIndex]
+            }
+            let phase = Double(frameIndex) * timePerFrame
+            return MeshingKit.animatedPositions(
+                for: phase,
+                positions: snapshot.positions,
+                animate: snapshot.shouldAnimate
+            )
+        }
     }
 
     static func makeLoopConfig(config: VideoExportConfig) -> FrameLoopConfig {
@@ -111,13 +123,29 @@ public extension MeshingKit {
             Int((config.duration * Double(config.frameRate)).rounded(.toNearestOrAwayFromZero))
         )
         let timePerFrame = 1.0 / Double(config.frameRate)
+        let shouldPrecompute = config.snapshot.shouldAnimate
+            && totalFrames <= maxPrecomputedAnimationFrames
+
+        let precomputedAnimatedPositions: [[SIMD2<Float>]]? = if shouldPrecompute {
+            (0..<totalFrames).map { frameIndex in
+                let phase = Double(frameIndex) * timePerFrame
+                return MeshingKit.animatedPositions(
+                    for: phase,
+                    positions: config.snapshot.positions,
+                    animate: true
+                )
+            }
+        } else {
+            nil
+        }
 
         return FrameLoopConfig(
             totalFrames: totalFrames,
             timePerFrame: timePerFrame,
             viewSize: config.viewSize,
             outputSize: config.outputSize,
-            snapshot: config.snapshot
+            snapshot: config.snapshot,
+            precomputedAnimatedPositions: precomputedAnimatedPositions
         )
     }
 
@@ -130,15 +158,15 @@ public extension MeshingKit {
         )
 
         let frameDuration = CMTimeMake(value: 1, timescale: config.frameRate)
-        let context = CIContext(options: [.useSoftwareRenderer: false])
         let state = VideoWriterState()
 
         return FrameLoopDriver(
             assetConfig: assetConfig,
-            context: context,
             frameDuration: frameDuration,
             state: state
         )
     }
+
+    private static let maxPrecomputedAnimationFrames = 12_000
 }
 #endif

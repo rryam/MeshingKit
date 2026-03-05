@@ -87,23 +87,7 @@ public extension MeshingKit {
             .frame(width: size.width, height: size.height)
             .overlay(alignment: .topLeading) {
                 if showDots {
-                    ZStack {
-                        ForEach(Array(points.indices), id: \.self) { index in
-                            let point = points[index]
-                            let dotColor = colors.indices.contains(index) ? colors[index] : .white
-                            Circle()
-                                .fill(dotColor.opacity(0.9))
-                                .frame(width: 10, height: 10)
-                                .overlay(
-                                    Circle().stroke(Color.white.opacity(0.9), lineWidth: 1)
-                                )
-                                .position(
-                                    x: CGFloat(point.x) * size.width,
-                                    y: CGFloat(point.y) * size.height
-                                )
-                        }
-                    }
-                    .frame(width: size.width, height: size.height, alignment: .topLeading)
+                    MeshingKit.controlPointsOverlay(points: points, colors: colors, size: size)
                 }
             }
             .blur(radius: blurRadius)
