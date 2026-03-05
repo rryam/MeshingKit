@@ -369,7 +369,7 @@ private extension MeshingKit {
     private static func validateTimeout(_ timeout: TimeInterval) -> Bool {
         let timeoutNanoseconds = timeout * 1_000_000_000
         return timeout.isFinite && timeout > 0
-            && timeoutNanoseconds.isFinite && timeoutNanoseconds <= Double(UInt64.max)
+            && timeoutNanoseconds.isFinite && timeoutNanoseconds < Double(UInt64.max)
     }
 
     private static func timeoutToNanoseconds(_ timeout: TimeInterval) throws -> UInt64 {
