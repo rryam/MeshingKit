@@ -221,8 +221,6 @@ public extension MeshingKit {
 
             context.clear(CGRect(x: 0, y: 0, width: width, height: height))
             context.interpolationQuality = .high
-            context.translateBy(x: 0, y: CGFloat(height))
-            context.scaleBy(x: 1, y: -1)
             context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
 
             return buffer
