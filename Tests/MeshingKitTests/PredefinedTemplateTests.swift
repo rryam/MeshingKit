@@ -42,6 +42,12 @@ struct PredefinedTemplateTests {
         #expect(results.count == 1)
     }
 
+    @Test("PredefinedTemplate find handles negative limit")
+    func predefinedTemplateFindNegativeLimit() {
+        let results = PredefinedTemplate.find(by: "aurora", limit: -1)
+        #expect(results.isEmpty)
+    }
+
     @Test("PredefinedTemplate find returns all for empty query")
     func predefinedTemplateFindEmptyQuery() {
         let results = PredefinedTemplate.find(by: "   ")

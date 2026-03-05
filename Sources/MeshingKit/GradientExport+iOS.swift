@@ -72,17 +72,25 @@ public extension MeshingKit {
         smoothsColors: Bool = true,
         completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
+        let points = template.points
+        let colors = template.colors
+
         let renderer = ImageRenderer(
             content: MeshGradient(
                 width: template.size,
                 height: template.size,
-                locations: .points(template.points),
-                colors: .colors(template.colors),
+                locations: .points(points),
+                colors: .colors(colors),
                 background: template.background,
                 smoothsColors: smoothsColors
             )
-            .blur(radius: blurRadius)
             .frame(width: size.width, height: size.height)
+            .overlay(alignment: .topLeading) {
+                if showDots {
+                    MeshingKit.controlPointsOverlay(points: points, colors: colors, size: size)
+                }
+            }
+            .blur(radius: blurRadius)
             .cornerRadius(showDots ? 0 : 12)
         )
         renderer.scale = scale

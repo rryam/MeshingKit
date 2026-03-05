@@ -32,23 +32,29 @@ extension Color {
     ///                  The "#" prefix is optional.
     ///
     /// - Note: If an invalid hex string is provided, the color will default to opaque white.
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(
-            in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        let scanned = Scanner(string: hex).scanHexInt64(&int)
+    public init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        let validHexDigits = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+        let isValidLength = hex.count == 3 || hex.count == 6 || hex.count == 8
+        let hasOnlyHexDigits = !hex.isEmpty && hex.unicodeScalars.allSatisfy { validHexDigits.contains($0) }
+
+        guard isValidLength, hasOnlyHexDigits, let int = UInt64(hex, radix: 16) else {
+            self.init(.sRGB, red: 1, green: 1, blue: 1, opacity: 1)
+            return
+        }
+
         let a: UInt64
         let r: UInt64
         let g: UInt64
         let b: UInt64
-        switch (scanned, hex.count) {
-        case (true, 3):  // RGB (12-bit)
+        switch hex.count {
+        case 3:  // RGB (12-bit)
             (a, r, g, b) = (
                 255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17
             )
-        case (true, 6):  // RGB (24-bit)
+        case 6:  // RGB (24-bit)
             (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case (true, 8):  // ARGB (32-bit)
+        case 8:  // ARGB (32-bit)
             (a, r, g, b) = (
                 int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF
             )

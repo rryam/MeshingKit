@@ -71,6 +71,28 @@ struct ExportTests {
         }
     }
 
+    @Test("Video export rejects invalid timeout")
+    func exportVideoRejectsInvalidTimeout() async {
+        do {
+            _ = try await MeshingKit.exportVideo(
+                template: .size2(.mysticTwilight),
+                size: CGSize(width: 320, height: 320),
+                duration: 1,
+                frameRate: 2,
+                timeout: .infinity
+            )
+            #expect(Bool(false), "Expected exportVideo to throw for invalid timeout.")
+        } catch let error as VideoExportError {
+            if case .invalidConfiguration(let message) = error {
+                #expect(message.contains("Timeout"))
+            } else {
+                #expect(Bool(false), "Unexpected error: \(error)")
+            }
+        } catch {
+            #expect(Bool(false), "Unexpected error type: \(error)")
+        }
+    }
+
 #if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
     @Test("Video export writes a file")
     func exportVideoWritesFile() async throws {
@@ -95,6 +117,53 @@ struct ExportTests {
             try? FileManager.default.removeItem(at: url)
         }
     }
+
+    @Test("Video export preserves orientation for static frame")
+    @MainActor
+    func exportVideoPreservesOrientation() async throws {
+        let size = CGSize(width: 180, height: 180)
+        let margin = 20
+
+        guard let snapshot = MeshingKit.snapshotCGImage(
+            template: .size2(.tropicalParadise),
+            size: size,
+            scale: 1,
+            smoothsColors: true
+        ) else {
+            #expect(Bool(false), "Expected snapshotCGImage to succeed.")
+            return
+        }
+
+        let url = try await MeshingKit.exportVideo(
+            template: .size2(.tropicalParadise),
+            size: size,
+            duration: 1.0,
+            frameRate: 1,
+            animate: false,
+            smoothsColors: true,
+            renderScale: 1
+        )
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
+        generator.appliesPreferredTrackTransform = true
+        let frame = try generator.copyCGImage(at: .zero, actualTime: nil)
+
+        let snapTL = sampleRGB(snapshot, x: margin, y: margin)
+        let snapTR = sampleRGB(snapshot, x: snapshot.width - margin - 1, y: margin)
+        let snapBL = sampleRGB(snapshot, x: margin, y: snapshot.height - margin - 1)
+        let snapBR = sampleRGB(snapshot, x: snapshot.width - margin - 1, y: snapshot.height - margin - 1)
+
+        let videoTL = sampleRGB(frame, x: margin, y: margin)
+        let videoTR = sampleRGB(frame, x: frame.width - margin - 1, y: margin)
+        let videoBL = sampleRGB(frame, x: margin, y: frame.height - margin - 1)
+        let videoBR = sampleRGB(frame, x: frame.width - margin - 1, y: frame.height - margin - 1)
+
+        #expect(colorDistance(snapTL, videoTL) < colorDistance(snapTL, videoBL))
+        #expect(colorDistance(snapTR, videoTR) < colorDistance(snapTR, videoBR))
+        #expect(colorDistance(snapBL, videoBL) < colorDistance(snapBL, videoTL))
+        #expect(colorDistance(snapBR, videoBR) < colorDistance(snapBR, videoTR))
+    }
 #endif
 }
 
@@ -102,4 +171,46 @@ private func isApproximatelyEqual(_ lhs: Double, _ rhs: Double, tolerance: Doubl
     -> Bool
 {
     abs(lhs - rhs) <= tolerance
+}
+
+private func sampleRGB(_ image: CGImage, x: Int, y: Int) -> (r: Int, g: Int, b: Int) {
+    let clampedX = max(0, min(image.width - 1, x))
+    let clampedY = max(0, min(image.height - 1, y))
+
+    let bytesPerPixel = 4
+    let bytesPerRow = bytesPerPixel * image.width
+    var data = [UInt8](repeating: 0, count: bytesPerRow * image.height)
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
+
+    data.withUnsafeMutableBytes { rawBuffer in
+        guard let baseAddress = rawBuffer.baseAddress else { return }
+        guard let context = CGContext(
+            data: baseAddress,
+            width: image.width,
+            height: image.height,
+            bitsPerComponent: 8,
+            bytesPerRow: bytesPerRow,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo
+        ) else {
+            return
+        }
+
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+    }
+
+    let offset = (clampedY * bytesPerRow) + (clampedX * bytesPerPixel)
+    return (
+        r: Int(data[offset]),
+        g: Int(data[offset + 1]),
+        b: Int(data[offset + 2])
+    )
+}
+
+private func colorDistance(_ lhs: (r: Int, g: Int, b: Int), _ rhs: (r: Int, g: Int, b: Int)) -> Int {
+    let dr = lhs.r - rhs.r
+    let dg = lhs.g - rhs.g
+    let db = lhs.b - rhs.b
+    return dr * dr + dg * dg + db * db
 }

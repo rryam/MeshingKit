@@ -9,7 +9,6 @@ import SwiftUI
 
 #if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
 import AVFoundation
-import CoreImage
 #if canImport(UIKit)
 import UIKit
 #elseif canImport(AppKit)
@@ -26,28 +25,58 @@ public extension MeshingKit {
     final class ContinuationHolder: @unchecked Sendable {
         private let lock = NSLock()
         private var continuation: CheckedContinuation<Void, Error>?
-        private var hasResumed = false
+        private var completion: Result<Void, Error>?
 
         func set(_ continuation: CheckedContinuation<Void, Error>) {
+            var pendingCompletion: Result<Void, Error>?
             lock.lock()
-            defer { lock.unlock() }
-            self.continuation = continuation
+            if let completion {
+                pendingCompletion = completion
+            } else {
+                self.continuation = continuation
+            }
+            lock.unlock()
+
+            guard let pendingCompletion else { return }
+            switch pendingCompletion {
+            case .success:
+                continuation.resume()
+            case .failure(let error):
+                continuation.resume(throwing: error)
+            }
         }
 
         func resumeWithCancellation() {
-            lock.lock()
-            defer { lock.unlock() }
-            guard !hasResumed, let cont = continuation else { return }
-            hasResumed = true
-            continuation = nil
-            cont.resume(throwing: CancellationError())
+            resume(throwing: CancellationError())
         }
 
-        func markResumed() {
+        func resume(throwing error: Error) {
+            complete(with: .failure(error))
+        }
+
+        func resume() {
+            complete(with: .success(()))
+        }
+
+        private func complete(with result: Result<Void, Error>) {
+            var continuationToResume: CheckedContinuation<Void, Error>?
             lock.lock()
-            defer { lock.unlock() }
-            hasResumed = true
+            guard completion == nil else {
+                lock.unlock()
+                return
+            }
+            completion = result
+            continuationToResume = continuation
             continuation = nil
+            lock.unlock()
+
+            guard let continuationToResume else { return }
+            switch result {
+            case .success:
+                continuationToResume.resume()
+            case .failure(let error):
+                continuationToResume.resume(throwing: error)
+            }
         }
     }
 
@@ -73,6 +102,19 @@ public extension MeshingKit {
         let viewSize: CGSize
         let outputSize: CGSize
         let snapshot: VideoExportSnapshot
+        let precomputedAnimatedPositions: [[SIMD2<Float>]]?
+
+        func points(forFrame frameIndex: Int) -> [SIMD2<Float>] {
+            if let precomputedAnimatedPositions {
+                return precomputedAnimatedPositions[frameIndex]
+            }
+            let phase = Double(frameIndex) * timePerFrame
+            return MeshingKit.animatedPositions(
+                for: phase,
+                positions: snapshot.positions,
+                animate: snapshot.shouldAnimate
+            )
+        }
     }
 
     static func makeLoopConfig(config: VideoExportConfig) -> FrameLoopConfig {
@@ -81,13 +123,29 @@ public extension MeshingKit {
             Int((config.duration * Double(config.frameRate)).rounded(.toNearestOrAwayFromZero))
         )
         let timePerFrame = 1.0 / Double(config.frameRate)
+        let shouldPrecompute = config.snapshot.shouldAnimate
+            && totalFrames <= maxPrecomputedAnimationFrames
+
+        let precomputedAnimatedPositions: [[SIMD2<Float>]]? = if shouldPrecompute {
+            (0..<totalFrames).map { frameIndex in
+                let phase = Double(frameIndex) * timePerFrame
+                return MeshingKit.animatedPositions(
+                    for: phase,
+                    positions: config.snapshot.positions,
+                    animate: true
+                )
+            }
+        } else {
+            nil
+        }
 
         return FrameLoopConfig(
             totalFrames: totalFrames,
             timePerFrame: timePerFrame,
             viewSize: config.viewSize,
             outputSize: config.outputSize,
-            snapshot: config.snapshot
+            snapshot: config.snapshot,
+            precomputedAnimatedPositions: precomputedAnimatedPositions
         )
     }
 
@@ -100,15 +158,15 @@ public extension MeshingKit {
         )
 
         let frameDuration = CMTimeMake(value: 1, timescale: config.frameRate)
-        let context = CIContext(options: [.useSoftwareRenderer: false])
         let state = VideoWriterState()
 
         return FrameLoopDriver(
             assetConfig: assetConfig,
-            context: context,
             frameDuration: frameDuration,
             state: state
         )
     }
+
+    private static let maxPrecomputedAnimationFrames = 12_000
 }
 #endif
