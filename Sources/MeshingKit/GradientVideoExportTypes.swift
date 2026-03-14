@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import simd
 
 #if canImport(AVFoundation) && canImport(CoreImage) && (canImport(UIKit) || canImport(AppKit))
 import AVFoundation
@@ -103,12 +104,17 @@ public extension MeshingKit {
         let outputSize: CGSize
         let snapshot: VideoExportSnapshot
         let precomputedAnimatedPositions: [[SIMD2<Float>]]?
+        let animationPattern: AnimationPattern?
 
         func points(forFrame frameIndex: Int) -> [SIMD2<Float>] {
             if let precomputedAnimatedPositions {
                 return precomputedAnimatedPositions[frameIndex]
             }
             let phase = Double(frameIndex) * timePerFrame
+            if let pattern = animationPattern {
+                let animated = pattern.apply(to: snapshot.positions, at: phase)
+                return animated.map { simd_clamp($0, .zero, SIMD2<Float>(repeating: 1)) }
+            }
             return MeshingKit.animatedPositions(
                 for: phase,
                 positions: snapshot.positions,
@@ -125,10 +131,15 @@ public extension MeshingKit {
         let timePerFrame = 1.0 / Double(config.frameRate)
         let shouldPrecompute = config.snapshot.shouldAnimate
             && totalFrames <= maxPrecomputedAnimationFrames
+        let pattern = config.snapshot.animationPattern
 
         let precomputedAnimatedPositions: [[SIMD2<Float>]]? = if shouldPrecompute {
             (0..<totalFrames).map { frameIndex in
                 let phase = Double(frameIndex) * timePerFrame
+                if let pattern {
+                    let animated = pattern.apply(to: config.snapshot.positions, at: phase)
+                    return animated.map { simd_clamp($0, .zero, SIMD2<Float>(repeating: 1)) }
+                }
                 return MeshingKit.animatedPositions(
                     for: phase,
                     positions: config.snapshot.positions,
@@ -145,7 +156,8 @@ public extension MeshingKit {
             viewSize: config.viewSize,
             outputSize: config.outputSize,
             snapshot: config.snapshot,
-            precomputedAnimatedPositions: precomputedAnimatedPositions
+            precomputedAnimatedPositions: precomputedAnimatedPositions,
+            animationPattern: pattern
         )
     }
 

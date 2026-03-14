@@ -221,6 +221,7 @@ public extension MeshingKit {
     ///   - animate: Whether to animate (default: true).
     ///   - smoothsColors: Whether to smooth colors (default: true).
     ///   - renderScale: Render scale multiplier (default: 1.0).
+    ///   - animationPattern: Optional custom animation pattern to apply during export (default: nil).
     ///   - fileName: The default file name (default: "mesh-gradient").
     ///   - timeout: Maximum time allowed for export (default: 30 minutes).
     ///   - completion: Called with the result URL or error.
@@ -235,6 +236,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil,
         fileName: String = "mesh-gradient",
         timeout: TimeInterval = videoExportTimeout,
         completion: @escaping (Result<URL, Error>) -> Void
@@ -271,6 +273,7 @@ public extension MeshingKit {
                         animate: animate,
                         smoothsColors: smoothsColors,
                         renderScale: renderScale,
+                        animationPattern: animationPattern,
                         timeout: timeout
                     )
 
@@ -303,6 +306,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil,
         fileName: String = "mesh-gradient",
         timeout: TimeInterval = videoExportTimeout,
         completion: @escaping (Result<URL, Error>) -> Void
@@ -317,6 +321,7 @@ public extension MeshingKit {
             animate: animate,
             smoothsColors: smoothsColors,
             renderScale: renderScale,
+            animationPattern: animationPattern,
             fileName: fileName,
             timeout: timeout,
             completion: completion
@@ -342,6 +347,7 @@ public extension MeshingKit {
             animate: configuration.animate,
             smoothsColors: configuration.smoothsColors,
             renderScale: configuration.renderScale,
+            animationPattern: configuration.animationPattern,
             fileName: fileName,
             timeout: timeout,
             completion: completion

@@ -27,6 +27,7 @@ public struct VideoExportSnapshot: Sendable {
     public let showDots: Bool
     public let shouldAnimate: Bool
     public let renderScale: CGFloat
+    public let animationPattern: AnimationPattern?
 
     public init(
         gridSize: Int,
@@ -37,7 +38,8 @@ public struct VideoExportSnapshot: Sendable {
         blurRadius: CGFloat,
         showDots: Bool,
         shouldAnimate: Bool,
-        renderScale: CGFloat
+        renderScale: CGFloat,
+        animationPattern: AnimationPattern? = nil
     ) {
         self.gridSize = gridSize
         self.positions = positions
@@ -48,6 +50,7 @@ public struct VideoExportSnapshot: Sendable {
         self.showDots = showDots
         self.shouldAnimate = shouldAnimate
         self.renderScale = renderScale
+        self.animationPattern = animationPattern
     }
 }
 
@@ -61,6 +64,7 @@ public struct VideoExportConfiguration: Sendable {
     public var animate: Bool
     public var smoothsColors: Bool
     public var renderScale: CGFloat
+    public var animationPattern: AnimationPattern?
 
     public init(
         size: CGSize,
@@ -70,7 +74,8 @@ public struct VideoExportConfiguration: Sendable {
         showDots: Bool = false,
         animate: Bool = true,
         smoothsColors: Bool = true,
-        renderScale: CGFloat = 1.0
+        renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil
     ) {
         self.size = size
         self.duration = duration
@@ -80,6 +85,7 @@ public struct VideoExportConfiguration: Sendable {
         self.animate = animate
         self.smoothsColors = smoothsColors
         self.renderScale = renderScale
+        self.animationPattern = animationPattern
     }
 }
 
@@ -106,6 +112,7 @@ public extension MeshingKit {
             animate: configuration.animate,
             smoothsColors: configuration.smoothsColors,
             renderScale: configuration.renderScale,
+            animationPattern: configuration.animationPattern,
             timeout: timeout
         )
     }
@@ -122,6 +129,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil,
         timeout: TimeInterval = videoExportTimeout
     ) async throws -> URL {
         try validateVideoExportConfiguration(
@@ -141,7 +149,8 @@ public extension MeshingKit {
             showDots: showDots,
             animate: animate,
             smoothsColors: smoothsColors,
-            renderScale: renderScale
+            renderScale: renderScale,
+            animationPattern: animationPattern
         )
 
         let params = buildExportParams(template: template, size: size, config: config, timeout: timeout)
@@ -190,7 +199,8 @@ public extension MeshingKit {
             blurRadius: config.blurRadius,
             showDots: config.showDots,
             shouldAnimate: config.animate,
-            renderScale: config.renderScale
+            renderScale: config.renderScale,
+            animationPattern: config.animationPattern
         )
 
         return VideoExportParams(
@@ -271,6 +281,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil,
         timeout: TimeInterval = videoExportTimeout
     ) async throws -> URL {
         try await exportVideo(
@@ -283,6 +294,7 @@ public extension MeshingKit {
             animate: animate,
             smoothsColors: smoothsColors,
             renderScale: renderScale,
+            animationPattern: animationPattern,
             timeout: timeout
         )
     }

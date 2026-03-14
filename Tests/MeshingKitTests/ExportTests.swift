@@ -118,6 +118,43 @@ struct ExportTests {
         }
     }
 
+    @Test("Video export uses custom animation pattern")
+    func exportVideoUsesCustomAnimationPattern() async throws {
+        let template = GradientTemplateSize3.auroraBorealis
+        let size = CGSize(width: 200, height: 200)
+
+        let pattern = AnimationPattern(animations: [
+            PointAnimation(pointIndex: 4, axis: .both, amplitude: 0.45, frequency: 0.0)
+        ])
+
+        let urlDefault = try await MeshingKit.exportVideo(
+            template: template, size: size, duration: 1, frameRate: 1
+        )
+        let urlCustom = try await MeshingKit.exportVideo(
+            template: template, size: size, duration: 1, frameRate: 1, animationPattern: pattern
+        )
+        defer {
+            try? FileManager.default.removeItem(at: urlDefault)
+            try? FileManager.default.removeItem(at: urlCustom)
+        }
+
+        let generator1 = AVAssetImageGenerator(asset: AVURLAsset(url: urlDefault))
+        generator1.appliesPreferredTrackTransform = true
+        let generator2 = AVAssetImageGenerator(asset: AVURLAsset(url: urlCustom))
+        generator2.appliesPreferredTrackTransform = true
+
+        let frameDefault = try generator1.copyCGImage(at: .zero, actualTime: nil)
+        let frameCustom = try generator2.copyCGImage(at: .zero, actualTime: nil)
+
+        let centerDefault = sampleRGB(frameDefault, x: 100, y: 100)
+        let centerCustom = sampleRGB(frameCustom, x: 100, y: 100)
+
+        #expect(
+            colorDistance(centerDefault, centerCustom) > 100,
+            "Center pixel should differ between default and custom animation pattern exports"
+        )
+    }
+
     @Test("Video export preserves orientation for static frame")
     @MainActor
     func exportVideoPreservesOrientation() async throws {
