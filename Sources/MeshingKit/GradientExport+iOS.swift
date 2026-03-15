@@ -137,6 +137,7 @@ public extension MeshingKit {
     ///   - showDots: Whether to show dots (default: false).
     ///   - animate: Whether to animate (default: true).
     ///   - smoothsColors: Whether to smooth colors (default: true).
+    ///   - animationPattern: Optional custom animation pattern to apply during export (default: nil).
     ///   - completion: Called with the result. Temporary files are cleaned up automatically.
     public static func exportVideoToPhotoLibrary(
         template: any GradientTemplate,
@@ -148,6 +149,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil,
         completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
         Task {
@@ -161,7 +163,8 @@ public extension MeshingKit {
                     showDots: showDots,
                     animate: animate,
                     smoothsColors: smoothsColors,
-                    renderScale: renderScale
+                    renderScale: renderScale,
+                    animationPattern: animationPattern
                 )
 
                 do {
@@ -207,6 +210,7 @@ public extension MeshingKit {
             animate: configuration.animate,
             smoothsColors: configuration.smoothsColors,
             renderScale: configuration.renderScale,
+            animationPattern: configuration.animationPattern,
             completion: completion
         )
     }
@@ -224,6 +228,7 @@ public extension MeshingKit {
         animate: Bool = true,
         smoothsColors: Bool = true,
         renderScale: CGFloat = 1.0,
+        animationPattern: AnimationPattern? = nil,
         completion: @escaping @Sendable (Result<Void, Error>) -> Void
     ) {
         exportVideoToPhotoLibrary(
@@ -236,6 +241,7 @@ public extension MeshingKit {
             animate: animate,
             smoothsColors: smoothsColors,
             renderScale: renderScale,
+            animationPattern: animationPattern,
             completion: completion
         )
     }
