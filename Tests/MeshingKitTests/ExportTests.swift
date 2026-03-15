@@ -143,8 +143,8 @@ struct ExportTests {
         let generator2 = AVAssetImageGenerator(asset: AVURLAsset(url: urlCustom))
         generator2.appliesPreferredTrackTransform = true
 
-        let frameDefault = try generator1.copyCGImage(at: .zero, actualTime: nil)
-        let frameCustom = try generator2.copyCGImage(at: .zero, actualTime: nil)
+        let frameDefault = try await image(at: .zero, generator: generator1)
+        let frameCustom = try await image(at: .zero, generator: generator2)
 
         let centerDefault = sampleRGB(frameDefault, x: 100, y: 100)
         let centerCustom = sampleRGB(frameCustom, x: 100, y: 100)
@@ -152,6 +152,48 @@ struct ExportTests {
         #expect(
             colorDistance(centerDefault, centerCustom) > 100,
             "Center pixel should differ between default and custom animation pattern exports"
+        )
+    }
+
+    @Test("Video export ignores custom animation pattern when animate is false")
+    func exportVideoIgnoresCustomAnimationPatternWhenAnimationDisabled() async throws {
+        let template = GradientTemplateSize3.auroraBorealis
+        let size = CGSize(width: 200, height: 200)
+
+        let pattern = AnimationPattern(animations: [
+            PointAnimation(pointIndex: 4, axis: .both, amplitude: 0.45, frequency: 0.0)
+        ])
+
+        let urlStatic = try await MeshingKit.exportVideo(
+            template: template, size: size, duration: 1, frameRate: 1, animate: false
+        )
+        let urlStaticWithPattern = try await MeshingKit.exportVideo(
+            template: template,
+            size: size,
+            duration: 1,
+            frameRate: 1,
+            animate: false,
+            animationPattern: pattern
+        )
+        defer {
+            try? FileManager.default.removeItem(at: urlStatic)
+            try? FileManager.default.removeItem(at: urlStaticWithPattern)
+        }
+
+        let generator1 = AVAssetImageGenerator(asset: AVURLAsset(url: urlStatic))
+        generator1.appliesPreferredTrackTransform = true
+        let generator2 = AVAssetImageGenerator(asset: AVURLAsset(url: urlStaticWithPattern))
+        generator2.appliesPreferredTrackTransform = true
+
+        let frameStatic = try await image(at: .zero, generator: generator1)
+        let frameStaticWithPattern = try await image(at: .zero, generator: generator2)
+
+        let centerStatic = sampleRGB(frameStatic, x: 100, y: 100)
+        let centerStaticWithPattern = sampleRGB(frameStaticWithPattern, x: 100, y: 100)
+
+        #expect(
+            colorDistance(centerStatic, centerStaticWithPattern) == 0,
+            "Custom animation patterns should be ignored when animate is false"
         )
     }
 
@@ -184,7 +226,7 @@ struct ExportTests {
 
         let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
         generator.appliesPreferredTrackTransform = true
-        let frame = try generator.copyCGImage(at: .zero, actualTime: nil)
+        let frame = try await image(at: .zero, generator: generator)
 
         let snapTL = sampleRGB(snapshot, x: margin, y: margin)
         let snapTR = sampleRGB(snapshot, x: snapshot.width - margin - 1, y: margin)
@@ -208,6 +250,11 @@ private func isApproximatelyEqual(_ lhs: Double, _ rhs: Double, tolerance: Doubl
     -> Bool
 {
     abs(lhs - rhs) <= tolerance
+}
+
+private func image(at time: CMTime, generator: AVAssetImageGenerator) async throws -> CGImage {
+    let frame = try await generator.image(at: time)
+    return frame.image
 }
 
 private func sampleRGB(_ image: CGImage, x: Int, y: Int) -> (r: Int, g: Int, b: Int) {

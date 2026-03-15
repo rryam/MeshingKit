@@ -131,7 +131,7 @@ public extension MeshingKit {
         let timePerFrame = 1.0 / Double(config.frameRate)
         let shouldPrecompute = config.snapshot.shouldAnimate
             && totalFrames <= maxPrecomputedAnimationFrames
-        let pattern = config.snapshot.animationPattern
+        let pattern = config.snapshot.shouldAnimate ? config.snapshot.animationPattern : nil
 
         let precomputedAnimatedPositions: [[SIMD2<Float>]]? = if shouldPrecompute {
             (0..<totalFrames).map { frameIndex in
