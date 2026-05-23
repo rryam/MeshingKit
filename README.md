@@ -1,6 +1,5 @@
 # MeshingKit
 
-
 ![Gradient](Sources/Resources/gradient.jpg)
 
 ![Swift](https://img.shields.io/badge/Swift-6.2-orange.svg)
@@ -10,14 +9,6 @@
 ![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)
 
 MeshingKit provides an easy way to create mesh gradients in SwiftUI with predefined gradient templates to directly render beautiful, gorgeous gradients!
-
-## Support
-
-Love this project? Check out my books to explore more of AI and iOS development:
-- [Exploring AI for iOS Development](https://academy.rudrank.com/product/ai)
-- [Exploring AI-Assisted Coding for iOS Development](https://academy.rudrank.com/product/ai-assisted-coding)
-
-Your support helps to keep this project growing!
 
 ## Meshing
 
