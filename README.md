@@ -357,7 +357,7 @@ This extension supports various hex formats:
 - "#RRGGBB" (24-bit)
 - "#AARRGGBB" (32-bit with alpha)
 
-`Color(hex:)` requires valid input and fails fast for invalid strings. Use `Color(validatingHex:)` for user-provided input that should return `nil` instead.
+`Color(hex:)` tolerates simple copied input such as extra surrounding punctuation and falls back to opaque white when it cannot parse a color. Use `Color(validatingHex:)` for user-provided input that should return `nil` instead.
 
 ## Export Helpers
 
