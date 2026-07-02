@@ -348,6 +348,7 @@ There is an extension on `Color` that allows to initialise colors using hexadeci
 
 ```swift
 let color = Color(hex: "#FF5733")
+let userColor = Color(validatingHex: input)
 ```
 
 This extension supports various hex formats:
@@ -355,6 +356,8 @@ This extension supports various hex formats:
 - "#RGB" (12-bit)
 - "#RRGGBB" (24-bit)
 - "#AARRGGBB" (32-bit with alpha)
+
+`Color(hex:)` requires valid input and fails fast for invalid strings. Use `Color(validatingHex:)` for user-provided input that should return `nil` instead.
 
 ## Export Helpers
 

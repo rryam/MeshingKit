@@ -31,23 +31,48 @@ extension Color {
     /// - Parameter hex: A string representing the color in hexadecimal format.
     ///                  The "#" prefix is optional.
     ///
-    /// - Note: If an invalid hex string is provided, the color will default to opaque white.
+    /// - Precondition: `hex` must be a valid 3-, 6-, or 8-digit hexadecimal color string.
+    ///                 Use `init?(validatingHex:)` when handling user-provided input.
     public init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        let validHexDigits = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
-        let isValidLength = hex.count == 3 || hex.count == 6 || hex.count == 8
-        let hasOnlyHexDigits = !hex.isEmpty && hex.unicodeScalars.allSatisfy { validHexDigits.contains($0) }
+        guard let color = Color(validatingHex: hex) else {
+            preconditionFailure("Invalid hex color string: \(hex)")
+        }
 
-        guard isValidLength, hasOnlyHexDigits, let int = UInt64(hex, radix: 16) else {
-            self.init(.sRGB, red: 1, green: 1, blue: 1, opacity: 1)
-            return
+        self = color
+    }
+
+    /// Initializes a `Color` instance from a hexadecimal color string, returning `nil` for invalid input.
+    ///
+    /// This initializer supports the following hex formats:
+    /// - "#RGB" (12-bit)
+    /// - "#RRGGBB" (24-bit)
+    /// - "#AARRGGBB" (32-bit with alpha)
+    ///
+    /// - Parameter hex: A string representing the color in hexadecimal format.
+    ///                  The "#" prefix is optional.
+    public init?(validatingHex hex: String) {
+        let hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedHex: String
+        if hex.hasPrefix("#") {
+            normalizedHex = String(hex.dropFirst())
+        } else {
+            normalizedHex = hex
+        }
+
+        let validHexDigits = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+        let isValidLength = normalizedHex.count == 3 || normalizedHex.count == 6 || normalizedHex.count == 8
+        let hasOnlyHexDigits = !normalizedHex.isEmpty
+            && normalizedHex.unicodeScalars.allSatisfy { validHexDigits.contains($0) }
+
+        guard isValidLength, hasOnlyHexDigits, let int = UInt64(normalizedHex, radix: 16) else {
+            return nil
         }
 
         let a: UInt64
         let r: UInt64
         let g: UInt64
         let b: UInt64
-        switch hex.count {
+        switch normalizedHex.count {
         case 3:  // RGB (12-bit)
             (a, r, g, b) = (
                 255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17
