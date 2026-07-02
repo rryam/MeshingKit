@@ -75,24 +75,27 @@ struct MeshingKitTests {
         #expect(type(of: color) == Color.self)
     }
 
-    @Test("Hex color extension handles invalid input")
+    @Test("Hex color extension rejects invalid input")
     func hexColorInvalidInput() {
         let invalidColors = [
             "not-a-hex",
             "#GGGGGG",
             "#12345",
             "#FF0000ZZ",
-            "#80FF0000extra"
+            "#80FF0000extra",
+            "#FF0000!"
         ]
 
         for hexValue in invalidColors {
-            let color = Color(hex: hexValue)
-            let rgba = resolvedRGBA(color)
-            #expect(isApproximatelyEqual(rgba.r, 1.0))
-            #expect(isApproximatelyEqual(rgba.g, 1.0))
-            #expect(isApproximatelyEqual(rgba.b, 1.0))
-            #expect(isApproximatelyEqual(rgba.a, 1.0))
+            #expect(Color(validatingHex: hexValue) == nil)
         }
+    }
+
+    @Test("Validated hex color extension handles valid input")
+    func validatedHexColorValidInput() {
+        let color = Color(validatingHex: "#FF0000")
+
+        #expect(color?.hexString() == "#FF0000")
     }
 
     @Test("Hex color extension outputs hex string")
