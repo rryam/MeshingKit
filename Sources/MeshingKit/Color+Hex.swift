@@ -31,11 +31,18 @@ extension Color {
     /// - Parameter hex: A string representing the color in hexadecimal format.
     ///                  The "#" prefix is optional.
     ///
-    /// - Precondition: `hex` must be a valid 3-, 6-, or 8-digit hexadecimal color string.
-    ///                 Use `init?(validatingHex:)` when handling user-provided input.
+    /// - Note: If an invalid hex string is provided, the color will default to opaque white.
+    ///         Use `init?(validatingHex:)` when handling user-provided input that should fail validation.
     public init(hex: String) {
-        guard let color = Color(validatingHex: hex) else {
-            preconditionFailure("Invalid hex color string: \(hex)")
+        if let color = Color(validatingHex: hex) {
+            self = color
+            return
+        }
+
+        let normalizedHex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        guard let color = Color(validatingNormalizedHex: normalizedHex) else {
+            self.init(.sRGB, red: 1, green: 1, blue: 1, opacity: 1)
+            return
         }
 
         self = color
@@ -59,6 +66,14 @@ extension Color {
             normalizedHex = hex
         }
 
+        guard let color = Color(validatingNormalizedHex: normalizedHex) else {
+            return nil
+        }
+
+        self = color
+    }
+
+    private init?(validatingNormalizedHex normalizedHex: String) {
         let validHexDigits = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
         let isValidLength = normalizedHex.count == 3 || normalizedHex.count == 6 || normalizedHex.count == 8
         let hasOnlyHexDigits = !normalizedHex.isEmpty

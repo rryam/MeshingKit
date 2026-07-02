@@ -75,7 +75,7 @@ struct MeshingKitTests {
         #expect(type(of: color) == Color.self)
     }
 
-    @Test("Hex color extension rejects invalid input")
+    @Test("Hex color extension rejects invalid strict input")
     func hexColorInvalidInput() {
         let invalidColors = [
             "not-a-hex",
@@ -83,11 +83,36 @@ struct MeshingKitTests {
             "#12345",
             "#FF0000ZZ",
             "#80FF0000extra",
-            "#FF0000!"
+            "#FF0000!",
+            "##FF0000",
+            "FF5733;;"
         ]
 
         for hexValue in invalidColors {
             #expect(Color(validatingHex: hexValue) == nil)
+        }
+    }
+
+    @Test("Hex color extension tolerates user-data-like input")
+    func hexColorToleratesUserDataLikeInput() {
+        #expect(Color(hex: "##FF0000").hexString() == "#FF0000")
+        #expect(Color(hex: "FF5733;;").hexString() == "#FF5733")
+    }
+
+    @Test("Hex color extension falls back to white for invalid input")
+    func hexColorFallsBackForInvalidInput() {
+        let invalidColors = [
+            "not-a-hex",
+            "#GGGGGG",
+            "#12345",
+            "#FF0000ZZ",
+            "#80FF0000extra"
+        ]
+
+        for hexValue in invalidColors {
+            let color = Color(hex: hexValue)
+            #expect(color.hexString() == "#FFFFFF")
+            #expect(color.hexString(includeAlpha: true) == "#FFFFFFFF")
         }
     }
 
