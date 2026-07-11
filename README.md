@@ -39,7 +39,7 @@ Add MeshingKit to your project using Swift Package Manager. In Xcode, go to File
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/rryam/MeshingKit.git", from: "2.4.0")
+    .package(url: "https://github.com/rryam/MeshingKit.git", from: "2.6.1")
 ]
 ```
 
