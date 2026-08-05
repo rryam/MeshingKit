@@ -130,6 +130,34 @@ struct MeshingKitTests {
         #expect(color.hexString(includeAlpha: true) == "#FFFF0000")
     }
 
+    @Test("Animation pattern ignores out-of-bounds point indices")
+    func animationPatternOutOfBoundsIndices() {
+        let pattern = AnimationPattern(animations: [
+            PointAnimation(pointIndex: -1, axis: .x, amplitude: 0.5),
+            PointAnimation(pointIndex: 99, axis: .y, amplitude: 0.5)
+        ])
+        let positions = Array(repeating: SIMD2<Float>(x: 0.5, y: 0.5), count: 4)
+
+        let animated = pattern.apply(to: positions, at: 1.0)
+
+        #expect(animated == positions)
+    }
+
+    @Test("Hex string stays well-formed for out-of-range colors")
+    func hexStringClampsComponents() {
+        let color = Color(.sRGB, red: 1.5, green: -0.25, blue: 0.5, opacity: 1)
+
+        #expect(color.hexString() == "#FF0080")
+    }
+
+    @Test("Template names are split from camel case")
+    func templateDisplayNames() {
+        #expect(GradientTemplateSize2.mysticTwilight.name == "Mystic Twilight")
+        #expect(GradientTemplateSize3.auroraBorealis.name == "Aurora Borealis")
+        #expect(GradientTemplateSize4.cosmicNebula.name == "Cosmic Nebula")
+        #expect(GradientTemplateSize3.intelligence.name == "Intelligence")
+    }
+
     @Test("Animated positions ignore unsupported counts")
     func animatedPositionsUnsupportedCounts() {
         let positions = Array(repeating: SIMD2<Float>(x: 0.5, y: 0.5), count: 5)

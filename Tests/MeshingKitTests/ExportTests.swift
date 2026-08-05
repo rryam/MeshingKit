@@ -257,7 +257,13 @@ private func image(at time: CMTime, generator: AVAssetImageGenerator) async thro
     return frame.image
 }
 
-private func sampleRGB(_ image: CGImage, x: Int, y: Int) -> (r: Int, g: Int, b: Int) {
+private struct SampledColor {
+    let r: Int
+    let g: Int
+    let b: Int
+}
+
+private func sampleRGB(_ image: CGImage, x: Int, y: Int) -> SampledColor {
     let clampedX = max(0, min(image.width - 1, x))
     let clampedY = max(0, min(image.height - 1, y))
 
@@ -285,16 +291,16 @@ private func sampleRGB(_ image: CGImage, x: Int, y: Int) -> (r: Int, g: Int, b: 
     }
 
     let offset = (clampedY * bytesPerRow) + (clampedX * bytesPerPixel)
-    return (
+    return SampledColor(
         r: Int(data[offset]),
         g: Int(data[offset + 1]),
         b: Int(data[offset + 2])
     )
 }
 
-private func colorDistance(_ lhs: (r: Int, g: Int, b: Int), _ rhs: (r: Int, g: Int, b: Int)) -> Int {
-    let dr = lhs.r - rhs.r
-    let dg = lhs.g - rhs.g
-    let db = lhs.b - rhs.b
-    return dr * dr + dg * dg + db * db
+private func colorDistance(_ lhs: SampledColor, _ rhs: SampledColor) -> Int {
+    let deltaR = lhs.r - rhs.r
+    let deltaG = lhs.g - rhs.g
+    let deltaB = lhs.b - rhs.b
+    return deltaR * deltaR + deltaG * deltaG + deltaB * deltaB
 }

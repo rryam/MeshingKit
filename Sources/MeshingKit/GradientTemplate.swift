@@ -39,6 +39,31 @@ public protocol GradientTemplate: Sendable {
     var background: Color { get }
 }
 
+extension String {
+    /// A user-facing form of a camelCase identifier: "auroraBorealis" -> "Aurora Borealis".
+    var camelCaseDisplayName: String {
+        var words: [String] = []
+        var current = ""
+
+        for character in self {
+            if character.isUppercase, !current.isEmpty {
+                words.append(current)
+                current = String(character)
+            } else {
+                current.append(character)
+            }
+        }
+
+        if !current.isEmpty {
+            words.append(current)
+        }
+
+        return words
+            .map { $0.prefix(1).uppercased() + $0.dropFirst() }
+            .joined(separator: " ")
+    }
+}
+
 /// A structure that implements the GradientTemplate protocol for custom gradients.
 public struct CustomGradientTemplate: GradientTemplate {
 

@@ -19,6 +19,10 @@ struct RGBAComponents {
     let a: Double
 }
 
+private func clampedUnit(_ value: CGFloat) -> Double {
+    min(max(Double(value), 0), 1)
+}
+
 extension Color {
 
     /// Initializes a `Color` instance from a hexadecimal color string.
@@ -121,16 +125,26 @@ extension Color {
         guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &a) else {
             return nil
         }
-        return RGBAComponents(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+        // getRed can return extended-range sRGB values for wide-gamut colors;
+        // clamp so hex/CSS output stays two digits per channel.
+        return RGBAComponents(
+            r: clampedUnit(r), g: clampedUnit(g), b: clampedUnit(b), a: clampedUnit(a)
+        )
 #elseif canImport(AppKit)
         let platformColor = NSColor(self)
-        let srgb = platformColor.usingColorSpace(.sRGB) ?? platformColor
+        // Colors that can't be represented in sRGB (e.g. pattern colors) would
+        // raise from getRed; treat a failed conversion as unconvertible.
+        guard let srgb = platformColor.usingColorSpace(.sRGB) else {
+            return nil
+        }
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
         srgb.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return RGBAComponents(r: Double(r), g: Double(g), b: Double(b), a: Double(a))
+        return RGBAComponents(
+            r: clampedUnit(r), g: clampedUnit(g), b: clampedUnit(b), a: clampedUnit(a)
+        )
 #else
         return nil
 #endif

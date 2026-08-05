@@ -18,6 +18,13 @@ struct PredefinedTemplateTests {
         #expect(template.moods.contains(.cool))
     }
 
+    @Test("PredefinedTemplate moods match lemmatized name tokens")
+    func predefinedTemplateMoodsLemmatized() {
+        // "dunes" lemmatizes to "dune"; the earthy keyword list stores "dunes".
+        let template = PredefinedTemplate.size2(.saharaDunes)
+        #expect(template.moods.contains(.earthy))
+    }
+
     @Test("PredefinedTemplate find by query")
     func predefinedTemplateFind() {
         let results = PredefinedTemplate.find(by: "aurora")

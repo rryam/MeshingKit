@@ -138,7 +138,7 @@ public struct AnimatedMeshGradientView: View {
         let adjustedTimeInterval =
             date.timeIntervalSinceReferenceDate * animationSpeed
 
-        if let animationPattern, gridSize >= 3 {
+        if let animationPattern {
             let animated = animationPattern.apply(to: positions, at: adjustedTimeInterval)
             return clampedToUnitSquare(animated)
         }
