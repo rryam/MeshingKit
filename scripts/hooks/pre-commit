@@ -30,8 +30,11 @@ fi
 echo "Checking staged Swift files:"
 echo "$STAGED_SWIFT_FILES" | sed 's/^/  - /'
 
-# Run SwiftLint on staged files
-if echo "$STAGED_SWIFT_FILES" | xargs swiftlint lint; then
+# Run SwiftLint on staged files.
+# --force-exclude: paths passed explicitly otherwise bypass `excluded:` in
+#   .swiftlint.yml, which would flag the deliberately-excluded template files.
+# --strict: match the CI invocation so warnings fail here rather than on CI.
+if echo "$STAGED_SWIFT_FILES" | xargs swiftlint lint --force-exclude --strict; then
     echo -e "${GREEN}✓ SwiftLint passed!${NC}"
     exit 0
 else
