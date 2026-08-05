@@ -146,7 +146,7 @@ public struct AnimationPattern: Sendable {
 
         for animation in animations {
             let index = animation.pointIndex
-            guard index < result.count else { continue }
+            guard result.indices.contains(index) else { continue }
 
             animation.apply(to: &result[index], at: phase)
         }

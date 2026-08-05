@@ -106,9 +106,13 @@ public extension MeshingKit {
                 return
             }
 
-            let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+            let isJPEG = fileType == .jpeg
+            // JPEG has no alpha channel. Rendered gradients have transparent rounded
+            // corners, which would otherwise be encoded as black.
+            let sourceImage = isJPEG ? MeshingKit.flattenedOnWhite(cgImage) ?? cgImage : cgImage
+            let bitmapRep = NSBitmapImageRep(cgImage: sourceImage)
 
-            let properties: [NSBitmapImageRep.PropertyKey: Any] = fileType == .jpeg
+            let properties: [NSBitmapImageRep.PropertyKey: Any] = isJPEG
                 ? [.compressionFactor: 0.9]
                 : [:]
 

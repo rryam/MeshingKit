@@ -23,7 +23,7 @@ public enum GradientTemplateSize4: String, CaseIterable, GradientTemplate {
 
     /// The name of the gradient template.
     public var name: String {
-        rawValue.capitalized
+        rawValue.camelCaseDisplayName
     }
 
     /// The size of the gradient, representing both width and height in pixels.

@@ -132,15 +132,6 @@ public extension MeshingKit {
         animationPattern: AnimationPattern? = nil,
         timeout: TimeInterval = videoExportTimeout
     ) async throws -> URL {
-        try validateVideoExportConfiguration(
-            template: template,
-            size: size,
-            duration: duration,
-            frameRate: frameRate,
-            renderScale: renderScale,
-            timeout: timeout
-        )
-
         let config = VideoExportConfiguration(
             size: size,
             duration: duration,
@@ -151,6 +142,12 @@ public extension MeshingKit {
             smoothsColors: smoothsColors,
             renderScale: renderScale,
             animationPattern: animationPattern
+        )
+
+        try validateVideoExportConfiguration(
+            template: template,
+            configuration: config,
+            timeout: timeout
         )
 
         let params = buildExportParams(template: template, size: size, config: config, timeout: timeout)
@@ -178,9 +175,11 @@ public extension MeshingKit {
         return tempDir.appendingPathComponent("meshGradient_\(dateString)_\(uniqueID).mp4")
     }
 
-    private static func calculateOutputSize(from size: CGSize, renderScale: CGFloat) -> CGSize {
-        let width = max(1, Int((size.width * renderScale).rounded()))
-        let height = max(1, Int((size.height * renderScale).rounded()))
+    /// Rounds to even dimensions: H.264 silently rounds odd sizes down, which would
+    /// otherwise leave the pixel buffer wider than the encoded video.
+    static func calculateOutputSize(from size: CGSize, renderScale: CGFloat) -> CGSize {
+        let width = max(2, Int((size.width * renderScale).rounded()) & ~1)
+        let height = max(2, Int((size.height * renderScale).rounded()) & ~1)
         return CGSize(width: width, height: height)
     }
 
@@ -303,12 +302,14 @@ public extension MeshingKit {
 private extension MeshingKit {
     static func validateVideoExportConfiguration(
         template: any GradientTemplate,
-        size: CGSize,
-        duration: TimeInterval,
-        frameRate: Int32,
-        renderScale: CGFloat,
+        configuration: VideoExportConfiguration,
         timeout: TimeInterval
     ) throws {
+        let size = configuration.size
+        let duration = configuration.duration
+        let frameRate = configuration.frameRate
+        let renderScale = configuration.renderScale
+
         guard validateDuration(duration) else {
             throw VideoExportError.invalidConfiguration(
                 duration > 0 ? "Duration must not exceed 1 hour." : "Duration must be greater than 0."

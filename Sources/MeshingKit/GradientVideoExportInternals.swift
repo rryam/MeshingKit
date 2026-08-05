@@ -71,44 +71,17 @@ public extension MeshingKit {
             while assetConfig.writerInput.isReadyForMoreMediaData
                 && state.frameIndex < loopConfig.totalFrames {
                 let index = state.frameIndex
-                let frameImage: CGImage
 
-                if loopConfig.snapshot.shouldAnimate {
-                    let points = loopConfig.points(forFrame: index)
-                    guard let renderedFrame = await MainActor.run(
-                        body: {
-                            renderFrame(
-                                points: points,
-                                size: loopConfig.viewSize,
-                                snapshot: loopConfig.snapshot
-                            )
-                        }
-                    ) else {
-                        state.isFinished = true
-                        continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
-                        return
-                    }
-                    frameImage = renderedFrame
-                } else {
-                    if cachedStaticFrame == nil {
-                        cachedStaticFrame = await MainActor.run(
-                            body: {
-                                renderFrame(
-                                    points: loopConfig.snapshot.positions,
-                                    size: loopConfig.viewSize,
-                                    snapshot: loopConfig.snapshot
-                                )
-                            }
-                        )
-                    }
-
-                    guard let staticFrame = cachedStaticFrame else {
-                        state.isFinished = true
-                        continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
-                        return
-                    }
-                    frameImage = staticFrame
+                guard let frameImage = await image(forFrame: index, loopConfig: loopConfig) else {
+                    state.isFinished = true
+                    continuationHolder.resume(throwing: VideoExportError.frameRenderingFailed)
+                    return
                 }
+
+                // Cancellation can run on the actor while the frame render is suspended
+                // on the main actor; appending after markAsFinished/cancelWriting raises
+                // an exception, so bail out before touching the writer again.
+                guard !state.isFinished else { return }
 
                 let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(index))
 
@@ -136,6 +109,38 @@ public extension MeshingKit {
                         )
                     }
                 }
+            }
+        }
+
+        /// Renders the frame at `index`, reusing a single cached image when the
+        /// export is not animated.
+        private func image(forFrame index: Int, loopConfig: FrameLoopConfig) async -> CGImage? {
+            guard loopConfig.snapshot.shouldAnimate else {
+                if cachedStaticFrame == nil {
+                    cachedStaticFrame = await renderOnMainActor(
+                        points: loopConfig.snapshot.positions,
+                        loopConfig: loopConfig
+                    )
+                }
+                return cachedStaticFrame
+            }
+
+            return await renderOnMainActor(
+                points: loopConfig.points(forFrame: index),
+                loopConfig: loopConfig
+            )
+        }
+
+        private func renderOnMainActor(
+            points: [SIMD2<Float>],
+            loopConfig: FrameLoopConfig
+        ) async -> CGImage? {
+            await MainActor.run {
+                renderFrame(
+                    points: points,
+                    size: loopConfig.viewSize,
+                    snapshot: loopConfig.snapshot
+                )
             }
         }
 

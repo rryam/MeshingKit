@@ -59,7 +59,7 @@ public struct ParameterizedNoiseView<Content: View>: View {
 
         content
             .colorEffect(
-                ShaderLibrary.parameterizedNoise(
+                ShaderLibrary.bundle(.module).parameterizedNoise(
                     .float(clampedIntensity),
                     .float(clampedFrequency),
                     .float(clampedOpacity)

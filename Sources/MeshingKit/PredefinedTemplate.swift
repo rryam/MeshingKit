@@ -214,13 +214,10 @@ private extension PredefinedTemplate {
     }()
 
     static func moods(for tokens: [String]) -> [TemplateMood] {
-        var matched: [TemplateMood] = []
-
-        for (mood, keywords) in moodKeywords where tokens.contains(where: keywords.contains) {
-            matched.append(mood)
+        TemplateMood.allCases.filter { mood in
+            guard let keywords = normalizedMoodKeywords[mood] else { return false }
+            return tokens.contains(where: keywords.contains)
         }
-
-        return matched
     }
 
     static func matchScore(for queryTokens: [String], in tokens: [String]) -> Int {
@@ -291,6 +288,12 @@ private extension PredefinedTemplate {
         }
 
         return result
+    }
+
+    /// Mood keywords passed through the same normalization as name tokens,
+    /// so lemmatized tokens (e.g. "dunes" -> "dune") still match.
+    static let normalizedMoodKeywords: [TemplateMood: Set<String>] = moodKeywords.mapValues { keywords in
+        Set(keywords.flatMap { normalizedTokens(from: $0) })
     }
 
     static let moodKeywords: [TemplateMood: Set<String>] = [
